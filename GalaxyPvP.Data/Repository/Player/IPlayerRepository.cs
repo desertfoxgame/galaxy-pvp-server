@@ -2,7 +2,7 @@
 
 namespace GalaxyPvP.Data
 {
-    public interface IPlayerRepository: IRepository<Player>
+    public interface IPlayerRepository: IGenericRepository<Player>
     {
     }
 }

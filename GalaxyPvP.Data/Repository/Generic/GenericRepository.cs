@@ -1,29 +1,28 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using GalaxyPvP.Data.Context;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace GalaxyPvP.Data
 {
-    public class Repository<T, TContext> : IRepository<T>
-        where T : class
-        where TContext : DbContext
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly TContext _context;
-        internal readonly DbSet<T> _dbSet;
-        protected Repository(TContext context)
+        private readonly GalaxyPvPContext _db;
+        internal DbSet<T> dbSet;
+        public GenericRepository(GalaxyPvPContext db)
         {
-            _context = context;
-            _dbSet = _context.Set<T>();
+            _db = db;
+            dbSet=_db.Set<T>();
         }
 
         public async Task CreateAsync(T entity)
         {
-            await _dbSet.AddAsync(entity);
+            await dbSet.AddAsync(entity);
             await SaveAsync();
         }
 
         public async Task<T> GetAsync(Expression<Func<T, bool>> filter = null, bool tracked = true, string? includeProperties = null)
         {
-            IQueryable<T> query = _dbSet;
+            IQueryable<T> query = dbSet;
             if (!tracked)
             {
                 query = query.AsNoTracking();
@@ -32,10 +31,10 @@ namespace GalaxyPvP.Data
             {
                 query = query.Where(filter);
             }
-
+            
             if (includeProperties != null)
             {
-                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach(var includeProp in includeProperties.Split(new char[] { ','}, StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(includeProp);
                 }
@@ -46,7 +45,7 @@ namespace GalaxyPvP.Data
         public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null,
             int pageSize = 0, int pageNumber = 1)
         {
-            IQueryable<T> query = _dbSet;
+            IQueryable<T> query = dbSet;
 
             if (filter != null)
             {
@@ -72,13 +71,15 @@ namespace GalaxyPvP.Data
 
         public async Task RemoveAsync(T entity)
         {
-            _dbSet.Remove(entity);
+            dbSet.Remove(entity);
             await SaveAsync();
         }
 
         public async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            await _db.SaveChangesAsync();
         }
+
+       
     }
 }

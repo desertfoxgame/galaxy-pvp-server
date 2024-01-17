@@ -3,8 +3,7 @@ using GalaxyPvP.Data.Model;
 
 namespace GalaxyPvP.Data
 {
-    public class PlayerRespository : Repository<Player, GalaxyPvPContext>,
-        IPlayerRepository
+    public class PlayerRespository : GenericRepository<Player>, IPlayerRepository
     {
         private GalaxyPvPContext _dbContext;
         protected PlayerRespository(GalaxyPvPContext context) : base(context)

@@ -2,7 +2,7 @@
 
 namespace GalaxyPvP.Data
 {
-    public interface IRepository<T>where T : class
+    public interface IGenericRepository<T> where T : class
     {
         Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null,
             int pageSize = 0, int pageNumber = 1);
@@ -10,7 +10,5 @@ namespace GalaxyPvP.Data
         Task CreateAsync(T entity);
         Task RemoveAsync(T entity);
         Task SaveAsync();
-
-
     }
 }

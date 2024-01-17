@@ -106,6 +106,10 @@ namespace GalaxyPvP.Data.Repository.User
                 await _roleManager.CreateAsync(new IdentityRole("moderator"));
                 await _roleManager.CreateAsync(new IdentityRole("player"));
             }
+            if (!_roleManager.RoleExistsAsync("player").GetAwaiter().GetResult())
+            {
+                await _roleManager.CreateAsync(new IdentityRole("player"));
+            }
             await _userManager.AddToRoleAsync(entity, "player");
 
             return ApiResponse<UserDTO>.ReturnResultWith200(_mapper.Map<UserDTO>(entity));
