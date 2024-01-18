@@ -11,10 +11,10 @@ namespace GalaxyPvP.Data.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        [Required]
         [ForeignKey("Player")]
         public int PlayerId { get; set; }
 
-        [Required]
         [Column(TypeName = "int")]
         public int DataId { get; set; }
 
@@ -25,16 +25,16 @@ namespace GalaxyPvP.Data.Model
         public string? NftId { get; set; }
 
         [Column(TypeName = "smallint")]
-        public short InventoryType { get; set; }
+        public short? InventoryType { get; set; } = 0;
 
         [Column(TypeName = "int")]
-        public int Level { get; set; }
+        public int? Level { get; set; } = 1;
 
         [Column(TypeName = "int")]
-        public int Exp { get; set; }
+        public int? Exp { get; set; } = 0;
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; } = DateTime.Now;
 
     }
 }
