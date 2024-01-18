@@ -48,19 +48,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: .net-app
-      
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E20E015D27324EB6B1A3DA57516F9D94 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4BFDB9868F364C4E8D72EE2E5E36FD7B }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B269382D41484D4F94F59F9DCFE2331D }}
-
+          
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'galaxy-pvp-asia'
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           slot-name: 'Production'
           package: .
           
