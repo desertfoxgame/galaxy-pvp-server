@@ -5,5 +5,6 @@ namespace GalaxyPvP.Data
     public class GalaxyUser:IdentityUser
     {
         public string? PlayfabId { get; set; }
+        public string? WalletAddress {  get; set; }
     }
 }
