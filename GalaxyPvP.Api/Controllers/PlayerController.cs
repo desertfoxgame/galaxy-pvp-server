@@ -2,6 +2,7 @@
 using Azure;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
+using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +13,7 @@ namespace GalaxyPvP.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PlayerController : ControllerBase
+    public class PlayerController : BaseController
     {
         private readonly IPlayerRepository _dbPlayer;
         private readonly IMapper _mapper;
@@ -26,95 +27,94 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpGet("GetPlayerByUserId")]
-        public async Task<ActionResult> GetPlayer(string userId)
+        public async Task<ApiResponse<Player>> GetPlayer(string userId)
         {
             try
             {
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return BadRequest();
+                    return ApiResponse<Player>.ReturnFailed(401, "UserId Null");
                 }
                 var player = await _dbPlayer.GetAsync(p => p.UserId == userId);
                 if (player == null)
                 {
-                    return NotFound();
+                    return ApiResponse<Player>.ReturnFailed(401, "Not Found!");
                 }
-                return Ok(player);
+                return ApiResponse<Player>.ReturnResultWith200(player);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return ApiResponse<Player>.ReturnFailed(401, ex.Message);
 
             }
         }
 
         [HttpPost("CreatePlayer")]
-        public async Task<ActionResult> CreatePlayer([FromBody] PlayerCreateDto createDto)
+        public async Task<ApiResponse<PlayerDto>> CreatePlayer([FromBody] PlayerCreateDto createDto)
         {
             try
             {
                 if (createDto == null)
                 {
-                    return BadRequest(createDto);
+                    return ApiResponse<PlayerDto>.ReturnFailed(401, "Create data is null");
                 }
                 if (await _dbPlayer.GetAsync(p => p.UserId == createDto.UserId || p.Nickname == p.Nickname || p.PlayfabId == p.PlayfabId) != null)
                 {
-                    ModelState.AddModelError("ErrorMessages", "Player exists");
-                    return BadRequest(ModelState);
+                    return ApiResponse<PlayerDto>.ReturnFailed(401, "Player exists");
                 }
                 Player player = _mapper.Map<Player>(createDto);
                 player.CreateAt = DateTime.Now.ToLocalTime();
                 player.UpdateAt = DateTime.Now.ToLocalTime();
                 await _dbPlayer.CreateAsync(player);
                 PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
-                return Ok(playerDTO);
+                return ApiResponse<PlayerDto>.ReturnResultWith200(playerDTO);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
             }
         }
 
         [HttpPut("UpdatePlayer")]
-        public async Task<ActionResult> UpdatePlayer([FromBody] PlayerUpdateDto updateDto)
+        public async Task<ApiResponse<PlayerDto>> UpdatePlayer([FromBody] PlayerUpdateDto updateDto)
         {
             try
             {
                 if (updateDto == null)
                 {
-                    return BadRequest(updateDto);
+                    return ApiResponse<PlayerDto>.ReturnFailed(401, "Update data is null");
                 }
 
                 Player player = await _dbPlayer.GetAsync(p => p.Id == updateDto.Id);
                 if (player == null)
                 {
-                    return NotFound("Player not found");
+                    return ApiResponse<PlayerDto>.Return404("Player not found");
                 }
-                
+
                 player = _mapper.Map<Player>(updateDto);
                 player.UpdateAt = DateTime.Now.ToLocalTime();
                 await _dbPlayer.SaveAsync();
                 PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
-                return Ok(playerDTO);
+                return ApiResponse<PlayerDto>.ReturnResultWith200(playerDTO);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
             }
         }
 
         [HttpDelete("DeletePlayer")]
-        public async Task<ActionResult> DeletePlayer([FromBody] int playerId)
+        public async Task<ApiResponse<string>> DeletePlayer([FromBody] int playerId)
         {
             try
             {
                 Player removePlayer = await _dbPlayer.GetAsync(x => x.Id == playerId);
                 await _dbPlayer.RemoveAsync(removePlayer);
-                return Ok();
+                return ApiResponse<string>.ReturnSuccess();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return ApiResponse<string>.ReturnFailed(401, ex.Message);
             }
         }
     }

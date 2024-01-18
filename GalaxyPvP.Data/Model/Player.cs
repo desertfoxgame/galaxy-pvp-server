@@ -11,6 +11,7 @@ namespace GalaxyPvP.Data.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
+        [ForeignKey("User")]
         public string UserId { get; set; }
         public string Nickname { get; set; }
         public string PlayfabId { get; set; }
