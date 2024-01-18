@@ -57,7 +57,7 @@ namespace GalaxyPvP.Api.Controllers
                 {
                     return BadRequest(createDto);
                 }
-                if (await _dbPlayer.GetAsync(p => p.UserId == createDto.UserId) != null)
+                if (await _dbPlayer.GetAsync(p => p.UserId == createDto.UserId || p.Nickname == p.Nickname || p.PlayfabId == p.PlayfabId) != null)
                 {
                     ModelState.AddModelError("ErrorMessages", "Player exists");
                     return BadRequest(ModelState);
