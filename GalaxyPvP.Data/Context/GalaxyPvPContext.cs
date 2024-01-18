@@ -10,6 +10,7 @@ namespace GalaxyPvP.Data.Context
 
         public DbSet<GalaxyUser> GalaxyUsers { get; set; }
         public DbSet<Player> Player { get; set; }
+        public DbSet<PlayerItem> PlayerItem { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

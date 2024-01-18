@@ -12,6 +12,7 @@ namespace GalaxyPvP.Data.Model
         public int Id { get; set; }
         [Required]
         [ForeignKey("User")]
+        [MaxLength(450)]
         public string UserId { get; set; }
         public string Nickname { get; set; }
         public string PlayfabId { get; set; }
