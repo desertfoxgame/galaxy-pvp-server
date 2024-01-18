@@ -28,7 +28,6 @@ builder.Services.AddDbContext<GalaxyPvPContext>(options =>
 builder.Services.AddIdentity<GalaxyUser, IdentityRole>().AddEntityFrameworkStores<GalaxyPvPContext>();
 
 builder.Services.AddResponseCaching();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 ////////AUTO MAPPING
 builder.Services.AddAutoMapper(typeof(MappingConfig));
@@ -39,6 +38,10 @@ builder.Services.AddControllers();
 ////////////SWAGGER
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPlayerRepository, PlayerRespository>();
 
 var app = builder.Build();
 
