@@ -41,7 +41,7 @@ namespace GalaxyPvP.Data.Repository.User
 
         public async Task<ApiResponse<LoginResponseDTO>> Login(LoginRequestDTO request)
         {
-            var user = _db.GalaxyUsers.FirstOrDefault(u => u.UserName.ToLower() == request.UserName.ToLower());
+            var user = _db.GalaxyUsers.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower());
 
             bool isValid = await _userManager.CheckPasswordAsync(user, request.Password);
 
