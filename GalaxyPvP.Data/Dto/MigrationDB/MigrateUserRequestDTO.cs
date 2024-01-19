@@ -17,6 +17,6 @@ namespace GalaxyPvP.Data
         public int MVP {  get; set; }
         public int WinStreaks {  get; set; }
         public int CurrentWinStreak {  get; set; }
-
+        public string[] PlayerItems {  get; set; }
     }
 }

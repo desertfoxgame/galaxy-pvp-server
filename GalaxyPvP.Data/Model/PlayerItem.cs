@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GalaxyPvP.Data.Model
 {
-    public class PlayerItem
+    public class PlayerItem:BaseModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -32,9 +30,6 @@ namespace GalaxyPvP.Data.Model
 
         [Column(TypeName = "int")]
         public int? Exp { get; set; } = 0;
-
-        public DateTime? CreatedAt { get; set; } = DateTime.Now;
-        public DateTime? UpdatedAt { get; set; } = DateTime.Now;
 
     }
 }

@@ -1,11 +1,9 @@
-﻿
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GalaxyPvP.Data.Model
 {
-    public class Player
+    public class Player:BaseModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -24,7 +22,5 @@ namespace GalaxyPvP.Data.Model
         public int WinStreak { get; set; }
         public int WinStreakCurrent { get; set; }
         public int MVP { get; set; }
-        public DateTime CreateAt { get; set; }
-        public DateTime UpdateAt { get; set; }
     }
 }

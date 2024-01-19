@@ -10,21 +10,20 @@ using System.Security.Claims;
 using System.Text;
 using Serilog;
 using GalaxyPvP.Extensions;
+using UserManagement.Common.GenericRespository;
 
 namespace GalaxyPvP.Data.Repository.User
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : GenericRepository<GalaxyUser, GalaxyPvPContext>, IUserRepository
     {
-        private readonly GalaxyPvPContext _db;
         private readonly UserManager<GalaxyUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private string secretKey;
         private readonly IMapper _mapper;
 
         public UserRepository(GalaxyPvPContext db, IConfiguration configuration,
-            UserManager<GalaxyUser> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager)
+            UserManager<GalaxyUser> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager):base(db)
         {
-            _db = db;
             _userManager = userManager;
             secretKey = configuration.GetValue<string>("ApiSettings:Secret");
             _mapper = mapper;
@@ -33,7 +32,7 @@ namespace GalaxyPvP.Data.Repository.User
 
         public bool IsUniqueUser(string username)
         {
-            var user = _db.GalaxyUsers.FirstOrDefault(x=>x.UserName == username);
+            var user = Context.GalaxyUsers.FirstOrDefault(x=>x.UserName == username);
             if (user == null) 
                 return true;
             return false;
@@ -41,7 +40,7 @@ namespace GalaxyPvP.Data.Repository.User
 
         public async Task<ApiResponse<LoginResponseDTO>> Login(LoginRequestDTO request)
         {
-            var user = _db.GalaxyUsers.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower());
+            var user = Context.GalaxyUsers.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower());
 
             bool isValid = await _userManager.CheckPasswordAsync(user, request.Password);
 

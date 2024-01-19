@@ -1,5 +1,4 @@
 ﻿
-
 namespace GalaxyPvP.Data
 {
     public class PlayerDto
