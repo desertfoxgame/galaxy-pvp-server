@@ -26,10 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GalaxyPvP.Data\GalaxyPvP.Data.csproj" />
     <ProjectReference Include="..\GalaxyPvP.Helper\GalaxyPvP.Helper.csproj" />
   </ItemGroup>

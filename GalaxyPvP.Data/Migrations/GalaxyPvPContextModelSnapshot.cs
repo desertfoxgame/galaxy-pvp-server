@@ -77,6 +77,9 @@ namespace GalaxyPvP.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("WalletAddress")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -98,11 +101,14 @@ namespace GalaxyPvP.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
 
                     b.Property<int>("Exp")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Level")
                         .HasColumnType("int");
@@ -124,8 +130,8 @@ namespace GalaxyPvP.Data.Migrations
                     b.Property<int>("Trophy")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -154,8 +160,8 @@ namespace GalaxyPvP.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
 
                     b.Property<int>("DataId")
                         .HasColumnType("int");
@@ -165,6 +171,9 @@ namespace GalaxyPvP.Data.Migrations
 
                     b.Property<short?>("InventoryType")
                         .HasColumnType("smallint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("Level")
                         .HasColumnType("int");
@@ -180,8 +189,8 @@ namespace GalaxyPvP.Data.Migrations
                     b.Property<int>("PlayerId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 

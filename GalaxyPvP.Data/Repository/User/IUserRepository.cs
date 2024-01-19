@@ -1,7 +1,6 @@
 ﻿using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.DTO;
 using GalaxyPvP.Extensions;
-using UserManagement.Common.GenericRespository;
 
 namespace GalaxyPvP.Data.Repository.User
 {

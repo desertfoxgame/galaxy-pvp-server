@@ -10,7 +10,6 @@ using System.Security.Claims;
 using System.Text;
 using Serilog;
 using GalaxyPvP.Extensions;
-using UserManagement.Common.GenericRespository;
 
 namespace GalaxyPvP.Data.Repository.User
 {

@@ -4,7 +4,7 @@ using GalaxyPvP.Data.Model;
 
 namespace GalaxyPvP.Data
 {
-    public class PlayerRespository : GenericRepository<Player>, IPlayerRepository
+    public class PlayerRespository : GenericRepository<Player, GalaxyPvPContext>, IPlayerRepository
     {
         private GalaxyPvPContext _db;
         private readonly IMapper _mapper;
