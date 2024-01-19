@@ -1,6 +1,7 @@
 using GalaxyPvP.Api.Helpers.Mapping;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
+using GalaxyPvP.Data.Repository.Player;
 using GalaxyPvP.Data.Repository.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@ builder.Services.AddSwaggerGen();
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRespository>();
+builder.Services.AddScoped<IPlayerItemRespository, PlayerItemRespository>();
 
 var app = builder.Build();
 

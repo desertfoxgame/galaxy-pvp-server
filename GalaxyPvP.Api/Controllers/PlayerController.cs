@@ -29,55 +29,31 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpGet("GetPlayerByUserId")]
-        public async Task<ApiResponse<PlayerDto>> GetPlayer(string userId)
+        public async Task<IActionResult> GetPlayer(string userId)
         {
             ApiResponse<PlayerDto> response = await _dbPlayer.Get(userId);
-            return response;
+            return ReturnFormatedResponse(response);
         }
 
         [HttpPost("CreatePlayer")]
-        public async Task<ApiResponse<PlayerDto>> CreatePlayer([FromBody] PlayerCreateDto createDto)
+        public async Task<IActionResult> CreatePlayer([FromBody] PlayerCreateDto createDto)
         {
             ApiResponse<PlayerDto> response = await _dbPlayer.Create(createDto);
-            return response;
+            return ReturnFormatedResponse(response);
         }
 
         [HttpPut("UpdatePlayer")]
-        public async Task<ApiResponse<PlayerDto>> UpdatePlayer([FromBody] PlayerDto updateDto)
+        public async Task<IActionResult> UpdatePlayer([FromBody] PlayerDto updateDto)
         {
             ApiResponse<PlayerDto> response = await _dbPlayer.Update(updateDto);
-            return response;
+            return ReturnFormatedResponse(response);
         }
 
         [HttpDelete("DeletePlayer")]
-        public async Task<ApiResponse<PlayerDto>> DeletePlayer([FromBody] int playerId)
+        public async Task<IActionResult> DeletePlayer([FromBody] int playerId)
         {
             ApiResponse<PlayerDto> response = await _dbPlayer.Delete(playerId);
-            return response;
-        }
-
-        [HttpGet("GetPlayerItem")]
-        [Authorize]
-        public async Task<ApiResponse<Player>> GetPlayerItem(int playerId)
-        {
-            try
-            {
-                //if (string.IsNullOrEmpty(playerId))
-                //{
-                //    return ApiResponse<Player>.ReturnFailed(401, "UserId Null");
-                //}
-                var player = _dbPlayer.FindBy(p => p.Id == playerId).FirstOrDefault();
-                if (player == null)
-                {
-                    return ApiResponse<Player>.ReturnFailed(401, "Not Found!");
-                }
-                return ApiResponse<Player>.ReturnResultWith200(player);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<Player>.ReturnFailed(401, ex.Message);
-
-            }
+            return ReturnFormatedResponse(response);
         }
     }
 }
