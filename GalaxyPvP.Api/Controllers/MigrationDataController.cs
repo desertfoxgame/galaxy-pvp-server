@@ -43,13 +43,24 @@ namespace GalaxyPvP.Api.Controllers
                 }
 
                 Player player = _mapper.Map<Player>(request);
-                _playerRepo.Add(player);
+                var newUser = _userRepo.FindBy(x => x.Email == request.Email).FirstOrDefault();
+                player.UserId = newUser.Id;
+                PlayerCreateDto playerCreateDto = _mapper.Map<PlayerCreateDto>(player);
                 PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
+                ApiResponse<PlayerDto> response = await _playerRepo.Create(playerCreateDto);
+                if (response.Success)
+                {
+                    //    await EmailExtension.SendEmailAsync(request.Email,
+                    //"Mật khẩu mới của bạn",
+                    //$"Mật khẩu mới cho tài khoản của bạn là: {password}");
+                    return ApiResponse<string>.ReturnSuccess();
+                }
+                else
+                {
+                    return ApiResponse<string>.ReturnFailed(401, "Create Player Failed!");
 
-                await EmailExtension.SendEmailAsync(request.Email,
-            "Mật khẩu mới của bạn",
-            $"Mật khẩu mới cho tài khoản của bạn là: {password}");
-                return ApiResponse<string>.ReturnSuccess();
+                }
+                
             }
             catch (Exception ex)
             {

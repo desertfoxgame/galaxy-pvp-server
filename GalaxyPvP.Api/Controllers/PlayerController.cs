@@ -7,6 +7,7 @@ using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -28,95 +29,31 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpGet("GetPlayerByUserId")]
-        public async Task<ApiResponse<Player>> GetPlayer(string userId)
+        public async Task<ApiResponse<PlayerDto>> GetPlayer(string userId)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return ApiResponse<Player>.ReturnFailed(401, "UserId Null");
-                }
-                var player = _dbPlayer.FindBy(p => p.UserId == userId).FirstOrDefault();
-                if (player == null)
-                {
-                    return ApiResponse<Player>.ReturnFailed(401, "Not Found!");
-                }
-                return ApiResponse<Player>.ReturnResultWith200(player);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<Player>.ReturnFailed(401, ex.Message);
-
-            }
+            ApiResponse<PlayerDto> response = await _dbPlayer.Get(userId);
+            return response;
         }
 
         [HttpPost("CreatePlayer")]
         public async Task<ApiResponse<PlayerDto>> CreatePlayer([FromBody] PlayerCreateDto createDto)
         {
-            try
-            {
-                if (createDto == null)
-                {
-                    return ApiResponse<PlayerDto>.ReturnFailed(401, "Create data is null");
-                }
-                if (_dbPlayer.FindBy(p => p.UserId == createDto.UserId || p.Nickname == p.Nickname || p.PlayfabId == p.PlayfabId) != null)
-                {
-                    return ApiResponse<PlayerDto>.ReturnFailed(401, "Player exists");
-                }
-                Player player = _mapper.Map<Player>(createDto);
-                //player.CreateAt = DateTime.Now.ToLocalTime();
-                //player.UpdateAt = DateTime.Now.ToLocalTime();
-                _dbPlayer.Add(player);
-                PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
-                return ApiResponse<PlayerDto>.ReturnResultWith200(playerDTO);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
-            }
+            ApiResponse<PlayerDto> response = await _dbPlayer.Create(createDto);
+            return response;
         }
 
         [HttpPut("UpdatePlayer")]
-        public async Task<ApiResponse<PlayerDto>> UpdatePlayer([FromBody] PlayerUpdateDto updateDto)
+        public async Task<ApiResponse<PlayerDto>> UpdatePlayer([FromBody] PlayerDto updateDto)
         {
-            try
-            {
-                if (updateDto == null)
-                {
-                    return ApiResponse<PlayerDto>.ReturnFailed(401, "Update data is null");
-                }
-
-                var player = _dbPlayer.FindBy(p => p.Id == updateDto.Id).FirstOrDefault();
-                if (player == null)
-                {
-                    return ApiResponse<PlayerDto>.Return404("Player not found");
-                }
-
-                player = _mapper.Map<Player>(updateDto);
-                //player.UpdateAt = DateTime.Now.ToLocalTime();
-                _dbPlayer.Update(player);
-                PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
-                return ApiResponse<PlayerDto>.ReturnResultWith200(playerDTO);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
-            }
+            ApiResponse<PlayerDto> response = await _dbPlayer.Update(updateDto);
+            return response;
         }
 
         [HttpDelete("DeletePlayer")]
-        public async Task<ApiResponse<string>> DeletePlayer([FromBody] int playerId)
+        public async Task<ApiResponse<PlayerDto>> DeletePlayer([FromBody] int playerId)
         {
-            try
-            {
-                var removePlayer = _dbPlayer.FindBy(x => x.Id == playerId).FirstOrDefault();
-                _dbPlayer.Delete(removePlayer);
-                return ApiResponse<string>.ReturnSuccess();
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<string>.ReturnFailed(401, ex.Message);
-            }
+            ApiResponse<PlayerDto> response = await _dbPlayer.Delete(playerId);
+            return response;
         }
 
         [HttpGet("GetPlayerItem")]

@@ -17,7 +17,8 @@ namespace GalaxyPvP.Data
         public IQueryable<TC> All => Context.Set<TC>();
         public void Add(TC entity)
         {
-            Context.Add(entity);
+            Context.Set<TC>().Add(entity);
+            Context.SaveChanges();
         }
 
         public IQueryable<TC> AllIncluding(params Expression<Func<TC, object>>[] includeProperties)
@@ -52,6 +53,11 @@ namespace GalaxyPvP.Data
         public async Task<TC> FindAsync(Guid id)
         {
             return await Context.Set<TC>().FindAsync(id);
+        }
+
+        public async Task<TC> FindAsync(Expression<Func<TC, bool>> predicate)
+        {
+            return await Context.Set<TC>().FirstOrDefaultAsync(predicate);
         }
 
         public virtual void Update(TC entity)
@@ -100,6 +106,10 @@ namespace GalaxyPvP.Data
         public void Dispose()
         {
             Context.Dispose();
+        }
+        public void SaveChangesAsync()
+        {
+            Context.SaveChangesAsync();
         }
     }
 }
