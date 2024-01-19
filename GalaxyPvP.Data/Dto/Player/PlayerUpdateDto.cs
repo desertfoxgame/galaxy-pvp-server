@@ -9,7 +9,7 @@ namespace GalaxyPvP.Data
 {
     public class PlayerUpdateDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string? Nickname { get; set; }
     }
 }

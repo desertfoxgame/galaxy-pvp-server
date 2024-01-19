@@ -50,7 +50,7 @@ namespace GalaxyPvP.Data
                 {
                     return ApiResponse<PlayerDto>.ReturnFailed(401, "Create data is null");
                 }
-                if (await FindAsync(p => p.Nickname == playerCreateDto.Nickname || p.PlayfabId == playerCreateDto.PlayfabId) != null)
+                if (await FindAsync(p => p.Nickname == playerCreateDto.Nickname || p.Id == playerCreateDto.Id) != null)
                 {
                     return ApiResponse<PlayerDto>.ReturnFailed(401, "Player exists");
                 }
@@ -96,7 +96,7 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<PlayerDto>> Delete(int playerId)
+        public async Task<ApiResponse<PlayerDto>> Delete(string playerId)
         {
             try
             {

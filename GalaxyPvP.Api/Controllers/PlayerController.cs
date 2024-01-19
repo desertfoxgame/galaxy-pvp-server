@@ -50,7 +50,7 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpDelete("DeletePlayer")]
-        public async Task<IActionResult> DeletePlayer([FromBody] int playerId)
+        public async Task<IActionResult> DeletePlayer([FromBody] string playerId)
         {
             ApiResponse<PlayerDto> response = await _dbPlayer.Delete(playerId);
             return ReturnFormatedResponse(response);
