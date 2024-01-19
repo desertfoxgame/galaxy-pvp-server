@@ -83,7 +83,9 @@ namespace GalaxyPvP.Data
                     return ApiResponse<PlayerDto>.Return404("Player not found");
                 }
 
-                player = _mapper.Map<Player>(playerUpdateDto);
+                _mapper.Map(playerUpdateDto, player);
+                player.CreatedAt = DateTime.Now;
+                player.UpdatedAt = DateTime.Now;
                 await Context.SaveChangesAsync();
                 PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
                 return ApiResponse<PlayerDto>.ReturnResultWith200(playerDTO);
@@ -101,6 +103,7 @@ namespace GalaxyPvP.Data
                 Player removePlayer = await FindAsync(x => x.Id == playerId);
                 PlayerDto responsePlayer = _mapper.Map<PlayerDto>(removePlayer);
                 Delete(removePlayer);
+                Context.SaveChanges();
                 return ApiResponse<PlayerDto>.ReturnResultWith200(responsePlayer);
             }
             catch (Exception ex)
