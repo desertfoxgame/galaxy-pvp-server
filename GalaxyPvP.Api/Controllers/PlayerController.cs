@@ -43,9 +43,9 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpPut("UpdatePlayer")]
-        public async Task<IActionResult> UpdatePlayer([FromBody] PlayerDto updateDto)
+        public async Task<IActionResult> UpdatePlayer([FromBody] PlayerUpdateDto updateDto)
         {
-            ApiResponse<PlayerDto> response = await _dbPlayer.Update(updateDto);
+            ApiResponse<PlayerUpdateDto> response = await _dbPlayer.Update(updateDto);
             return ReturnFormatedResponse(response);
         }
 

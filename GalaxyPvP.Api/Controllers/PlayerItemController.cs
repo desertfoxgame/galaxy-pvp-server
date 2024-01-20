@@ -2,6 +2,7 @@
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Dto.Player;
+using GalaxyPvP.Data.Model;
 using GalaxyPvP.Data.Repository.Player;
 using GalaxyPvP.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -29,6 +30,14 @@ namespace GalaxyPvP.Api.Controllers
         public async Task<IActionResult> GetPlayerItem(int itemId)
         {
             ApiResponse<PlayerItemDto> response = await _repository.Get(itemId);
+            return ReturnFormatedResponse(response);
+        }
+        
+        [HttpGet("GetAllPlayerItem")]
+        //[Authorize]
+        public async Task<IActionResult> GetPlayerItem(string playerId)
+        {
+            ApiResponse<ListPlayerItemDto> response = await _repository.GetAll(playerId);
             return ReturnFormatedResponse(response);
         }
 

@@ -16,11 +16,13 @@ namespace GalaxyPvP.Data.Repository.Player
     {
         private GalaxyPvPContext _db;
         private readonly IMapper _mapper;
+        private readonly IPlayerRepository _playerRepo;
 
-        public PlayerItemRespository(GalaxyPvPContext db, IMapper mapper) : base(db)
+        public PlayerItemRespository(GalaxyPvPContext db, IMapper mapper, IPlayerRepository playerRepo) : base(db)
         {
             _db = db;
             _mapper = mapper;
+            _playerRepo = playerRepo;
         }
 
         public async Task<ApiResponse<PlayerItemDto>> Get(int itemId)
@@ -111,6 +113,29 @@ namespace GalaxyPvP.Data.Repository.Player
             catch (Exception ex)
             {
                 return ApiResponse<PlayerItemDto>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<ListPlayerItemDto>> GetAll(string playerId)
+        {
+            try
+            {
+                if (playerId == null)
+                {
+                    return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, "PlayerId is null");
+                }
+                List<PlayerItem> items = await Context.Set<PlayerItem>().Where(p => p.PlayerId == playerId).ToListAsync();
+                if (items == null)
+                {
+                    return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, "Not Found!");
+                }
+                ListPlayerItemDto response = new ListPlayerItemDto();
+                response.PlayerItems = items;
+                return ApiResponse<ListPlayerItemDto>.ReturnResultWith200(response);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, ex.Message);
             }
         }
     }
