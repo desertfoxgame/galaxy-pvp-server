@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GalaxyPvP.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddIdentityUserTable : Migration
+    public partial class BaseMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,6 +30,8 @@ namespace GalaxyPvP.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PlayfabId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WalletAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -54,11 +56,9 @@ namespace GalaxyPvP.Data.Migrations
                 name: "Player",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     Nickname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PlayfabId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Level = table.Column<int>(type: "int", nullable: false),
                     Exp = table.Column<int>(type: "int", nullable: false),
                     Trophy = table.Column<int>(type: "int", nullable: false),
@@ -67,12 +67,35 @@ namespace GalaxyPvP.Data.Migrations
                     WinStreak = table.Column<int>(type: "int", nullable: false),
                     WinStreakCurrent = table.Column<int>(type: "int", nullable: false),
                     MVP = table.Column<int>(type: "int", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Player", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PlayerItem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PlayerId = table.Column<int>(type: "int", nullable: false),
+                    DataId = table.Column<int>(type: "int", nullable: false),
+                    NftType = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
+                    NftId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
+                    InventoryType = table.Column<short>(type: "smallint", nullable: true),
+                    Level = table.Column<int>(type: "int", nullable: true),
+                    Exp = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlayerItem", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -241,6 +264,9 @@ namespace GalaxyPvP.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Player");
+
+            migrationBuilder.DropTable(
+                name: "PlayerItem");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

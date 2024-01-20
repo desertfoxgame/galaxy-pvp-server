@@ -1,6 +1,7 @@
 using GalaxyPvP.Api.Helpers.Mapping;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
+using GalaxyPvP.Data.Repository.Player;
 using GalaxyPvP.Data.Repository.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,6 @@ builder.Services.AddDbContext<GalaxyPvPContext>(options =>
 builder.Services.AddIdentity<GalaxyUser, IdentityRole>().AddEntityFrameworkStores<GalaxyPvPContext>();
 
 builder.Services.AddResponseCaching();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 ////////AUTO MAPPING
 builder.Services.AddAutoMapper(typeof(MappingConfig));
@@ -39,6 +39,12 @@ builder.Services.AddControllers();
 ////////////SWAGGER
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPlayerRepository, PlayerRespository>();
+builder.Services.AddScoped<IPlayerItemRespository, PlayerItemRespository>();
+builder.Services.AddScoped<IMigrationDataRepository, MigrationDataRepository>();
 
 var app = builder.Build();
 

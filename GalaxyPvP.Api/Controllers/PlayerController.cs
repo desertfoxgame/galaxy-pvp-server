@@ -1,7 +1,13 @@
 ﻿using AutoMapper;
+using Azure;
 using GalaxyPvP.Data;
+using GalaxyPvP.Data.Context;
+using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.Model;
+using GalaxyPvP.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -9,74 +15,45 @@ namespace GalaxyPvP.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PlayerController : ControllerBase
+    public class PlayerController : BaseController
     {
         private readonly IPlayerRepository _dbPlayer;
         private readonly IMapper _mapper;
-        public PlayerController(IPlayerRepository dbPlayer, IMapper mapper)
+        private GalaxyPvPContext _context;
+
+        public PlayerController(IPlayerRepository dbPlayer, IMapper mapper, GalaxyPvPContext context)
         {
             _dbPlayer = dbPlayer;
             _mapper = mapper;
+            _context = context;
         }
 
-        //[HttpGet("{userId}", Name = "api/get-player")]
-        //public async Task<ActionResult<ApiResponse>> GetPlayer(string userId)
-        //{
-        //    try
-        //    {
-        //        if(string.IsNullOrEmpty(userId))
-        //        {
-        //            _response.StatusCode = HttpStatusCode.BadRequest;
-        //            return BadRequest(_response);
-        //        }
-        //        var player = await _dbPlayer.GetAsync(p => p.UserId == userId);
-        //        if(player == null)
-        //        {
-        //            _response.StatusCode = HttpStatusCode.NotFound;
-        //            return NotFound(_response);
-        //        }
-        //        _response.Result = _mapper.Map<PlayerDto>(player);
-        //        _response.StatusCode = HttpStatusCode.OK;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ErrorMessages
-        //             = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+        [HttpGet("GetPlayerByUserId")]
+        public async Task<IActionResult> GetPlayer(string userId)
+        {
+            ApiResponse<PlayerDto> response = await _dbPlayer.Get(userId);
+            return ReturnFormatedResponse(response);
+        }
 
-        //[HttpPost]
-        //public async Task<ActionResult<ApiResponse>> CreatePlayer([FromBody] PlayerCreateDto createDto)
-        //{
-        //    try
-        //    {
-        //        if(createDto == null)
-        //        {
-        //            return BadRequest(createDto);
-        //        }
-        //        if(await _dbPlayer.GetAsync(p=>p.UserId == createDto.UserId) != null)
-        //        {
-        //            ModelState.AddModelError("ErrorMessages", "Player exists");
-        //            return BadRequest(ModelState);
-        //        }
-        //        Player player = _mapper.Map<Player>(createDto);
-        //        player.CreateAt = DateTime.Now.ToLocalTime();
-        //        player.UpdateAt = DateTime.Now.ToLocalTime();
-        //        await _dbPlayer.CreateAsync(player);
-        //        _response.Result = _mapper.Map<PlayerDto>(player);
-        //        _response.StatusCode = HttpStatusCode.OK;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ErrorMessages
-        //             = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+        [HttpPost("CreatePlayer")]
+        public async Task<IActionResult> CreatePlayer([FromBody] PlayerCreateDto createDto)
+        {
+            ApiResponse<PlayerDto> response = await _dbPlayer.Create(createDto);
+            return ReturnFormatedResponse(response);
+        }
+
+        [HttpPut("UpdatePlayer")]
+        public async Task<IActionResult> UpdatePlayer([FromBody] PlayerDto updateDto)
+        {
+            ApiResponse<PlayerDto> response = await _dbPlayer.Update(updateDto);
+            return ReturnFormatedResponse(response);
+        }
+
+        [HttpDelete("DeletePlayer")]
+        public async Task<IActionResult> DeletePlayer([FromBody] string playerId)
+        {
+            ApiResponse<PlayerDto> response = await _dbPlayer.Delete(playerId);
+            return ReturnFormatedResponse(response);
+        }
     }
 }

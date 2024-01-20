@@ -2,13 +2,23 @@
 
 namespace GalaxyPvP.Data
 {
-    public interface IGenericRepository<T> where T : class
+    public interface IGenericRepository<TC>
+        where TC : class
     {
-        Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null,
-            int pageSize = 0, int pageNumber = 1);
-        Task<T> GetAsync(Expression<Func<T, bool>> filter = null, bool tracked = true, string? includeProperties = null);
-        Task CreateAsync(T entity);
-        Task RemoveAsync(T entity);
-        Task SaveAsync();
+        IQueryable<TC> All { get; }
+        IQueryable<TC> AllIncluding(params Expression<Func<TC, object>>[] includeProperties);
+        IQueryable<TC> FindByInclude(Expression<Func<TC, bool>> predicate, params Expression<Func<TC, object>>[] includeProperties);
+        IQueryable<TC> FindBy(Expression<Func<TC, bool>> predicate);
+        TC Find(Guid id);
+        Task<TC> FindAsync(Guid id);
+        void Add(TC entity);
+        void Update(TC entity);
+        void UpdateRange(List<TC> entities);
+        void Delete(Guid id);
+        void Delete(TC entity);
+        void Remove(TC entity);
+        void InsertUpdateGraph(TC entity);
+        void RemoveRange(IEnumerable<TC> lstEntities);
+        void AddRange(IEnumerable<TC> lstEntities);
     }
 }

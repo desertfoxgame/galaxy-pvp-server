@@ -17,6 +17,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
@@ -26,12 +29,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\GalaxyPvP.Data\GalaxyPvP.Data.csproj" />
+    <ProjectReference Include="..\GalaxyPvP.Helper\GalaxyPvP.Helper.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GalaxyPvP.Data\GalaxyPvP.Data.csproj" />
-    <ProjectReference Include="..\GalaxyPvP.Helper\GalaxyPvP.Helper.csproj" />
+    <Folder Include="Helpers\MatchMaking\" />
   </ItemGroup>
 
 </Project>
