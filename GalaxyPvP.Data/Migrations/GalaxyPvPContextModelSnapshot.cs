@@ -95,11 +95,8 @@ namespace GalaxyPvP.Data.Migrations
 
             modelBuilder.Entity("GalaxyPvP.Data.Model.Player", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
@@ -117,10 +114,6 @@ namespace GalaxyPvP.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Nickname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PlayfabId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

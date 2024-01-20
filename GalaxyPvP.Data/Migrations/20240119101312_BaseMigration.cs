@@ -56,11 +56,9 @@ namespace GalaxyPvP.Data.Migrations
                 name: "Player",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     Nickname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PlayfabId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Level = table.Column<int>(type: "int", nullable: false),
                     Exp = table.Column<int>(type: "int", nullable: false),
                     Trophy = table.Column<int>(type: "int", nullable: false),
