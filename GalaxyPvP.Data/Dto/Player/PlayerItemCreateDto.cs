@@ -8,7 +8,7 @@ namespace GalaxyPvP.Data.Dto.Player
 {
     public class PlayerItemCreateDto
     {
-        public int PlayerId { get; set; }
+        public string PlayerId { get; set; }
 
         public int DataId { get; set; }
 

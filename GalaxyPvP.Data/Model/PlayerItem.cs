@@ -11,7 +11,7 @@ namespace GalaxyPvP.Data.Model
 
         [Required]
         [ForeignKey("Player")]
-        public int PlayerId { get; set; }
+        public string PlayerId { get; set; }
 
         [Column(TypeName = "int")]
         public int DataId { get; set; }

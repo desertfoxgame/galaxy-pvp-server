@@ -53,7 +53,9 @@ namespace GalaxyPvP.Data.Repository.Player
                 {
                     return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Item exists");
                 }
-                PlayerItem item = _mapper.Map<PlayerItem>(itemCreateDto);
+                //PlayerItem item = _mapper.Map<PlayerItem>(itemCreateDto);
+                PlayerItem item = new PlayerItem();
+                _mapper.Map(itemCreateDto, item);
                 item.CreatedAt = DateTime.Now;
                 item.UpdatedAt = DateTime.Now;
                 Add(item);
