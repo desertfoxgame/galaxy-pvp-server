@@ -18,7 +18,6 @@ namespace GalaxyPvP.Data
         public void Add(TC entity)
         {
             Context.Set<TC>().Add(entity);
-            Context.SaveChanges();
         }
 
         public IQueryable<TC> AllIncluding(params Expression<Func<TC, object>>[] includeProperties)

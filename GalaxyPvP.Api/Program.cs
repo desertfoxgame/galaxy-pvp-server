@@ -44,6 +44,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRespository>();
 builder.Services.AddScoped<IPlayerItemRespository, PlayerItemRespository>();
+builder.Services.AddScoped<IMigrationDataRepository, MigrationDataRepository>();
 
 var app = builder.Build();
 
