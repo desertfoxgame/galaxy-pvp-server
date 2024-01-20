@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,5 +19,7 @@ namespace GalaxyPvP.Data
         public int WinStreaks {  get; set; }
         public int CurrentWinStreak {  get; set; }
         public string[] PlayerItems {  get; set; }
+
+        ///foreach string => get dataid, dataid => create item
     }
 }
