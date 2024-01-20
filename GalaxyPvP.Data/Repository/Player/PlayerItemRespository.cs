@@ -49,7 +49,7 @@ namespace GalaxyPvP.Data.Repository.Player
                 {
                     return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Create data is null");
                 }
-                if (await FindAsync(p => p.DataId == itemCreateDto.DataId) != null)
+                if (await FindAsync(p => p.DataId == itemCreateDto.DataId && p.PlayerId == itemCreateDto.PlayerId) != null)
                 {
                     return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Item exists");
                 }

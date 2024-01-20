@@ -66,7 +66,11 @@ namespace GalaxyPvP.Data
                         itemCreateDto.PlayerId = player.Id;
                         itemCreateDto.DataId = dataId;
 
-                        await _playerItemRepo.Create(itemCreateDto);
+                        ApiResponse<PlayerItemDto> itemResponse = await _playerItemRepo.Create(itemCreateDto);
+                        if (!itemResponse.Success)
+                        {
+                            return ApiResponse<string>.ReturnFailed(401, itemResponse.Errors);
+                        }
                     }
                 }
 
@@ -81,7 +85,7 @@ namespace GalaxyPvP.Data
                 }
                 else
                 {
-                    return ApiResponse<string>.ReturnFailed(401, "Create Player Failed!");
+                    return ApiResponse<string>.ReturnFailed(401, response.Errors);
 
                 }
 

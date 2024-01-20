@@ -63,6 +63,7 @@ namespace GalaxyPvP.Data
                 player.CreatedAt = DateTime.Now;
                 player.UpdatedAt = DateTime.Now;
                 Add(player);
+                Context.SaveChanges();
                 PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
                 return ApiResponse<PlayerDto>.ReturnResultWith200(playerDTO);
             }
