@@ -66,6 +66,7 @@ namespace GalaxyPvP.Api.Controllers
                         itemCreateDto.DataId = dataId;
 
                         await _playerItemRepo.Create(itemCreateDto);
+                        
                     }
                 }
 
