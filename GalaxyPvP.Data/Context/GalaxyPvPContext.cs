@@ -12,10 +12,17 @@ namespace GalaxyPvP.Data.Context
         public DbSet<GalaxyUser> GalaxyUsers { get; set; }
         public DbSet<Player> Player { get; set; }
         public DbSet<PlayerItem> PlayerItem { get; set; }
+        public DbSet<GameConfig> GameConfigs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            //builder.Entity<GameConfig>().HasData(
+            //    new GameConfig() { Key = "Version_Android", Value = "3.0.0" },
+            //    new GameConfig() { Key = "Version_iOS", Value = "3.0.0" },
+            //    new GameConfig() { Key = "Version_Windows", Value = "3.0.0" }
+            //    );
         }
     }
 }

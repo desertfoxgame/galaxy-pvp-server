@@ -26,8 +26,15 @@ builder.Services.AddDbContext<GalaxyPvPContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("PvPConnection"));
 });
 
-builder.Services.AddIdentity<GalaxyUser, IdentityRole>().AddEntityFrameworkStores<GalaxyPvPContext>();
+// Add Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPlayerRepository, PlayerRespository>();
+builder.Services.AddScoped<IPlayerItemRespository, PlayerItemRespository>();
+builder.Services.AddScoped<IMigrationDataRepository, MigrationDataRepository>();
+builder.Services.AddScoped<IGameConfigRepository, GameConfigRepository>();
 
+
+builder.Services.AddIdentity<GalaxyUser, IdentityRole>().AddEntityFrameworkStores<GalaxyPvPContext>();
 builder.Services.AddResponseCaching();
 
 ////////AUTO MAPPING
@@ -39,12 +46,6 @@ builder.Services.AddControllers();
 ////////////SWAGGER
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Add Repositories
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IPlayerRepository, PlayerRespository>();
-builder.Services.AddScoped<IPlayerItemRespository, PlayerItemRespository>();
-builder.Services.AddScoped<IMigrationDataRepository, MigrationDataRepository>();
 
 var app = builder.Build();
 
