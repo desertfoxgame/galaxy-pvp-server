@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GalaxyPvP.Helper\GalaxyPvP.Helper.csproj" />
+    <ProjectReference Include="..\GalaxyPvP.Helper\GalaxyPvP.Exensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

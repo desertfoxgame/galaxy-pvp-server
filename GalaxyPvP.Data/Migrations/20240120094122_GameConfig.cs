@@ -16,10 +16,7 @@ namespace GalaxyPvP.Data.Migrations
                 columns: table => new
                 {
                     Key = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
