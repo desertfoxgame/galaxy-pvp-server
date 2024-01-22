@@ -12,7 +12,7 @@ namespace GalaxyPvP.Data
         Task<ApiResponse<PlayerItemDto>> Create(PlayerItemCreateDto playerCreateDto);
         Task<ApiResponse<ListCreatePlayerItemDto>> CreateList(ListCreatePlayerItemDto playerCreateListDto);
         Task<ApiResponse<PlayerItemDto>> Update(PlayerItemDto playerUpdateDto);
-        Task<ApiResponse<ListPlayerItemDto>> UpdateList(ListPlayerItemDto playerUpdateDto);
+        Task<ApiResponse<ListUpdatePlayerItemDto>> UpdateList(ListUpdatePlayerItemDto playerUpdateDto);
         Task<ApiResponse<PlayerItemDto>> Delete(int playerId);
         Task<ApiResponse<ListPlayerItemDto>> ValidateWallet(ListPlayerItemDto playerCreateListDto);
 

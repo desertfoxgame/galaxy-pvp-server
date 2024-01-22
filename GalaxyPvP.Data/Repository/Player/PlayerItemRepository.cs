@@ -80,8 +80,7 @@ namespace GalaxyPvP.Data.Repository.Player
                     return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Update data is null");
                 }
 
-                //Player player = await FindAsync(p => p.Id == playerUpdateDto.Id);
-                var item = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.Id == itemUpdateDto.Id);
+                var item = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == itemUpdateDto.DataId && p.PlayerId == itemUpdateDto.PlayerId);
                 if (item == null)
                 {
                     return ApiResponse<PlayerItemDto>.Return404("Player not found");
@@ -171,9 +170,31 @@ namespace GalaxyPvP.Data.Repository.Player
             }
         }
 
-        public Task<ApiResponse<ListPlayerItemDto>> UpdateList(ListPlayerItemDto playerUpdateDto)
+        public async Task<ApiResponse<ListUpdatePlayerItemDto>> UpdateList(ListUpdatePlayerItemDto playerUpdateDto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                foreach (var item in playerUpdateDto.PlayerItems)
+                {
+                    var existItem = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == item.DataId && p.PlayerId == playerUpdateDto.PlayerId);
+                    if (existItem == null)
+                    {
+                        return ApiResponse<ListUpdatePlayerItemDto>.Return404("Item not exist");
+                    }
+
+                    _mapper.Map(item, existItem);
+                    existItem.CreatedAt = DateTime.Now;
+                    existItem.UpdatedAt = DateTime.Now;
+                    await Context.SaveChangesAsync();
+                }
+
+                return ApiResponse<ListUpdatePlayerItemDto>.ReturnResultWith200(playerUpdateDto);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<ListUpdatePlayerItemDto>.ReturnFailed(401, ex.Message);
+            }
+
         }
 
         public Task<ApiResponse<ListPlayerItemDto>> ValidateWallet(ListPlayerItemDto playerCreateListDto)

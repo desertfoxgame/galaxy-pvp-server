@@ -65,6 +65,14 @@ namespace GalaxyPvP.Api.Controllers
             return ReturnFormatedResponse(response);
         }
 
+        [HttpPut("UpdatePlayerItems")]
+        //[Authorize]
+        public async Task<IActionResult> UpdatePlayerItems(ListUpdatePlayerItemDto updateDto)
+        {
+            ApiResponse<ListUpdatePlayerItemDto> response = await _repository.UpdateList(updateDto);
+            return ReturnFormatedResponse(response);
+        }
+
         [HttpDelete("DeletePlayerItem")]
         //[Authorize]
         public async Task<IActionResult> DeletePlayerItem(int itemId)
