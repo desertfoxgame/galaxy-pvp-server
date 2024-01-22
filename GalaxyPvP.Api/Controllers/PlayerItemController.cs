@@ -2,6 +2,7 @@
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Dto.Player;
+using GalaxyPvP.Data.Model;
 using GalaxyPvP.Data.Repository.Player;
 using GalaxyPvP.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -13,11 +14,11 @@ namespace GalaxyPvP.Api.Controllers
     [ApiController]
     public class PlayerItemController : BaseController
     {
-        private readonly IPlayerItemRespository _repository;
+        private readonly IPlayerItemRepository _repository;
         private readonly IMapper _mapper;
         private GalaxyPvPContext _context;
 
-        public PlayerItemController(IPlayerItemRespository repository, IMapper mapper, GalaxyPvPContext context)
+        public PlayerItemController(IPlayerItemRepository repository, IMapper mapper, GalaxyPvPContext context)
         {
             _repository = repository;
             _mapper = mapper;
@@ -31,6 +32,14 @@ namespace GalaxyPvP.Api.Controllers
             ApiResponse<PlayerItemDto> response = await _repository.Get(itemId);
             return ReturnFormatedResponse(response);
         }
+        
+        [HttpGet("GetAllPlayerItem")]
+        //[Authorize]
+        public async Task<IActionResult> GetPlayerItem(string playerId)
+        {
+            ApiResponse<ListPlayerItemDto> response = await _repository.GetAll(playerId);
+            return ReturnFormatedResponse(response);
+        }
 
         [HttpPost("CreatePlayerItem")]
         //[Authorize]
@@ -39,12 +48,28 @@ namespace GalaxyPvP.Api.Controllers
             ApiResponse<PlayerItemDto> response = await _repository.Create(createDto);
             return ReturnFormatedResponse(response);
         }
+        
+        [HttpPost("CreatePlayerItems")]
+        //[Authorize]
+        public async Task<IActionResult> CreatePlayerItems(ListCreatePlayerItemDto createDto)
+        {
+            ApiResponse<ListCreatePlayerItemDto> response = await _repository.CreateList(createDto);
+            return ReturnFormatedResponse(response);
+        }
 
         [HttpPut("UpdatePlayerItem")]
         //[Authorize]
         public async Task<IActionResult> UpdatePlayerItem(PlayerItemDto updateDto)
         {
             ApiResponse<PlayerItemDto> response = await _repository.Update(updateDto);
+            return ReturnFormatedResponse(response);
+        }
+
+        [HttpPut("UpdatePlayerItems")]
+        //[Authorize]
+        public async Task<IActionResult> UpdatePlayerItems(ListUpdatePlayerItemDto updateDto)
+        {
+            ApiResponse<ListUpdatePlayerItemDto> response = await _repository.UpdateList(updateDto);
             return ReturnFormatedResponse(response);
         }
 

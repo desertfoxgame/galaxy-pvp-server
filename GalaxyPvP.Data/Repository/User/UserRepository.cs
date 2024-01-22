@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using Serilog;
 using GalaxyPvP.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace GalaxyPvP.Data.Repository.User
 {
@@ -111,6 +112,101 @@ namespace GalaxyPvP.Data.Repository.User
             await _userManager.AddToRoleAsync(entity, "player");
 
             return ApiResponse<UserDTO>.ReturnResultWith200(_mapper.Map<UserDTO>(entity));
+        }
+
+        public async Task<ApiResponse<UserDTO>> GetById(string userId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "UserId Null");
+                }
+                var list = await Context.Set<GalaxyUser>().ToListAsync();
+                var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(p => p.Id == userId);
+                if (user == null)
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "Not Found!");
+                }
+                UserDTO reponse = _mapper.Map<UserDTO>(user);
+                return ApiResponse<UserDTO>.ReturnResultWith200(reponse);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+
+            }
+        }
+
+        public async Task<ApiResponse<UserDTO>> GetByEmail(string email)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "UserEmail Null");
+                }
+                var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(p => p.Email == email);
+                if (user == null)
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "Not Found!");
+                }
+                UserDTO reponse = _mapper.Map<UserDTO>(user);
+                return ApiResponse<UserDTO>.ReturnResultWith200(reponse);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+
+            }
+        }
+
+        public async Task<ApiResponse<UserDTO>> GetByUserName(string userName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userName))
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "UserName Null");
+                }
+                var user = await FindAsync(p => p.UserName == userName);
+                if (user == null)
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "Not Found!");
+                }
+                UserDTO reponse = _mapper.Map<UserDTO>(user);
+                return ApiResponse<UserDTO>.ReturnResultWith200(reponse);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<UserDTO>> Update(UserDTO userUpdateDto)
+        {
+            try
+            {
+                if (userUpdateDto == null)
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "Update data is null");
+                }
+
+                var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(p => p.Id == userUpdateDto.ID);
+                if (user == null)
+                {
+                    return ApiResponse<UserDTO>.Return404("Player not found");
+                }
+
+                _mapper.Map(userUpdateDto, user);
+                await Context.SaveChangesAsync();
+                UserDTO playerDTO = _mapper.Map<UserDTO>(user);
+                return ApiResponse<UserDTO>.ReturnResultWith200(playerDTO);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+            }
         }
     }
 }

@@ -21,11 +21,11 @@ namespace GalaxyPvP.Api.Controllers
         private readonly IMapper _mapper;
         private readonly IPlayerRepository _playerRepo;
         private readonly IUserRepository _userRepo;
-        private readonly IPlayerItemRespository _playerItemRepo;
+        private readonly IPlayerItemRepository _playerItemRepo;
         private readonly IMigrationDataRepository _migrationDataRepo;
 
         public MigrationDataController(ILogger<UserController> logger, IMapper mapper, IUserRepository userRepo, IPlayerRepository playerRepo, 
-            IPlayerItemRespository playerItemRepo, IMigrationDataRepository migrationDataRepo)
+            IPlayerItemRepository playerItemRepo, IMigrationDataRepository migrationDataRepo)
         {
             _logger = logger;
             _playerRepo = playerRepo;

@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace GalaxyPvP.Data.Dto.Player
 {
-    public class PlayerItemCreateDto 
+    public class PlayerItemUpdateDto 
     {
-        public string PlayerId { get; set; }
-
         public int DataId { get; set; }
 
         public string? NftType { get; set; }

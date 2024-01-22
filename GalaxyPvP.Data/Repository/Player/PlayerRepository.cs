@@ -9,12 +9,12 @@ using NanoidDotNet;
 
 namespace GalaxyPvP.Data
 {
-    public class PlayerRespository : GenericRepository<Player, GalaxyPvPContext>, IPlayerRepository
+    public class PlayerRepository : GenericRepository<Player, GalaxyPvPContext>, IPlayerRepository
     {
         private GalaxyPvPContext _db;
         private readonly IMapper _mapper;
 
-        public PlayerRespository(GalaxyPvPContext db,IMapper mapper):base(db)
+        public PlayerRepository(GalaxyPvPContext db,IMapper mapper):base(db)
         {
             _db = db;
             _mapper = mapper;
@@ -73,32 +73,32 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<PlayerDto>> Update(PlayerDto playerUpdateDto)
+        public async Task<ApiResponse<PlayerUpdateDto>> Update(PlayerUpdateDto playerUpdateDto)
         {
             try
             {
                 if (playerUpdateDto == null)
                 {
-                    return ApiResponse<PlayerDto>.ReturnFailed(401, "Update data is null");
+                    return ApiResponse<PlayerUpdateDto>.ReturnFailed(401, "Update data is null");
                 }
 
                 //Player player = await FindAsync(p => p.Id == playerUpdateDto.Id);
                 Player player = await Context.Set<Player>().FirstOrDefaultAsync(p => p.Id == playerUpdateDto.Id);
                 if (player == null)
                 {
-                    return ApiResponse<PlayerDto>.Return404("Player not found");
+                    return ApiResponse<PlayerUpdateDto>.Return404("Player not found");
                 }
 
                 _mapper.Map(playerUpdateDto, player);
                 player.CreatedAt = DateTime.Now;
                 player.UpdatedAt = DateTime.Now;
                 await Context.SaveChangesAsync();
-                PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
-                return ApiResponse<PlayerDto>.ReturnResultWith200(playerDTO);
+                PlayerUpdateDto playerDTO = _mapper.Map<PlayerUpdateDto>(player);
+                return ApiResponse<PlayerUpdateDto>.ReturnResultWith200(playerDTO);
             }
             catch (Exception ex)
             {
-                return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
+                return ApiResponse<PlayerUpdateDto>.ReturnFailed(401, ex.Message);
             }
         }
 

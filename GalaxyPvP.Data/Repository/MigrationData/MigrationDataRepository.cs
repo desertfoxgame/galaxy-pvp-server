@@ -23,9 +23,9 @@ namespace GalaxyPvP.Data
         private readonly IMapper _mapper;
         private readonly IPlayerRepository _playerRepo;
         private readonly IUserRepository _userRepo;
-        private readonly IPlayerItemRespository _playerItemRepo;
+        private readonly IPlayerItemRepository _playerItemRepo;
 
-        public MigrationDataRepository(GalaxyPvPContext db, IMapper mapper, IUserRepository userRepo, IPlayerRepository playerRepo, IPlayerItemRespository playerItemRepo) : base(db)
+        public MigrationDataRepository(GalaxyPvPContext db, IMapper mapper, IUserRepository userRepo, IPlayerRepository playerRepo, IPlayerItemRepository playerItemRepo) : base(db)
         {
             _db = db;
             _playerRepo = playerRepo;

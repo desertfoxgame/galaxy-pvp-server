@@ -4,9 +4,7 @@ namespace GalaxyPvP.Data
 {
     public class PlayerCreateDto
     {
-        [Required]
-        public string Id { get; set; }
-        [Required]
+        public string? Id { get; set; }
         public string UserId { get; set; }
         public string? Nickname { get; set; }
         public int Level { get; set; }
