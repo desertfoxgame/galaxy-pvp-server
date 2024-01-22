@@ -20,7 +20,7 @@ namespace GalaxyPvP.Data
             _mapper = mapper;
         }
 
-        public async Task<ApiResponse<PlayerDto>> Get(string userId)
+        public async Task<ApiResponse<PlayerDto>> GetByUserId(string userId)
         {
             try
             {
@@ -29,6 +29,29 @@ namespace GalaxyPvP.Data
                     return ApiResponse<PlayerDto>.ReturnFailed(401, "UserId Null");
                 }
                 var player = await FindAsync(p => p.UserId == userId);
+                if (player == null)
+                {
+                    return ApiResponse<PlayerDto>.ReturnFailed(401, "Not Found!");
+                }
+                PlayerDto reponse = _mapper.Map<PlayerDto>(player);
+                return ApiResponse<PlayerDto>.ReturnResultWith200(reponse);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
+
+            }
+        }
+
+        public async Task<ApiResponse<PlayerDto>> GetByPlayerId(string playerId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(playerId))
+                {
+                    return ApiResponse<PlayerDto>.ReturnFailed(401, "PlayerId Null");
+                }
+                var player = await FindAsync(p => p.Id == playerId);
                 if (player == null)
                 {
                     return ApiResponse<PlayerDto>.ReturnFailed(401, "Not Found!");

@@ -81,7 +81,7 @@ namespace GalaxyPvP.Data
                     //    await EmailExtension.SendEmailAsync(request.Email,
                     //"Mật khẩu mới của bạn",
                     //$"Mật khẩu mới cho tài khoản của bạn là: {password}");
-                    return ApiResponse<string>.ReturnSuccess();
+                    return ApiResponse<string>.ReturnResultWith200("Succeed!");
                 }
                 else
                 {

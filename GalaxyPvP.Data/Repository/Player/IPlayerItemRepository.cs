@@ -11,9 +11,9 @@ namespace GalaxyPvP.Data
         Task<ApiResponse<ListPlayerItemDto>> GetAllByNFT(string nftId);
         Task<ApiResponse<PlayerItemDto>> Create(PlayerItemCreateDto playerCreateDto);
         Task<ApiResponse<ListCreatePlayerItemDto>> CreateList(ListCreatePlayerItemDto playerCreateListDto);
-        Task<ApiResponse<PlayerItemDto>> Update(PlayerItemDto playerUpdateDto);
+        Task<ApiResponse<PlayerItemDto>> Update(string playerId , PlayerItemUpdateDto playerUpdateDto);
         Task<ApiResponse<ListUpdatePlayerItemDto>> UpdateList(ListUpdatePlayerItemDto playerUpdateDto);
-        Task<ApiResponse<PlayerItemDto>> Delete(int playerId);
+        Task<ApiResponse<PlayerItemDto>> Delete(string playerId, int dataId);
         Task<ApiResponse<ListPlayerItemDto>> ValidateWallet(ListPlayerItemDto playerCreateListDto);
 
     }
