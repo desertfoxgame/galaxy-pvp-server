@@ -30,7 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GalaxyPvP.Data\GalaxyPvP.Data.csproj" />
-    <ProjectReference Include="..\GalaxyPvP.Helper\GalaxyPvP.Helper.csproj" />
+    <ProjectReference Include="..\GalaxyPvP.Helper\GalaxyPvP.Exensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
