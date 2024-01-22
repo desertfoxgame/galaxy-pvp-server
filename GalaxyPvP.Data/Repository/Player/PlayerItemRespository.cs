@@ -55,7 +55,7 @@ namespace GalaxyPvP.Data.Repository.Player
                 {
                     return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Item exists");
                 }
-                //PlayerItem item = _mapper.Map<PlayerItem>(itemCreateDto);
+
                 PlayerItem item = new PlayerItem();
                 _mapper.Map(itemCreateDto, item);
                 item.CreatedAt = DateTime.Now;
@@ -137,6 +137,46 @@ namespace GalaxyPvP.Data.Repository.Player
             {
                 return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, ex.Message);
             }
+        }
+
+        public Task<ApiResponse<ListPlayerItemDto>> GetAllByNFT(string nftId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ApiResponse<ListPlayerItemDto>> CreateList(ListPlayerItemDto playerCreateListDto)
+        {
+            try
+            {
+                foreach (var item in playerCreateListDto.PlayerItems)
+                {
+                    var existItem = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.Id == item.Id && p.PlayerId == playerCreateListDto.PlayerId);
+                    if (existItem != null)
+                    {
+                        return ApiResponse<ListPlayerItemDto>.Return404("Player exist");
+                    }
+
+                    item.CreatedAt = DateTime.Now;
+                    item.UpdatedAt = DateTime.Now;
+                    Add(item);
+                    await Context.SaveChangesAsync();
+                }
+                return ApiResponse<ListPlayerItemDto>.ReturnResultWith200(playerCreateListDto);
+
+            }
+            catch (Exception ex) {
+                return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public Task<ApiResponse<ListPlayerItemDto>> UpdateList(ListPlayerItemDto playerUpdateDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ApiResponse<ListPlayerItemDto>> ValidateWallet(ListPlayerItemDto playerCreateListDto)
+        {
+            throw new NotImplementedException();
         }
     }
 }

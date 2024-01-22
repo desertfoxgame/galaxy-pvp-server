@@ -1,4 +1,5 @@
-﻿using GalaxyPvP.Data.Context;
+﻿using AutoMapper;
+using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -8,8 +9,13 @@ namespace GalaxyPvP.Data
 {
     public class GameConfigRepository : GenericRepository<GameConfig, GalaxyPvPContext>, IGameConfigRepository
     {
-        protected GameConfigRepository(GalaxyPvPContext context) : base(context)
+        private GalaxyPvPContext _db;
+        private readonly IMapper _mapper;
+
+        public GameConfigRepository(GalaxyPvPContext context, IMapper mapper) : base(context)
         {
+            _db = context;
+            _mapper = mapper;
         }
 
         public async Task<ApiResponse<string>> GetConfigs()

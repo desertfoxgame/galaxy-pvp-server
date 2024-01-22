@@ -33,5 +33,26 @@ namespace GalaxyPvP.Api.Controllers
             var user = await _userRepo.Register(model);
             return ReturnFormatedResponse(user);
         }
+
+        [HttpGet("GetById")]
+        public async Task<IActionResult> GetById(string userId)
+        {
+            var user = await _userRepo.GetById(userId);
+            return ReturnFormatedResponse(user);
+        }
+
+        [HttpGet("GetByEmail")]
+        public async Task<IActionResult> GetByEmail(string userEmail)
+        {
+            var user = await _userRepo.GetByEmail(userEmail);
+            return ReturnFormatedResponse(user);
+        }
+
+        [HttpGet("GetByUserName")]
+        public async Task<IActionResult> GetByUserName(string userName)
+        {
+            var user = await _userRepo.GetByUserName(userName);
+            return ReturnFormatedResponse(user);
+        }
     }
 }

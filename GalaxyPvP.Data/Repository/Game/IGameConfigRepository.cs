@@ -3,7 +3,7 @@ using GalaxyPvP.Extensions;
 
 namespace GalaxyPvP.Data
 {
-    public interface IGameConfigRepository:IGenericRepository<GameConfig>
+    public interface IGameConfigRepository : IGenericRepository<GameConfig>
     {
         Task<ApiResponse<string>> GetConfigs();
     }

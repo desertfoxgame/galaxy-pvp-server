@@ -11,11 +11,10 @@ namespace GalaxyPvP.Data.Repository.User
         Task<ApiResponse<LoginResponseDTO>> Login(LoginRequestDTO loginRequestDTO);
         Task<ApiResponse<UserDTO>> Register(RegisterRequestDTO registerationRequestDTO);
 
-        //Task<ApiResponse<UserDTO>> GetById(string userId);
-        //Task<ApiResponse<UserDTO>> GetByEmail(string email);
-        //Task<ApiResponse<UserDTO>> GetByUserName(string userName);
-        //Task<ApiResponse<UserDTO>> Create(UserDTO userCreateDto);
-        //Task<ApiResponse<UserDTO>> Update(PlayerItemDto playerUpdateDto);
+        Task<ApiResponse<UserDTO>> GetById(string userId);
+        Task<ApiResponse<UserDTO>> GetByEmail(string email);
+        Task<ApiResponse<UserDTO>> GetByUserName(string userName);
+        Task<ApiResponse<UserDTO>> Update(UserDTO playerUpdateDto);
         //Task<ApiResponse<UserDTO>> Delete(int playerId);
     }
 }
