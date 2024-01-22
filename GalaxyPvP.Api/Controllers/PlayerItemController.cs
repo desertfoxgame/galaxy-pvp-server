@@ -51,9 +51,9 @@ namespace GalaxyPvP.Api.Controllers
         
         [HttpPost("CreatePlayerItems")]
         //[Authorize]
-        public async Task<IActionResult> CreatePlayerItems(ListPlayerItemDto createDto)
+        public async Task<IActionResult> CreatePlayerItems(ListCreatePlayerItemDto createDto)
         {
-            ApiResponse<ListPlayerItemDto> response = await _repository.CreateList(createDto);
+            ApiResponse<ListCreatePlayerItemDto> response = await _repository.CreateList(createDto);
             return ReturnFormatedResponse(response);
         }
 

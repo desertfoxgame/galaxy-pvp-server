@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GalaxyPvP.Data.Dto.Player
 {
-    public class PlayerItemCreateDto
+    public class PlayerItemCreateDto 
     {
         public string PlayerId { get; set; }
 

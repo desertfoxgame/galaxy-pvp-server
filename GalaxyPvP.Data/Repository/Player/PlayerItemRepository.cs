@@ -144,28 +144,30 @@ namespace GalaxyPvP.Data.Repository.Player
             throw new NotImplementedException();
         }
 
-        public async Task<ApiResponse<ListPlayerItemDto>> CreateList(ListPlayerItemDto playerCreateListDto)
+        public async Task<ApiResponse<ListCreatePlayerItemDto>> CreateList(ListCreatePlayerItemDto playerCreateListDto)
         {
             try
             {
                 foreach (var item in playerCreateListDto.PlayerItems)
                 {
-                    var existItem = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.Id == item.Id && p.PlayerId == playerCreateListDto.PlayerId);
+                    var existItem = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == item.DataId && p.PlayerId == playerCreateListDto.PlayerId);
                     if (existItem != null)
                     {
-                        return ApiResponse<ListPlayerItemDto>.Return404("Player exist");
+                        return ApiResponse<ListCreatePlayerItemDto>.Return404("Item of Player exist");
                     }
 
-                    item.CreatedAt = DateTime.Now;
-                    item.UpdatedAt = DateTime.Now;
-                    Add(item);
+                    PlayerItem itemDto = _mapper.Map<PlayerItem>(item);
+
+                    itemDto.CreatedAt = DateTime.Now;
+                    itemDto.UpdatedAt = DateTime.Now;
+                    Add(itemDto);
                     await Context.SaveChangesAsync();
                 }
-                return ApiResponse<ListPlayerItemDto>.ReturnResultWith200(playerCreateListDto);
+                return ApiResponse<ListCreatePlayerItemDto>.ReturnResultWith200(playerCreateListDto);
 
             }
             catch (Exception ex) {
-                return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, ex.Message);
+                return ApiResponse<ListCreatePlayerItemDto>.ReturnFailed(401, ex.Message);
             }
         }
 
