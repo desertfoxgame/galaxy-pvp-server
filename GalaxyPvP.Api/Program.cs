@@ -32,6 +32,7 @@ builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
 builder.Services.AddScoped<IPlayerItemRepository, PlayerItemRepository>();
 builder.Services.AddScoped<IMigrationDataRepository, MigrationDataRepository>();
 builder.Services.AddScoped<IGameConfigRepository, GameConfigRepository>();
+builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 
 
 builder.Services.AddIdentity<GalaxyUser, IdentityRole>().AddEntityFrameworkStores<GalaxyPvPContext>();
