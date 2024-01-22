@@ -25,64 +25,63 @@ namespace GalaxyPvP.Data
             _playerRepo = playerRepo;
         }
 
-        public async Task<ApiResponse<List<Friend>>> GetFriendList(string playerId)
-        {
-            throw new NotImplementedException();
+        //public async Task<ApiResponse<List<Friend>>> GetFriendList(string playerId)
+        //{
+        //    throw new NotImplementedException();
+        //    //try
+        //    //{
+        //    //    if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId) == null)
+        //    //    {
+        //    //        return ApiResponse<List<Friend>>.ReturnFailed(401, "Player not exist!");
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        List<Player> listFriend = Context.Set<Player>()
+        //    //                                        .Include(p1 => p1.FriendsAsPlayer1)
+        //    //                                        .Include(p2 => p2.FriendsAsPlayer2)
+        //    //                                        .Where(p => p.Id == f);
 
-            //try
-            //{
-            //    if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId) == null)
-            //    {
-            //        return ApiResponse<List<Friend>>.ReturnFailed(401, "Player not exist!");
-            //    }
-            //    else
-            //    {
-            //        //List<Player> listFriend = Context.Set<Player>().Include(o => o.);
+        //    //        return ApiResponse<Friend>.ReturnResultWith200("Sent!");
+        //    //    }
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    return ApiResponse<Friend>.ReturnFailed(401, ex.Message);
+        //    //}
+        //}
 
-            //        return ApiResponse<Friend>.ReturnResultWith200("Sent!");
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    return ApiResponse<Friend>.ReturnFailed(401, ex.Message);
-            //}
-        }
+        //public async Task<ApiResponse<string>> CreateFriendRequest(FriendRequestDto request)
+        //{
+        //    throw new NotImplementedException();
 
-        public async Task<ApiResponse<Friend>> GetFriendNotification(int itemId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<ApiResponse<string>> CreateFriendRequest(FriendRequestDto request)
-        {
-            try
-            {
-                if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player1) == null)
-                {
-                    return ApiResponse<string>.ReturnFailed(401, "Player1 not exist!");
-                }
-                else if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player2) == null)
-                {
-                    return ApiResponse<string>.ReturnFailed(401, "Player2 not exist!");
-                }
-                else
-                {
-                    Friend newFriendRequest = new Friend();
-                    //newFriendRequest.Player1 = request.Player1;
-                    //newFriendRequest.Player2 = request.Player2;
-                    newFriendRequest.state = 0;
-                    newFriendRequest.CreatedAt = DateTime.Now;
-                    newFriendRequest.UpdatedAt = DateTime.Now;
-                    Add(newFriendRequest);
-                    Context.SaveChanges();
-                    return ApiResponse<string>.ReturnResultWith200("Sent!");
-                }
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<string>.ReturnFailed(401, ex.Message);
-            }
-        }
+        //    //try
+        //    //{
+        //    //    if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player1) == null)
+        //    //    {
+        //    //        return ApiResponse<string>.ReturnFailed(401, "Player1 not exist!");
+        //    //    }
+        //    //    else if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player2) == null)
+        //    //    {
+        //    //        return ApiResponse<string>.ReturnFailed(401, "Player2 not exist!");
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        Friend newFriendRequest = new Friend();
+        //    //        newFriendRequest.Player1Id = request.Player1;
+        //    //        newFriendRequest.Player2Id = request.Player2;
+        //    //        newFriendRequest.state = 0;
+        //    //        newFriendRequest.CreatedAt = DateTime.Now;
+        //    //        newFriendRequest.UpdatedAt = DateTime.Now;
+        //    //        Add(newFriendRequest);
+        //    //        Context.SaveChanges();
+        //    //        return ApiResponse<string>.ReturnResultWith200("Sent!");
+        //    //    }
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    return ApiResponse<string>.ReturnFailed(401, ex.Message);
+        //    //}
+        //}
 
         public async Task<ApiResponse<Friend>> UpdateFriendRequest(int itemId)
         {
@@ -90,6 +89,21 @@ namespace GalaxyPvP.Data
         }
 
         public Task<ApiResponse<Friend>> GetFriendList(int itemId)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ApiResponse<Friend>> IFriendRepository.GetFriendList(string playerId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ApiResponse<Friend>> GetFriendNotification(int itemId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ApiResponse<string>> CreateFriendRequest(FriendRequestDto request)
         {
             throw new NotImplementedException();
         }

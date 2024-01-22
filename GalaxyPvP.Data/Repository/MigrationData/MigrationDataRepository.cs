@@ -14,6 +14,8 @@ using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Model;
 using Microsoft.VisualBasic.FileIO;
+using GalaxyPvP.Data.Dto.MigrationDB;
+using Microsoft.EntityFrameworkCore;
 
 namespace GalaxyPvP.Data
 {
@@ -34,10 +36,14 @@ namespace GalaxyPvP.Data
             _playerItemRepo = playerItemRepo;
         }
 
-        public async Task<ApiResponse<string>> MigrationUser(MigrateUserRequestDTO request)
+        public async Task<ApiResponse<MigrateUserResponseDTO>> MigrationUser(MigrateUserRequestDTO request)
         {
             try
             {
+                MigrateUserResponseDTO response = new MigrateUserResponseDTO();
+                _mapper.Map(request, response);
+                response.PlayerItemsCantCreate = new List<string>();
+
                 RegisterRequestDTO registerDto = _mapper.Map<RegisterRequestDTO>(request);
 
                 string password = GenerateExtension.GeneratePassword(16);
@@ -47,7 +53,7 @@ namespace GalaxyPvP.Data
                 var user = await _userRepo.Register(registerDto);
                 if (!user.Success)
                 {
-                    return ApiResponse<string>.ReturnFailed(401, user.Errors);
+                    return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, user.Errors);
                 }
 
                 Player player = _mapper.Map<Player>(request);
@@ -69,30 +75,34 @@ namespace GalaxyPvP.Data
                         ApiResponse<PlayerItemDto> itemResponse = await _playerItemRepo.Create(itemCreateDto);
                         if (!itemResponse.Success)
                         {
-                            return ApiResponse<string>.ReturnFailed(401, itemResponse.Errors);
+                            return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, "Can't Create Item");
                         }
+                    }
+                    else
+                    {
+                        response.PlayerItemsCantCreate.Add(name);
                     }
                 }
 
                 PlayerCreateDto playerDTO = _mapper.Map<PlayerCreateDto>(player);
-                ApiResponse<PlayerDto> response = await _playerRepo.Create(playerCreateDto);
-                if (response.Success)
+                ApiResponse<PlayerDto> createPlayerResponse = await _playerRepo.Create(playerCreateDto);
+                if (createPlayerResponse.Success)
                 {
                     //    await EmailExtension.SendEmailAsync(request.Email,
                     //"Mật khẩu mới của bạn",
                     //$"Mật khẩu mới cho tài khoản của bạn là: {password}");
-                    return ApiResponse<string>.ReturnResultWith200("Succeed!");
+                    return ApiResponse<MigrateUserResponseDTO>.ReturnResultWith200(response);
                 }
                 else
                 {
-                    return ApiResponse<string>.ReturnFailed(401, response.Errors);
+                    return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, createPlayerResponse.Errors);
 
                 }
 
             }
             catch (Exception ex)
             {
-                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+                return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, ex.Message);
             }
         }
 
@@ -143,6 +153,31 @@ namespace GalaxyPvP.Data
             }
 
             return data;
+        }
+
+        public async Task<ApiResponse<string>> DeleteMigrationUser(string playerId)
+        {
+            try
+            {
+                List<PlayerItem> listItem = new List<PlayerItem>();
+                listItem = await Context.Set<PlayerItem>().Where(x => x.PlayerId == playerId).ToListAsync();
+
+                Player player = await Context.Set<Player>().Where(x => x.Id == playerId).FirstOrDefaultAsync();
+                
+                var user = await Context.Set<GalaxyUser>().Where(x => x.Email == player.UserId).ToListAsync();
+
+                Context.Set<PlayerItem>().RemoveRange(listItem);
+                Context.Set<Player>().Remove(player);
+                Context.Set<GalaxyUser>().RemoveRange(user);
+
+                Context.SaveChanges();
+
+                return ApiResponse<string>.ReturnResultWith200("Successful!");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+            }
         }
     }
 }

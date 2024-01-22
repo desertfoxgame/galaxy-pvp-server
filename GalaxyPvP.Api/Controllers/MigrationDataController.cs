@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data;
+using GalaxyPvP.Data.Dto.MigrationDB;
 using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.DTO;
@@ -38,9 +39,15 @@ namespace GalaxyPvP.Api.Controllers
         [HttpPost("MigrateUser")]
         public async Task<IActionResult> MigrationUser([FromBody] MigrateUserRequestDTO request)
         {
-            ApiResponse<string> response = await _migrationDataRepo.MigrationUser(request);
+            ApiResponse<MigrateUserResponseDTO> response = await _migrationDataRepo.MigrationUser(request);
             return ReturnFormatedResponse(response);
         }
-        
+
+        [HttpDelete("DeleteMigrateUser")]
+        public async Task<IActionResult> DeleteMigrateUser(string playerId)
+        {
+            ApiResponse<string> response = await _migrationDataRepo.DeleteMigrationUser(playerId);
+            return ReturnFormatedResponse(response);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Dto.Game;
+using GalaxyPvP.Data.Dto.MigrationDB;
 using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.DTO;
@@ -25,6 +26,7 @@ namespace GalaxyPvP.Api.Helpers.Mapping
             CreateMap<MigrateUserRequestDTO, GalaxyUser>().ReverseMap();
             CreateMap<MigrateUserRequestDTO, Player>().ReverseMap();
             CreateMap<MigrateUserRequestDTO, RegisterRequestDTO>().ReverseMap();
+            CreateMap<MigrateUserRequestDTO, MigrateUserResponseDTO>().ReverseMap();
 
             //Player Item
             CreateMap<PlayerItem, PlayerItemDto>().ReverseMap();
