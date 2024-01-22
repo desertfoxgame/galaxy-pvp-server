@@ -14,7 +14,7 @@ namespace GalaxyPvP.Api.Controllers
             _dbGameConfig = dbGameConfig;
         }
 
-        [HttpGet("GameConfigs")]
+        [HttpGet("GetGameConfigs")]
         public async Task<IActionResult> GetGameConfigs()
         {
             var result = await _dbGameConfig.GetConfigs();
