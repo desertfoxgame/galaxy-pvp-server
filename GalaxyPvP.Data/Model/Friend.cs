@@ -14,9 +14,11 @@ namespace GalaxyPvP.Data.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
-        public string Player1 {  get; set; }
+        public string Player1Id {  get; set; }
+        public Player Player1 {  get; set; }
         [Required]
-        public string Player2 { get; set; }
+        public string Player2Id { get; set; }
+        public Player Player2 { get; set; }
         [Required]
         public short state { get; set; } = 0;
 

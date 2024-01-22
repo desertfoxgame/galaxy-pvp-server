@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
@@ -24,9 +25,27 @@ namespace GalaxyPvP.Data
             _playerRepo = playerRepo;
         }
 
-        public async Task<ApiResponse<Friend>> GetFriendList(int itemId)
+        public async Task<ApiResponse<List<Friend>>> GetFriendList(string playerId)
         {
             throw new NotImplementedException();
+
+            //try
+            //{
+            //    if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId) == null)
+            //    {
+            //        return ApiResponse<List<Friend>>.ReturnFailed(401, "Player not exist!");
+            //    }
+            //    else
+            //    {
+            //        //List<Player> listFriend = Context.Set<Player>().Include(o => o.);
+
+            //        return ApiResponse<Friend>.ReturnResultWith200("Sent!");
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    return ApiResponse<Friend>.ReturnFailed(401, ex.Message);
+            //}
         }
 
         public async Task<ApiResponse<Friend>> GetFriendNotification(int itemId)
@@ -40,11 +59,11 @@ namespace GalaxyPvP.Data
             {
                 if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player1) == null)
                 {
-                    return ApiResponse<string>.ReturnResultWith200("Player1 not exist!");
+                    return ApiResponse<string>.ReturnFailed(401, "Player1 not exist!");
                 }
                 else if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player2) == null)
                 {
-                    return ApiResponse<string>.ReturnResultWith200("Player2 not exist!");
+                    return ApiResponse<string>.ReturnFailed(401, "Player2 not exist!");
                 }
                 else
                 {
