@@ -68,8 +68,8 @@ namespace GalaxyPvP.Data
                 else
                 {
                     Friend newFriendRequest = new Friend();
-                    newFriendRequest.Player1 = request.Player1;
-                    newFriendRequest.Player2 = request.Player2;
+                    //newFriendRequest.Player1 = request.Player1;
+                    //newFriendRequest.Player2 = request.Player2;
                     newFriendRequest.state = 0;
                     newFriendRequest.CreatedAt = DateTime.Now;
                     newFriendRequest.UpdatedAt = DateTime.Now;
@@ -85,6 +85,11 @@ namespace GalaxyPvP.Data
         }
 
         public async Task<ApiResponse<Friend>> UpdateFriendRequest(int itemId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ApiResponse<Friend>> GetFriendList(int itemId)
         {
             throw new NotImplementedException();
         }
