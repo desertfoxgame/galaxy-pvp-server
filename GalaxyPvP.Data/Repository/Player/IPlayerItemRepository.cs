@@ -4,7 +4,7 @@ using GalaxyPvP.Extensions;
 
 namespace GalaxyPvP.Data
 {
-    public interface IPlayerItemRespository : IGenericRepository<PlayerItem>
+    public interface IPlayerItemRepository : IGenericRepository<PlayerItem>
     {
         Task<ApiResponse<PlayerItemDto>> Get(int itemId);
         Task<ApiResponse<ListPlayerItemDto>> GetAll(string playerId);

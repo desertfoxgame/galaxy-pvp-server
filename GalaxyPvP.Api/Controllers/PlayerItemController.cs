@@ -14,11 +14,11 @@ namespace GalaxyPvP.Api.Controllers
     [ApiController]
     public class PlayerItemController : BaseController
     {
-        private readonly IPlayerItemRespository _repository;
+        private readonly IPlayerItemRepository _repository;
         private readonly IMapper _mapper;
         private GalaxyPvPContext _context;
 
-        public PlayerItemController(IPlayerItemRespository repository, IMapper mapper, GalaxyPvPContext context)
+        public PlayerItemController(IPlayerItemRepository repository, IMapper mapper, GalaxyPvPContext context)
         {
             _repository = repository;
             _mapper = mapper;

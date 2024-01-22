@@ -9,12 +9,12 @@ using NanoidDotNet;
 
 namespace GalaxyPvP.Data
 {
-    public class PlayerRespository : GenericRepository<Player, GalaxyPvPContext>, IPlayerRepository
+    public class PlayerRepository : GenericRepository<Player, GalaxyPvPContext>, IPlayerRepository
     {
         private GalaxyPvPContext _db;
         private readonly IMapper _mapper;
 
-        public PlayerRespository(GalaxyPvPContext db,IMapper mapper):base(db)
+        public PlayerRepository(GalaxyPvPContext db,IMapper mapper):base(db)
         {
             _db = db;
             _mapper = mapper;

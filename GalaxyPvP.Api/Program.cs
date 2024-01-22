@@ -28,8 +28,8 @@ builder.Services.AddDbContext<GalaxyPvPContext>(options =>
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IPlayerRepository, PlayerRespository>();
-builder.Services.AddScoped<IPlayerItemRespository, PlayerItemRespository>();
+builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
+builder.Services.AddScoped<IPlayerItemRepository, PlayerItemRepository>();
 builder.Services.AddScoped<IMigrationDataRepository, MigrationDataRepository>();
 builder.Services.AddScoped<IGameConfigRepository, GameConfigRepository>();
 

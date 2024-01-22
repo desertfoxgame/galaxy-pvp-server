@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace GalaxyPvP.Data.Repository.Player
 {
-    public class PlayerItemRespository : GenericRepository<PlayerItem, GalaxyPvPContext>, IPlayerItemRespository
+    public class PlayerItemRepository : GenericRepository<PlayerItem, GalaxyPvPContext>, IPlayerItemRepository
     {
         private GalaxyPvPContext _db;
         private readonly IMapper _mapper;
         private readonly IPlayerRepository _playerRepo;
 
-        public PlayerItemRespository(GalaxyPvPContext db, IMapper mapper, IPlayerRepository playerRepo) : base(db)
+        public PlayerItemRepository(GalaxyPvPContext db, IMapper mapper, IPlayerRepository playerRepo) : base(db)
         {
             _db = db;
             _mapper = mapper;
