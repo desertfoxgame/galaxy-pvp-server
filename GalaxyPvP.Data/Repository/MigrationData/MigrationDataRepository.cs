@@ -40,7 +40,7 @@ namespace GalaxyPvP.Data
             {
                 RegisterRequestDTO registerDto = _mapper.Map<RegisterRequestDTO>(request);
 
-                string password = GenerateExtionsion.GeneratePassword(16, true, true, true);
+                string password = GenerateExtension.GeneratePassword(16);
                 registerDto.UserName = registerDto.Email;
                 registerDto.Password = password;
 
