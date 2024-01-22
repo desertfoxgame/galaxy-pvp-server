@@ -63,5 +63,12 @@ namespace GalaxyPvP.Api.Controllers
             ApiResponse<PlayerDto> response = await _dbPlayer.Delete(playerId);
             return ReturnFormatedResponse(response);
         }
+
+        [HttpGet("GetLeaderboard")]
+        public async Task<IActionResult> GetLeaderboard(string playerId)
+        {
+            ApiResponse<int> response = await _dbPlayer.GetLeaderboard(playerId);
+            return ReturnFormatedResponse(response);
+        }
     }
 }
