@@ -18,11 +18,11 @@ namespace GalaxyPvP.Data.Context
         {
             base.OnModelCreating(builder);
 
-            //builder.Entity<GameConfig>().HasData(
-            //    new GameConfig() { Key = "Version_Android", Value = "3.0.0" },
-            //    new GameConfig() { Key = "Version_iOS", Value = "3.0.0" },
-            //    new GameConfig() { Key = "Version_Windows", Value = "3.0.0" }
-            //    );
+            builder.Entity<GameConfig>().HasData(
+                new GameConfig() { Key = "Version_Android", Value = "3.0.0" },
+                new GameConfig() { Key = "Version_iOS", Value = "3.0.0" },
+                new GameConfig() { Key = "Version_Windows", Value = "3.0.0" }
+                );
         }
     }
 }

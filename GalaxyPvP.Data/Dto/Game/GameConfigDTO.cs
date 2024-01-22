@@ -8,6 +8,7 @@ namespace GalaxyPvP.Data.Dto.Game
 {
     public class GameConfigDTO
     {
-        public string Configs {  get; set; }
+        public string Key {  get; set; }
+        public string Value { get; set; }
     }
 }

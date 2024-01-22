@@ -6,7 +6,6 @@ namespace GalaxyPvP.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class GameController : BaseController
     {
         private readonly IGameConfigRepository _dbGameConfig;

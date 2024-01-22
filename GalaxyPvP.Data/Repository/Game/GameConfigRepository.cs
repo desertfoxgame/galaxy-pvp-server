@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data.Context;
+using GalaxyPvP.Data.Dto.Game;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace GalaxyPvP.Data
 {
@@ -18,17 +20,17 @@ namespace GalaxyPvP.Data
             _mapper = mapper;
         }
 
-        public async Task<ApiResponse<string>> GetConfigs()
+        public async Task<ApiResponse<List<GameConfigDTO>>> GetConfigs()
         {
             try
             {
-                var configs = await All.ToListAsync();
-                string configJson = JsonConvert.SerializeObject(configs);
-                return ApiResponse<string>.ReturnResultWith200(configJson);         
+                List<GameConfig> configs = await All.ToListAsync();
+               
+                return ApiResponse<List<GameConfigDTO>>.ReturnResultWith200(_mapper.Map<List<GameConfigDTO>>(configs));         
             }
             catch (Exception ex)
             {
-                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+                return ApiResponse<List<GameConfigDTO>>.ReturnFailed(401, ex.Message);
             }
         }
     }

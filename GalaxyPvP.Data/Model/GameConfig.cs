@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GalaxyPvP.Data.Model
+namespace GalaxyPvP.Data
 {
-    public class GameConfig:BaseModel
+    public class GameConfig
     {
         [Key]
         public string Key {  get; set; }

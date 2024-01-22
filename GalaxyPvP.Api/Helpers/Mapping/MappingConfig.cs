@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data;
+using GalaxyPvP.Data.Dto.Game;
 using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.DTO;
@@ -12,6 +13,8 @@ namespace GalaxyPvP.Api.Helpers.Mapping
         public MappingConfig()
         {
             CreateMap<GalaxyUser, UserDTO>().ReverseMap();
+            //Game
+            CreateMap<GameConfig, GameConfigDTO>().ReverseMap();
 
             //Player
             CreateMap<Player, PlayerDto>().ReverseMap();
