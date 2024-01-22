@@ -7,7 +7,6 @@ namespace GalaxyPvP.Data.Context
     public class GalaxyPvPContext:IdentityDbContext<GalaxyUser>
     {
         public GalaxyPvPContext(DbContextOptions<GalaxyPvPContext> options):base(options) { }
-        public GalaxyPvPContext():base() { }
 
         public DbSet<GalaxyUser> GalaxyUsers { get; set; }
         public DbSet<Player> Player { get; set; }

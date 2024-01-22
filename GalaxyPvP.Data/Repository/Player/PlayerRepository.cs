@@ -140,5 +140,18 @@ namespace GalaxyPvP.Data
                 return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
             }
         }
+
+        public async Task<ApiResponse<int>> GetLeaderboard(string playerId)
+        {
+            try
+            {
+                Player player = await FindAsync(x => x.Id == playerId);
+                return ApiResponse<int>.ReturnResultWith200(player.Trophy);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<int>.ReturnFailed(401, ex.Message);
+            }
+        }
     }
 }
