@@ -25,80 +25,40 @@ namespace GalaxyPvP.Data
             _playerRepo = playerRepo;
         }
 
-        public async Task<ApiResponse<List<Player>>> GetFriendList(string playerId)
+        public async Task<ApiResponse<List<PlayerDto>>> GetFriendList(string playerId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId) == null)
+                {
+                    return ApiResponse<List<PlayerDto>>.ReturnFailed(401, "Player not exist!");
+                }
+                else
+                {
+                    List<Friend> listFriend = Context.Set<Friend>()
+                                                    .Include(f => f.Player1)
+                                                    .Include(f => f.Player2)
+                                                    .Where(f => (f.Player1Id == playerId || f.Player2Id == playerId) && f.state == 1)
+                                                    .ToList();
+                    List<PlayerDto> list = new List<PlayerDto>();
+                    foreach (var f in listFriend)
+                    {
+                        string friendId = (f.Player1Id == playerId) ? f.Player2Id : f.Player1Id;
+                        Player player = Context.Set<Player>().FirstOrDefault(f => f.Id == friendId);
+                        PlayerDto playerDto = _mapper.Map<PlayerDto>(player);
+                        if(player != null)
+                        {
+                            list.Add(playerDto);
+                        }
+                    }
 
-            //try
-            //{
-            //    // Check if the player with the given ID exists
-            //    Player player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId);
-            //    if (player == null)
-            //    {
-            //        // Player not found, return a failure response
-            //        return null; // or ApiResponse<List<Player>>.ReturnFailed(...) if you prefer
-            //    }
-
-            //    // Retrieve the list of friends for the given player
-            //    List<Friend> listFriend = Context.Set<Friend>()
-            //        .Include(f => f.Player1)
-            //        .Include(f => f.Player2)
-            //        .Where(f => (f.Player1Id == playerId || f.Player2Id == playerId) && f.state == 1)
-            //        .ToList();
-
-            //    // Create a list to store the friend players
-            //    List<Player> friendList = new List<Player>();
-
-            //    // Iterate through each friend and add the corresponding player to the list
-            //    foreach (var friend in listFriend)
-            //    {
-            //        // Determine the friend's ID (the other player's ID in the friendship)
-            //        string friendId = (friend.Player1Id == playerId) ? friend.Player2Id : friend.Player1Id;
-
-            //        // Retrieve the friend player and add it to the list
-            //        Player friendPlayer = await Context.Set<Player>().FirstOrDefaultAsync(p => p.Id == friendId);
-            //        if (friendPlayer != null)
-            //        {
-            //            friendList.Add(friendPlayer);
-            //        }
-            //    }
-
-            //    return friendList;
-            //}
-            //catch (Exception ex)
-            //{
-            //    // Handle exceptions if needed
-            //    return null; // or ApiResponse<List<Player>>.ReturnFailed(...) if you prefer
-            //}
-            //try
-            //{
-            //    if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId) == null)
-            //    {
-            //        return ApiResponse<List<Player>>.ReturnFailed(401, "Player not exist!");
-            //    }
-            //    else
-            //    {
-            //        List<Friend> listFriend = Context.Set<Friend>()
-            //                                        .Include(f => f.Player1)
-            //                                        .Include(f => f.Player2)
-            //                                        .Where(f => (f.Player1Id == playerId || f.Player2Id == playerId) && f.state == 1)
-            //                                        .ToList();
-            //        List<Player> list = new List<Player>();
-            //        foreach (var f in listFriend)
-            //        {
-            //            string friendId = (f.Player1Id == playerId) ? f.Player2Id : f.Player1Id;
-            //            Player player = Context.Set<Player>().FirstOrDefault(f => f.Id == friendId);
-            //            player.FriendsAsPlayer1 = Context.Set<Player>().FirstOrDefault(f => f.Id == playerId);
-            //            list.Add(player);
-            //        }
-
-            //        return ApiResponse<List<Player>>.ReturnResultWith200(list);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    return ApiResponse<List<Player>>.ReturnFailed(401, ex.Message);
-            //}
+                    return ApiResponse<List<PlayerDto>>.ReturnResultWith200(list);
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<List<PlayerDto>>.ReturnFailed(401, ex.Message);
+            }
         }
 
         public async Task<ApiResponse<string>> CreateFriendRequest(FriendRequestDto request)
@@ -141,14 +101,68 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<Friend>> UpdateFriendRequest(int itemId)
+        public async Task<ApiResponse<string>> UpdateFriendRequest(short state, FriendRequestDto request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player1) == null)
+                {
+                    return ApiResponse<string>.ReturnFailed(401, "Player1 not exist!");
+                }
+                else if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player2) == null)
+                {
+                    return ApiResponse<string>.ReturnFailed(401, "Player2 not exist!");
+                }
+                else if (request.Player1 == request.Player2)
+                {
+                    return ApiResponse<string>.ReturnFailed(401, "Player1 and Player2 can't be the same Id!");
+                }
+                else
+                {
+                    Friend friendRequest = await Context.Set<Friend>().FirstOrDefaultAsync(x => (x.Player1Id == request.Player1 && x.Player2Id == request.Player2) ||
+                                                                                                (x.Player1Id == request.Player2 && x.Player2Id == request.Player1));
+                    if (friendRequest != null)
+                    {
+                        friendRequest.state = state;
+                        friendRequest.UpdatedAt = DateTime.Now;
+                        Context.SaveChanges();
+                        return ApiResponse<string>.ReturnResultWith200("Successful!");
+                    }
+                    else
+                    {
+                        return ApiResponse<string>.ReturnFailed(401, "Friend Request not exist!");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+            }
         }
 
-        public Task<ApiResponse<Friend>> GetFriendNotification(int itemId)
+        public async Task<ApiResponse<int>> GetFriendNotification(string playerId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId) == null)
+                {
+                    return ApiResponse<int>.ReturnFailed(401, "Player not exist!");
+                }
+                else
+                {
+                    List<Friend> listFriend = Context.Set<Friend>()
+                                                    .Include(f => f.Player1)
+                                                    .Include(f => f.Player2)
+                                                    .Where(f => (f.Player1Id == playerId || f.Player2Id == playerId) && f.state == 0)
+                                                    .ToList();
+
+                    return ApiResponse<int>.ReturnResultWith200(listFriend.Count);
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<int>.ReturnFailed(401, ex.Message);
+            }
         }
     }
 }

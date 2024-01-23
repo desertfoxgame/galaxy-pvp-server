@@ -11,8 +11,8 @@ namespace GalaxyPvP.Data
     public interface IFriendRepository
     {
         Task<ApiResponse<string>> CreateFriendRequest(FriendRequestDto request);
-        Task<ApiResponse<List<Player>>> GetFriendList(string playerId);
-        Task<ApiResponse<Friend>> GetFriendNotification(int itemId);
-        Task<ApiResponse<Friend>> UpdateFriendRequest(int itemId);
+        Task<ApiResponse<List<PlayerDto>>> GetFriendList(string playerId);
+        Task<ApiResponse<int>> GetFriendNotification(string playerId);
+        Task<ApiResponse<string>> UpdateFriendRequest(short state, FriendRequestDto friend);
     }
 }
