@@ -8,6 +8,6 @@ public class MatchMakingTicket
     public int ModeId;
     public int Trophy;
 
-    public long SubmitedTime;
+    public DateTime SubmitedTime;
 
 }

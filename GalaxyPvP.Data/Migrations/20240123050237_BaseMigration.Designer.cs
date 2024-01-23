@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GalaxyPvP.Data.Migrations
 {
     [DbContext(typeof(GalaxyPvPContext))]
-    [Migration("20240123043442_BaseMigration")]
+    [Migration("20240123050237_BaseMigration")]
     partial class BaseMigration
     {
         /// <inheritdoc />
@@ -171,6 +171,9 @@ namespace GalaxyPvP.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DataId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()

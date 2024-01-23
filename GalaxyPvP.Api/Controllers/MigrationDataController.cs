@@ -1,18 +1,9 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Dto.MigrationDB;
-using GalaxyPvP.Data.Dto.Player;
-using GalaxyPvP.Data.Dto.User;
-using GalaxyPvP.Data.DTO;
-using GalaxyPvP.Data.Model;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
-using GalaxyPvP.Helper;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic.FileIO;
-using System.Reflection;
 
 namespace GalaxyPvP.Api.Controllers
 {

@@ -4,6 +4,7 @@ using GalaxyPvP.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GalaxyPvP.Data.Migrations
 {
     [DbContext(typeof(GalaxyPvPContext))]
-    partial class GalaxyPvPContextModelSnapshot : ModelSnapshot
+    [Migration("20240122092422_friend-foreignkey")]
+    partial class friendforeignkey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,26 +162,6 @@ namespace GalaxyPvP.Data.Migrations
                     b.HasIndex("Player2Id");
 
                     b.ToTable("Friends");
-                });
-
-            modelBuilder.Entity("GalaxyPvP.Data.Model.ItemDataMigration", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DataId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ItemData");
                 });
 
             modelBuilder.Entity("GalaxyPvP.Data.Model.Player", b =>

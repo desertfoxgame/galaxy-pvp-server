@@ -3,6 +3,7 @@ using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Repository.Player;
 using GalaxyPvP.Data.Repository.User;
+using GalaxyPvP.Helper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,8 @@ builder.Services.AddDbContext<GalaxyPvPContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("PvPConnection"));
 });
 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
@@ -33,7 +36,7 @@ builder.Services.AddScoped<IPlayerItemRepository, PlayerItemRepository>();
 builder.Services.AddScoped<IMigrationDataRepository, MigrationDataRepository>();
 builder.Services.AddScoped<IGameConfigRepository, GameConfigRepository>();
 builder.Services.AddScoped<IFriendRepository, FriendRepository>();
-
+builder.Services.AddScoped<UserInfoToken>(c => new UserInfoToken() { Id = "" });
 
 //builder.Services.AddIdentity<GalaxyUser, IdentityRole>().AddEntityFrameworkStores<GalaxyPvPContext>();
 builder.Services.AddIdentity<GalaxyUser, IdentityRole>()
@@ -46,6 +49,11 @@ builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 builder.Services.AddControllers();
 
+JwtSettings settings = new JwtSettings() 
+{
+    Key = builder.Configuration.GetValue<string>("ApiSettings:Secret")
+};
+builder.Services.AddJwtAutheticationConfiguration(settings);
 
 ////////////SWAGGER
 builder.Services.AddEndpointsApiExplorer();

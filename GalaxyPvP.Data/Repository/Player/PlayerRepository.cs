@@ -83,7 +83,7 @@ namespace GalaxyPvP.Data
                 Player player = _mapper.Map<Player>(playerCreateDto);
                 if (string.IsNullOrEmpty(player.Id))
                 {
-                    player.Id = Nanoid.Generate("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 16);
+                    player.Id = GenerateExtension.GenerateID(16);
                 }
                 player.CreatedAt = DateTime.Now;
                 player.UpdatedAt = DateTime.Now;
