@@ -138,11 +138,13 @@ namespace GalaxyPvP.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Player1")
-                        .HasColumnType("int");
+                    b.Property<string>("Player1Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Player2")
-                        .HasColumnType("int");
+                    b.Property<string>("Player2Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime");
@@ -152,7 +154,28 @@ namespace GalaxyPvP.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Player1Id");
+
+                    b.HasIndex("Player2Id");
+
                     b.ToTable("Friends");
+                });
+
+            modelBuilder.Entity("GalaxyPvP.Data.Model.ItemDataMigration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ItemData");
                 });
 
             modelBuilder.Entity("GalaxyPvP.Data.Model.Player", b =>
@@ -386,6 +409,25 @@ namespace GalaxyPvP.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("GalaxyPvP.Data.Model.Friend", b =>
+                {
+                    b.HasOne("GalaxyPvP.Data.Model.Player", "Player1")
+                        .WithMany("FriendsAsPlayer1")
+                        .HasForeignKey("Player1Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GalaxyPvP.Data.Model.Player", "Player2")
+                        .WithMany("FriendsAsPlayer2")
+                        .HasForeignKey("Player2Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Player1");
+
+                    b.Navigation("Player2");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -435,6 +477,13 @@ namespace GalaxyPvP.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("GalaxyPvP.Data.Model.Player", b =>
+                {
+                    b.Navigation("FriendsAsPlayer1");
+
+                    b.Navigation("FriendsAsPlayer2");
                 });
 #pragma warning restore 612, 618
         }
