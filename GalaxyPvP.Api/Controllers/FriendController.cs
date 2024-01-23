@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using GalaxyPvP.Extensions;
 using GalaxyPvP.Data.Model;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace GalaxyPvP.Api.Controllers
 {
@@ -19,6 +21,26 @@ namespace GalaxyPvP.Api.Controllers
         {
             _repoFriend = repoFriend;
             _mapper = mapper;
+        }
+
+        [HttpGet("GetFriendList")]
+        public async Task<IActionResult> GetFriendList(string playerId)
+        {
+            //ApiResponse<List<Player>> response = await _repoFriend.GetFriendList(playerId);
+            //return ReturnFormatedResponse(response);
+            ApiResponse<List<Player>> response = await _repoFriend.GetFriendList(playerId);
+
+            // Use JsonSerializerOptions with ReferenceHandler.Preserve
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                // Add any other serialization options if needed
+            };
+
+            // Serialize the object using JsonSerializer with options
+            var json = JsonSerializer.Serialize(response, options);
+
+            return Ok(json);
         }
 
         [HttpPost("SentFriendRequest")]
