@@ -36,6 +36,28 @@ namespace GalaxyPvP.Data
             _playerItemRepo = playerItemRepo;
         }
 
+
+        public async Task<ApiResponse<string>> AddItemData()
+        {
+            try
+            {
+                List<DataItemCSV> data = GetListDataItemCsv();
+                foreach(DataItemCSV item in data)
+                {
+                    ItemDataMigration itemData = new ItemDataMigration();
+                    itemData.Id = item.Id;
+                    itemData.Name = item.Name;
+                    Context.Set<ItemDataMigration>().Add(itemData);
+                }
+                await Context.SaveChangesAsync();
+                return ApiResponse<string>.ReturnSuccess();
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+            }
+        }
+
         public async Task<ApiResponse<MigrateUserResponseDTO>> MigrationUser(MigrateUserRequestDTO request)
         {
             try

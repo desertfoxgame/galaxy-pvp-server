@@ -36,6 +36,13 @@ namespace GalaxyPvP.Api.Controllers
             _migrationDataRepo = migrationDataRepo;
         }
 
+        [HttpPost("AddItemData")]
+        public async Task<IActionResult> AddItemData()
+        {
+            ApiResponse<string> response = await _migrationDataRepo.AddItemData();
+            return ReturnFormatedResponse(response);
+        }
+
         [HttpPost("MigrateUser")]
         public async Task<IActionResult> MigrationUser([FromBody] MigrateUserRequestDTO request)
         {

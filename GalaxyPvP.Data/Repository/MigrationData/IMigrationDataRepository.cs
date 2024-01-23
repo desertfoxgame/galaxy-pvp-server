@@ -8,6 +8,7 @@ namespace GalaxyPvP.Data.Repository.User
     public interface IMigrationDataRepository : IGenericRepository<GalaxyUser>
     {
         Task<ApiResponse<MigrateUserResponseDTO>> MigrationUser(MigrateUserRequestDTO request);
+        Task<ApiResponse<string>> AddItemData();
         Task<ApiResponse<string>> DeleteMigrationUser(string playerId);
     }
 }
