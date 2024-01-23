@@ -27,47 +27,49 @@ namespace GalaxyPvP.Data
 
         public async Task<ApiResponse<List<Player>>> GetFriendList(string playerId)
         {
-            try
-            {
-                // Check if the player with the given ID exists
-                Player player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId);
-                if (player == null)
-                {
-                    // Player not found, return a failure response
-                    return null; // or ApiResponse<List<Player>>.ReturnFailed(...) if you prefer
-                }
+            throw new NotImplementedException();
 
-                // Retrieve the list of friends for the given player
-                List<Friend> listFriend = Context.Set<Friend>()
-                    .Include(f => f.Player1)
-                    .Include(f => f.Player2)
-                    .Where(f => (f.Player1Id == playerId || f.Player2Id == playerId) && f.state == 1)
-                    .ToList();
+            //try
+            //{
+            //    // Check if the player with the given ID exists
+            //    Player player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId);
+            //    if (player == null)
+            //    {
+            //        // Player not found, return a failure response
+            //        return null; // or ApiResponse<List<Player>>.ReturnFailed(...) if you prefer
+            //    }
 
-                // Create a list to store the friend players
-                List<Player> friendList = new List<Player>();
+            //    // Retrieve the list of friends for the given player
+            //    List<Friend> listFriend = Context.Set<Friend>()
+            //        .Include(f => f.Player1)
+            //        .Include(f => f.Player2)
+            //        .Where(f => (f.Player1Id == playerId || f.Player2Id == playerId) && f.state == 1)
+            //        .ToList();
 
-                // Iterate through each friend and add the corresponding player to the list
-                foreach (var friend in listFriend)
-                {
-                    // Determine the friend's ID (the other player's ID in the friendship)
-                    string friendId = (friend.Player1Id == playerId) ? friend.Player2Id : friend.Player1Id;
+            //    // Create a list to store the friend players
+            //    List<Player> friendList = new List<Player>();
 
-                    // Retrieve the friend player and add it to the list
-                    Player friendPlayer = await Context.Set<Player>().FirstOrDefaultAsync(p => p.Id == friendId);
-                    if (friendPlayer != null)
-                    {
-                        friendList.Add(friendPlayer);
-                    }
-                }
+            //    // Iterate through each friend and add the corresponding player to the list
+            //    foreach (var friend in listFriend)
+            //    {
+            //        // Determine the friend's ID (the other player's ID in the friendship)
+            //        string friendId = (friend.Player1Id == playerId) ? friend.Player2Id : friend.Player1Id;
 
-                return friendList;
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions if needed
-                return null; // or ApiResponse<List<Player>>.ReturnFailed(...) if you prefer
-            }
+            //        // Retrieve the friend player and add it to the list
+            //        Player friendPlayer = await Context.Set<Player>().FirstOrDefaultAsync(p => p.Id == friendId);
+            //        if (friendPlayer != null)
+            //        {
+            //            friendList.Add(friendPlayer);
+            //        }
+            //    }
+
+            //    return friendList;
+            //}
+            //catch (Exception ex)
+            //{
+            //    // Handle exceptions if needed
+            //    return null; // or ApiResponse<List<Player>>.ReturnFailed(...) if you prefer
+            //}
             //try
             //{
             //    if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId) == null)
