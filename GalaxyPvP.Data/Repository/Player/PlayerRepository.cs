@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data.Context;
+using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.DTO;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NanoidDotNet;
+using System.Linq;
 
 namespace GalaxyPvP.Data
 {
@@ -14,7 +16,7 @@ namespace GalaxyPvP.Data
         private GalaxyPvPContext _db;
         private readonly IMapper _mapper;
 
-        public PlayerRepository(GalaxyPvPContext db,IMapper mapper):base(db)
+        public PlayerRepository(GalaxyPvPContext db, IMapper mapper) : base(db)
         {
             _db = db;
             _mapper = mapper;
@@ -79,7 +81,7 @@ namespace GalaxyPvP.Data
                     return ApiResponse<PlayerDto>.ReturnFailed(401, "Player exists");
                 }
                 Player player = _mapper.Map<Player>(playerCreateDto);
-                if(string.IsNullOrEmpty(player.Id))
+                if (string.IsNullOrEmpty(player.Id))
                 {
                     player.Id = Nanoid.Generate("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 16);
                 }
@@ -141,16 +143,24 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<int>> GetLeaderboard(string playerId)
+        public async Task<ApiResponse<List<PlayerDto>>> GetLeaderboard(int amount)
         {
             try
             {
-                Player player = await FindAsync(x => x.Id == playerId);
-                return ApiResponse<int>.ReturnResultWith200(player.Trophy);
+                List<PlayerDto> res = new List<PlayerDto>();
+                if (amount > Context.Set<Player>().ToList().Count)
+                {
+                    amount = Context.Set<Player>().ToList().Count;
+                }
+                List<Player> list = await Context.Set<Player>().OrderByDescending(x => x.Trophy).Take(amount).ToListAsync();
+
+                res = _mapper.Map<List<PlayerDto>>(list);
+
+                return ApiResponse<List<PlayerDto>>.ReturnResultWith200(res);
             }
             catch (Exception ex)
             {
-                return ApiResponse<int>.ReturnFailed(401, ex.Message);
+                return ApiResponse<List<PlayerDto>>.ReturnFailed(401, ex.Message);
             }
         }
     }

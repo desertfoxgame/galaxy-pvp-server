@@ -2,6 +2,7 @@
 using Azure;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
+using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
@@ -65,9 +66,9 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpGet("GetLeaderboard")]
-        public async Task<IActionResult> GetLeaderboard(string playerId)
+        public async Task<IActionResult> GetLeaderboard(int amount)
         {
-            ApiResponse<int> response = await _dbPlayer.GetLeaderboard(playerId);
+            ApiResponse<List<PlayerDto>> response = await _dbPlayer.GetLeaderboard(amount);
             return ReturnFormatedResponse(response);
         }
     }
