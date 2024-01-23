@@ -16,6 +16,8 @@ using System.Reflection;
 
 namespace GalaxyPvP.Api.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class MigrationDataController : BaseController
     {
         private readonly ILogger<UserController> _logger;
