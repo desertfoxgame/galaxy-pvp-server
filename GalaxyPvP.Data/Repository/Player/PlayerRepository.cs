@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data.Context;
+using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.DTO;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NanoidDotNet;
+using System.Linq;
 
 namespace GalaxyPvP.Data
 {
@@ -14,13 +16,13 @@ namespace GalaxyPvP.Data
         private GalaxyPvPContext _db;
         private readonly IMapper _mapper;
 
-        public PlayerRepository(GalaxyPvPContext db,IMapper mapper):base(db)
+        public PlayerRepository(GalaxyPvPContext db, IMapper mapper) : base(db)
         {
             _db = db;
             _mapper = mapper;
         }
 
-        public async Task<ApiResponse<PlayerDto>> Get(string userId)
+        public async Task<ApiResponse<PlayerDto>> GetByUserId(string userId)
         {
             try
             {
@@ -29,6 +31,29 @@ namespace GalaxyPvP.Data
                     return ApiResponse<PlayerDto>.ReturnFailed(401, "UserId Null");
                 }
                 var player = await FindAsync(p => p.UserId == userId);
+                if (player == null)
+                {
+                    return ApiResponse<PlayerDto>.ReturnFailed(401, "Not Found!");
+                }
+                PlayerDto reponse = _mapper.Map<PlayerDto>(player);
+                return ApiResponse<PlayerDto>.ReturnResultWith200(reponse);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
+
+            }
+        }
+
+        public async Task<ApiResponse<PlayerDto>> GetByPlayerId(string playerId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(playerId))
+                {
+                    return ApiResponse<PlayerDto>.ReturnFailed(401, "PlayerId Null");
+                }
+                var player = await FindAsync(p => p.Id == playerId);
                 if (player == null)
                 {
                     return ApiResponse<PlayerDto>.ReturnFailed(401, "Not Found!");
@@ -56,7 +81,7 @@ namespace GalaxyPvP.Data
                     return ApiResponse<PlayerDto>.ReturnFailed(401, "Player exists");
                 }
                 Player player = _mapper.Map<Player>(playerCreateDto);
-                if(string.IsNullOrEmpty(player.Id))
+                if (string.IsNullOrEmpty(player.Id))
                 {
                     player.Id = Nanoid.Generate("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 16);
                 }
@@ -115,6 +140,27 @@ namespace GalaxyPvP.Data
             catch (Exception ex)
             {
                 return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<List<PlayerDto>>> GetLeaderboard(int amount)
+        {
+            try
+            {
+                List<PlayerDto> res = new List<PlayerDto>();
+                if (amount > Context.Set<Player>().ToList().Count)
+                {
+                    amount = Context.Set<Player>().ToList().Count;
+                }
+                List<Player> list = await Context.Set<Player>().OrderByDescending(x => x.Trophy).Take(amount).ToListAsync();
+
+                res = _mapper.Map<List<PlayerDto>>(list);
+
+                return ApiResponse<List<PlayerDto>>.ReturnResultWith200(res);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<List<PlayerDto>>.ReturnFailed(401, ex.Message);
             }
         }
     }

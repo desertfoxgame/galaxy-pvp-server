@@ -71,7 +71,7 @@ namespace GalaxyPvP.Data.Repository.Player
             }
         }
 
-        public async Task<ApiResponse<PlayerItemDto>> Update(PlayerItemDto itemUpdateDto)
+        public async Task<ApiResponse<PlayerItemDto>> Update(string playerId, PlayerItemUpdateDto itemUpdateDto)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace GalaxyPvP.Data.Repository.Player
                     return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Update data is null");
                 }
 
-                var item = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == itemUpdateDto.DataId && p.PlayerId == itemUpdateDto.PlayerId);
+                var item = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == itemUpdateDto.DataId && p.PlayerId == playerId);
                 if (item == null)
                 {
                     return ApiResponse<PlayerItemDto>.Return404("Player not found");
@@ -99,11 +99,11 @@ namespace GalaxyPvP.Data.Repository.Player
             }
         }
 
-        public async Task<ApiResponse<PlayerItemDto>> Delete(int itemId)
+        public async Task<ApiResponse<PlayerItemDto>> Delete(string playerId, int dataId)
         {
             try
             {
-                PlayerItem removeItem = await FindAsync(x => x.Id == itemId);
+                PlayerItem removeItem = await FindAsync(x => x.PlayerId == playerId && x.DataId == dataId);
                 PlayerItemDto responseItem = _mapper.Map<PlayerItemDto>(removeItem);
                 Delete(removeItem);
                 Context.SaveChanges();
@@ -163,9 +163,9 @@ namespace GalaxyPvP.Data.Repository.Player
                     await Context.SaveChangesAsync();
                 }
                 return ApiResponse<ListCreatePlayerItemDto>.ReturnResultWith200(playerCreateListDto);
-
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return ApiResponse<ListCreatePlayerItemDto>.ReturnFailed(401, ex.Message);
             }
         }

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace GalaxyPvP.Data.Migrations
 {
     /// <inheritdoc />
@@ -53,6 +55,31 @@ namespace GalaxyPvP.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GameConfigs",
+                columns: table => new
+                {
+                    Key = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GameConfigs", x => x.Key);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ItemData",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ItemData", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Player",
                 columns: table => new
                 {
@@ -82,7 +109,7 @@ namespace GalaxyPvP.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PlayerId = table.Column<int>(type: "int", nullable: false),
+                    PlayerId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DataId = table.Column<int>(type: "int", nullable: false),
                     NftType = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
                     NftId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
@@ -204,6 +231,46 @@ namespace GalaxyPvP.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Friends",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Player1Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Player2Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    state = table.Column<short>(type: "smallint", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Friends", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Friends_Player_Player1Id",
+                        column: x => x.Player1Id,
+                        principalTable: "Player",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Friends_Player_Player2Id",
+                        column: x => x.Player2Id,
+                        principalTable: "Player",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "GameConfigs",
+                columns: new[] { "Key", "Value" },
+                values: new object[,]
+                {
+                    { "Version_Android", "3.0.0" },
+                    { "Version_iOS", "3.0.0" },
+                    { "Version_Windows", "3.0.0" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -242,6 +309,16 @@ namespace GalaxyPvP.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Friends_Player1Id",
+                table: "Friends",
+                column: "Player1Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Friends_Player2Id",
+                table: "Friends",
+                column: "Player2Id");
         }
 
         /// <inheritdoc />
@@ -263,7 +340,13 @@ namespace GalaxyPvP.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Player");
+                name: "Friends");
+
+            migrationBuilder.DropTable(
+                name: "GameConfigs");
+
+            migrationBuilder.DropTable(
+                name: "ItemData");
 
             migrationBuilder.DropTable(
                 name: "PlayerItem");
@@ -273,6 +356,9 @@ namespace GalaxyPvP.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Player");
         }
     }
 }

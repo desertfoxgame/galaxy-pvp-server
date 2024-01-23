@@ -26,11 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GalaxyPvP.Helper\GalaxyPvP.Helper.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations\" />
+    <ProjectReference Include="..\GalaxyPvP.Helper\GalaxyPvP.Exensions.csproj" />
   </ItemGroup>
 
 </Project>

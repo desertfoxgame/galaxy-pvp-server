@@ -32,7 +32,7 @@ namespace GalaxyPvP.Api.Controllers
             ApiResponse<PlayerItemDto> response = await _repository.Get(itemId);
             return ReturnFormatedResponse(response);
         }
-        
+
         [HttpGet("GetAllPlayerItem")]
         //[Authorize]
         public async Task<IActionResult> GetPlayerItem(string playerId)
@@ -48,7 +48,7 @@ namespace GalaxyPvP.Api.Controllers
             ApiResponse<PlayerItemDto> response = await _repository.Create(createDto);
             return ReturnFormatedResponse(response);
         }
-        
+
         [HttpPost("CreatePlayerItems")]
         //[Authorize]
         public async Task<IActionResult> CreatePlayerItems(ListCreatePlayerItemDto createDto)
@@ -59,9 +59,9 @@ namespace GalaxyPvP.Api.Controllers
 
         [HttpPut("UpdatePlayerItem")]
         //[Authorize]
-        public async Task<IActionResult> UpdatePlayerItem(PlayerItemDto updateDto)
+        public async Task<IActionResult> UpdatePlayerItem(string playerId, PlayerItemUpdateDto updateDto)
         {
-            ApiResponse<PlayerItemDto> response = await _repository.Update(updateDto);
+            ApiResponse<PlayerItemDto> response = await _repository.Update(playerId, updateDto);
             return ReturnFormatedResponse(response);
         }
 
@@ -75,9 +75,9 @@ namespace GalaxyPvP.Api.Controllers
 
         [HttpDelete("DeletePlayerItem")]
         //[Authorize]
-        public async Task<IActionResult> DeletePlayerItem(int itemId)
+        public async Task<IActionResult> DeletePlayerItem(string playerId, int dataId)
         {
-            ApiResponse<PlayerItemDto> response = await _repository.Delete(itemId);
+            ApiResponse<PlayerItemDto> response = await _repository.Delete(playerId, dataId);
             return ReturnFormatedResponse(response);
         }
     }
