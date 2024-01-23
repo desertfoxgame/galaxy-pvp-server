@@ -45,7 +45,7 @@ namespace GalaxyPvP.Data
                 foreach(DataItemCSV item in data)
                 {
                     ItemDataMigration itemData = new ItemDataMigration();
-                    itemData.Id = item.Id;
+                    itemData.DataId = item.Id;
                     itemData.Name = item.Name;
                     Context.Set<ItemDataMigration>().Add(itemData);
                 }
@@ -87,18 +87,15 @@ namespace GalaxyPvP.Data
 
                 foreach (string name in request.PlayerItems)
                 {
-                    int dataId = GetItemDataId(name);
-                    if (dataId != 0)
+                    var itemData = await Context.Set<ItemDataMigration>().FirstOrDefaultAsync(x => x.Name == name);
+                    if (itemData != null)
                     {
+                        int dataId = itemData.DataId;
                         PlayerItemCreateDto itemCreateDto = new PlayerItemCreateDto();
                         itemCreateDto.PlayerId = player.Id;
                         itemCreateDto.DataId = dataId;
 
-                        ApiResponse<PlayerItemDto> itemResponse = await _playerItemRepo.Create(itemCreateDto);
-                        if (!itemResponse.Success)
-                        {
-                            return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, "Can't Create Item");
-                        }
+                        await _playerItemRepo.Create(itemCreateDto);
                     }
                     else
                     {
