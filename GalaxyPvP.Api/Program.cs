@@ -7,6 +7,7 @@ using GalaxyPvP.Helper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PlayFab;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +50,8 @@ builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 builder.Services.AddControllers();
 
+builder.Services.AddMemoryCache();
+
 JwtSettings settings = new JwtSettings() 
 {
     Key = builder.Configuration.GetValue<string>("ApiSettings:Secret")
@@ -58,6 +61,9 @@ builder.Services.AddJwtAutheticationConfiguration(settings);
 ////////////SWAGGER
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+PlayFabSettings.staticSettings.TitleId = "903AC";
+PlayFabSettings.staticSettings.DeveloperSecretKey = "I8BHKCU9NFZPM1NF74PNCGB4WPYM8HEMOSOZGHW6XSIT9PKY5B";
 
 var app = builder.Build();
 

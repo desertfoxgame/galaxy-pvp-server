@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -23,18 +24,22 @@ namespace GalaxyPvP.Api.Controllers
         private readonly IMapper _mapper;
         private readonly UserInfoToken _userInfoToken;
         private IHttpContextAccessor _httpContext;
+        private readonly IMemoryCache _memoryCache;
 
-        private Dictionary<string, MatchMakingTicket> PlayerPools = new Dictionary<string, MatchMakingTicket>();
+        //private Dictionary<string, MatchMakingTicket> PlayerPools = new Dictionary<string, MatchMakingTicket>();
 
         public MatchMakingController(UserManager<GalaxyUser> userManager, IPlayerRepository playerManager, IMapper mapper, 
             UserInfoToken userInfoToken,
-            IHttpContextAccessor httpContext)
+            IHttpContextAccessor httpContext,
+            IMemoryCache memoryCache)
         {
             _userManager = userManager;
             _playerRepository = playerManager;
             _mapper = mapper;
             _userInfoToken = userInfoToken;
             _httpContext = httpContext;
+            _memoryCache = memoryCache;
+
         }
 
         [HttpPost("SubmitTicket")]
@@ -54,7 +59,15 @@ namespace GalaxyPvP.Api.Controllers
                 return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "Player not found"));
             }
             PlayerDto player = getPlayer.Data;
-            if(PlayerPools.ContainsKey(player.Id))
+            Dictionary<string, MatchMakingTicket> PlayerPools = GetCachedDictionary();
+
+            if (PlayerPools == null)
+            {
+                PlayerPools = new Dictionary<string, MatchMakingTicket>();
+                SaveDictionaryToCache(PlayerPools);
+            }
+
+            if (PlayerPools.ContainsKey(player.Id))
             {
                 return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "Already in queued"));
             }
@@ -62,7 +75,27 @@ namespace GalaxyPvP.Api.Controllers
             ticket.PlayerId = player.Id;
             ticket.SubmitedTime = DateTime.UtcNow;
             PlayerPools.Add(player.Id, ticket);
+            SaveDictionaryToCache(PlayerPools);
+
             return ReturnFormatedResponse(ApiResponse<string>.ReturnSuccess());
+        }
+
+        void SaveDictionaryToCache(Dictionary<string, MatchMakingTicket> data)
+        {
+            // Set the dictionary in the cache with a specific key and expiration time
+            _memoryCache.Set("PlayerPools", data);
+        }
+
+        Dictionary<string, MatchMakingTicket> GetCachedDictionary()
+        {
+            // Try to get the dictionary from the cache
+            if (_memoryCache.TryGetValue("PlayerPools", out Dictionary<string, MatchMakingTicket> cachedData))
+            {
+                return cachedData;
+            }
+
+            // If not in the cache, return null or fetch it from the data source
+            return null;
         }
     }
 }
