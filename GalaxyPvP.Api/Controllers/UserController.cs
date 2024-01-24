@@ -76,7 +76,7 @@ namespace GalaxyPvP.Api.Controllers
                 string tutorial = userData.TryGetValue("tutorial", out UserDataRecord? Tutorial) ? Tutorial.Value : string.Empty;
                 string developer = userData.TryGetValue("developer", out UserDataRecord? Developer) ? Developer.Value : string.Empty;
 
-                string[] playerItems = new string[5000];
+                string[] playerItems = new string[inventory.Count];
                 for (int i = 0; i < inventory?.Count; i++)
                 {
                     playerItems[i] = (inventory[i].DisplayName);
