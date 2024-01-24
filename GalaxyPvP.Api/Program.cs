@@ -65,7 +65,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHostedService<MatchMakingBackgroundService>();
 
-//PlayFabSettings.staticSettings.TitleId = "903AC";
+PlayFabSettings.staticSettings.TitleId = "903AC";
 //PlayFabSettings.staticSettings.DeveloperSecretKey = "I8BHKCU9NFZPM1NF74PNCGB4WPYM8HEMOSOZGHW6XSIT9PKY5B";
 
 var app = builder.Build();

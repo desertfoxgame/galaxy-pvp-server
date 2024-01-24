@@ -1,4 +1,6 @@
-﻿using GalaxyPvP.Data;
+﻿using Azure.Core;
+using GalaxyPvP.Data;
+using GalaxyPvP.Data.Dto.MigrationDB;
 using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
@@ -16,10 +18,13 @@ namespace GalaxyPvP.Api.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserRepository _userRepo;
-        public UserController(ILogger<UserController> logger, IUserRepository userRepo)
+        private readonly IMigrationDataRepository _migrationDataRepo;
+        
+        public UserController(ILogger<UserController> logger, IUserRepository userRepo, IMigrationDataRepository migrationDataRepo)
         {
             _logger = logger;
             _userRepo = userRepo;
+            _migrationDataRepo = migrationDataRepo;
         }
 
         [HttpPost("login")]
@@ -32,32 +37,17 @@ namespace GalaxyPvP.Api.Controllers
                 {
                     Email = model.Email,
                     Password = model.Password,
-                    InfoRequestParameters = new()
+                    InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
                     {
                         GetPlayerProfile = true,
                         GetUserData = true,
                         GetUserInventory = true,
                         GetUserReadOnlyData = true,
-                        ProfileConstraints = new()
+                        ProfileConstraints = new PlayerProfileViewConstraints
                         {
                             ShowDisplayName = true,
                         },
-                        UserDataKeys = new List<string>
-                        {
-                            "CurrentWinStreaks",
-                            "MVP",
-                            "TotalGames",
-                            "WinGames",
-                            "WinStreaks",
-                            "tutorial",
-                            "developer"
-                        },
-                        UserReadOnlyDataKeys = new List<string> 
-                        {
-                            "publicaddress"
-                        }
                     },
-                    TitleId = "903AC"
                 };
                 var playfabResp = await PlayFabClientAPI.LoginWithEmailAddressAsync(playfabRequest);
                 if (playfabResp.Error != null)
@@ -86,10 +76,10 @@ namespace GalaxyPvP.Api.Controllers
                 string tutorial = userData.TryGetValue("tutorial", out UserDataRecord? Tutorial) ? Tutorial.Value : string.Empty;
                 string developer = userData.TryGetValue("developer", out UserDataRecord? Developer) ? Developer.Value : string.Empty;
 
-                List<string> playerItems = [];
+                string[] playerItems = new string[5000];
                 for (int i = 0; i < inventory?.Count; i++)
                 {
-                    playerItems.Add(inventory[i].DisplayName);
+                    playerItems[i] = (inventory[i].DisplayName);
                 }
 
                 // Migrate data and return response here
@@ -103,7 +93,17 @@ namespace GalaxyPvP.Api.Controllers
                 migrationRequestDTO.MVP = int.Parse(mvp);
                 migrationRequestDTO.WinStreaks = int.Parse(winStreaks);
                 migrationRequestDTO.CurrentWinStreak = int.Parse(currentWinStreaks);
+                migrationRequestDTO.PlayerItems = playerItems;
 
+                ApiResponse<MigrateUserResponseDTO> response = await _migrationDataRepo.MigrationUser(migrationRequestDTO);
+                if(response.Success)
+                {
+                    return ReturnFormatedResponse(response);
+                }
+                else
+                {
+                    return ReturnFormatedResponse(ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, response.Errors));
+                }
             }
             return ReturnFormatedResponse(loginResponse);
         }
