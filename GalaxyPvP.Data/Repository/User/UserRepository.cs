@@ -42,6 +42,11 @@ namespace GalaxyPvP.Data.Repository.User
         {
             var user = Context.GalaxyUsers.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower());
 
+            
+            if (user == default)
+            {
+                return ApiResponse<LoginResponseDTO>.ReturnUserNotFound();
+            }
             bool isValid = await _userManager.CheckPasswordAsync(user, request.Password);
 
             if (user == null || isValid == false)

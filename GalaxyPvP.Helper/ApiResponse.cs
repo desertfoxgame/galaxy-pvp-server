@@ -91,6 +91,11 @@ namespace GalaxyPvP.Extensions
         {
             return new ApiResponse<T>(404, new List<string> { message });
         }
+
+        public static ApiResponse<T> ReturnUserNotFound()
+        {
+            return new ApiResponse<T>(400, null);
+        }
     }
 
 }
