@@ -1,4 +1,5 @@
-﻿using GalaxyPvP.Data.Dto.User;
+﻿using GalaxyPvP.Data;
+using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -41,8 +42,8 @@ namespace GalaxyPvP.Api.Controllers
                         {
                             ShowDisplayName = true,
                         },
-                        UserDataKeys =
-                        [
+                        UserDataKeys = new List<string>
+                        {
                             "CurrentWinStreaks",
                             "MVP",
                             "TotalGames",
@@ -50,11 +51,11 @@ namespace GalaxyPvP.Api.Controllers
                             "WinStreaks",
                             "tutorial",
                             "developer"
-                        ],
-                        UserReadOnlyDataKeys = 
-                        [
+                        },
+                        UserReadOnlyDataKeys = new List<string> 
+                        {
                             "publicaddress"
-                        ]
+                        }
                     },
                     TitleId = "903AC"
                 };
@@ -86,6 +87,23 @@ namespace GalaxyPvP.Api.Controllers
                 string developer = userData.TryGetValue("developer", out UserDataRecord? Developer) ? Developer.Value : string.Empty;
 
                 // Migrate data and return response here
+                MigrateUserRequestDTO migrationRequestDTO = new MigrateUserRequestDTO();
+                migrationRequestDTO.PlayfabID = playfabId;
+                migrationRequestDTO.Email = email;
+                migrationRequestDTO.Nickname = nickname;
+                migrationRequestDTO.WalletAddress = walletaddress;
+                migrationRequestDTO.WinGames = int.Parse(winGames);
+                migrationRequestDTO.TotalGames = int.Parse(totalGames);
+                migrationRequestDTO.MVP = int.Parse(mvp);
+                migrationRequestDTO.WinStreaks = int.Parse(winStreaks);
+                migrationRequestDTO.CurrentWinStreak = int.Parse(currentWinStreaks);
+
+                List<string> playerItems = new List<string>();
+                foreach(ItemInstance item in inventory)
+                {
+                    playerItems.Add(item.ItemId);
+                }
+
             }
             return ReturnFormatedResponse(loginResponse);
         }

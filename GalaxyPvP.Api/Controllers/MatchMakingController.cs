@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data;
+using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using GalaxyPvP.Helper;
 using Microsoft.AspNetCore.Authorization;
@@ -77,7 +78,39 @@ namespace GalaxyPvP.Api.Controllers
             PlayerPools.Add(player.Id, ticket);
             SaveDictionaryToCache(PlayerPools);
 
-            return ReturnFormatedResponse(ApiResponse<string>.ReturnSuccess());
+            return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Success"));
+        }
+
+        [HttpPost("CheckForMatch")]
+        [Authorize]
+        public async Task<IActionResult> CheckForMatch([FromBody] MatchRequestDto request)
+        {
+            Dictionary<string, MatchMakingTicket> PlayerPools = GetCachedDictionary();
+
+            if (PlayerPools == null)
+            {
+                PlayerPools = new Dictionary<string, MatchMakingTicket>();
+                SaveDictionaryToCache(PlayerPools);
+            }
+
+            if (PlayerPools.ContainsKey(request.PlayerId))
+            {
+                if(PlayerPools.Count >= 6)
+                {
+                    return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Game ready!"));
+                }
+                else if (PlayerPools.Count >= 4 && request.WaitTime >= 30) {
+                    return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Game ready with bot!"));
+                }
+
+                return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Already in queued"));
+            }
+            else
+            {
+                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "Player not in queued"));
+            }
+
+            //return ReturnFormatedResponse(ApiResponse<string>.ReturnSuccess());
         }
 
         void SaveDictionaryToCache(Dictionary<string, MatchMakingTicket> data)

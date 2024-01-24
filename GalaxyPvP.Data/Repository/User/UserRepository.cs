@@ -41,7 +41,6 @@ namespace GalaxyPvP.Data.Repository.User
         public async Task<ApiResponse<LoginResponseDTO>> Login(LoginRequestDTO request)
         {
             var user = Context.GalaxyUsers.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower());
-
             
             if (user == default)
             {

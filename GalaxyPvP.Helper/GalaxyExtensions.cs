@@ -34,6 +34,24 @@ namespace GalaxyPvP.Helper
             }
 
             return data;
-        }        
+        }
+
+        //public static void SaveDictionaryToCache(Dictionary<string, MatchMakingTicket> data)
+        //{
+        //    // Set the dictionary in the cache with a specific key and expiration time
+        //    _memoryCache.Set("PlayerPools", data);
+        //}
+
+        //public static Dictionary<string, MatchMakingTicket> GetCachedDictionary()
+        //{
+        //    // Try to get the dictionary from the cache
+        //    if (_memoryCache.TryGetValue("PlayerPools", out Dictionary<string, MatchMakingTicket> cachedData))
+        //    {
+        //        return cachedData;
+        //    }
+
+        //    // If not in the cache, return null or fetch it from the data source
+        //    return null;
+        //}
     }
 }

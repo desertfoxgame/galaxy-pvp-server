@@ -1,4 +1,5 @@
 using GalaxyPvP.Api.Helpers.Mapping;
+using GalaxyPvP.Api.Services;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Repository.Player;
@@ -61,6 +62,11 @@ builder.Services.AddJwtAutheticationConfiguration(settings);
 ////////////SWAGGER
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddHostedService<MatchMakingBackgroundService>();
+
+//PlayFabSettings.staticSettings.TitleId = "903AC";
+//PlayFabSettings.staticSettings.DeveloperSecretKey = "I8BHKCU9NFZPM1NF74PNCGB4WPYM8HEMOSOZGHW6XSIT9PKY5B";
 
 var app = builder.Build();
 
