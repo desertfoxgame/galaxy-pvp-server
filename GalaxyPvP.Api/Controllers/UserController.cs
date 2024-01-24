@@ -78,13 +78,19 @@ namespace GalaxyPvP.Api.Controllers
                 string nickname = profile.DisplayName == null ? string.Empty : profile.DisplayName;
                 string walletaddress = readonlyData.TryGetValue("publicaddress", out UserDataRecord? wallet) ? wallet.Value : string.Empty;
 
-                string currentWinStreaks = userData.TryGetValue("CurrentWinStreaks", out UserDataRecord? CurrentWinStreaks) ? CurrentWinStreaks.Value : string.Empty;
-                string mvp = userData.TryGetValue("MVP", out UserDataRecord? MVP) ? MVP.Value : string.Empty;
-                string totalGames = userData.TryGetValue("TotalGames", out UserDataRecord? TotalGames) ? TotalGames.Value : string.Empty;
-                string winGames = userData.TryGetValue("WinGames", out UserDataRecord? WinGames) ? WinGames.Value : string.Empty;
-                string winStreaks = userData.TryGetValue("WinStreaks", out UserDataRecord? WinStreaks) ? WinStreaks.Value : string.Empty;
+                string currentWinStreaks = userData.TryGetValue("CurrentWinStreaks", out UserDataRecord? CurrentWinStreaks) ? CurrentWinStreaks.Value : "0";
+                string mvp = userData.TryGetValue("MVP", out UserDataRecord? MVP) ? MVP.Value : "0";
+                string totalGames = userData.TryGetValue("TotalGames", out UserDataRecord? TotalGames) ? TotalGames.Value : "0";
+                string winGames = userData.TryGetValue("WinGames", out UserDataRecord? WinGames) ? WinGames.Value : "0";
+                string winStreaks = userData.TryGetValue("WinStreaks", out UserDataRecord? WinStreaks) ? WinStreaks.Value : "0";
                 string tutorial = userData.TryGetValue("tutorial", out UserDataRecord? Tutorial) ? Tutorial.Value : string.Empty;
                 string developer = userData.TryGetValue("developer", out UserDataRecord? Developer) ? Developer.Value : string.Empty;
+
+                List<string> playerItems = [];
+                for (int i = 0; i < inventory?.Count; i++)
+                {
+                    playerItems.Add(inventory[i].DisplayName);
+                }
 
                 // Migrate data and return response here
                 MigrateUserRequestDTO migrationRequestDTO = new MigrateUserRequestDTO();
@@ -97,12 +103,6 @@ namespace GalaxyPvP.Api.Controllers
                 migrationRequestDTO.MVP = int.Parse(mvp);
                 migrationRequestDTO.WinStreaks = int.Parse(winStreaks);
                 migrationRequestDTO.CurrentWinStreak = int.Parse(currentWinStreaks);
-
-                List<string> playerItems = new List<string>();
-                foreach(ItemInstance item in inventory)
-                {
-                    playerItems.Add(item.ItemId);
-                }
 
             }
             return ReturnFormatedResponse(loginResponse);
