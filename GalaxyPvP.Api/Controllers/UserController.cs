@@ -15,7 +15,6 @@ namespace GalaxyPvP.Api.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserRepository _userRepo;
-
         public UserController(ILogger<UserController> logger, IUserRepository userRepo)
         {
             _logger = logger;
@@ -56,7 +55,8 @@ namespace GalaxyPvP.Api.Controllers
                         [
                             "publicaddress"
                         ]
-                    }
+                    },
+                    TitleId = "903AC"
                 };
                 var playfabResp = await PlayFabClientAPI.LoginWithEmailAddressAsync(playfabRequest);
                 if (playfabResp.Error != null)
