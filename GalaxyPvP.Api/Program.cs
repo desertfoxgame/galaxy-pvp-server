@@ -29,6 +29,7 @@ builder.Services.AddDbContext<GalaxyPvPContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("PvPConnection"));
 });
 
+
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // Add Repositories
@@ -66,7 +67,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHostedService<MatchMakingBackgroundService>();
 
 PlayFabSettings.staticSettings.TitleId = "903AC";
-//PlayFabSettings.staticSettings.DeveloperSecretKey = "I8BHKCU9NFZPM1NF74PNCGB4WPYM8HEMOSOZGHW6XSIT9PKY5B";
+PlayFabSettings.staticSettings.DeveloperSecretKey = "I8BHKCU9NFZPM1NF74PNCGB4WPYM8HEMOSOZGHW6XSIT9PKY5B";
 
 var app = builder.Build();
 

@@ -29,4 +29,20 @@
     <ProjectReference Include="..\GalaxyPvP.Helper\GalaxyPvP.Exensions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Quantum\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PhotonDeterministic">
+      <HintPath>Quantum\PhotonDeterministic.dll</HintPath>
+    </Reference>
+    <Reference Include="quantum.code">
+      <HintPath>Quantum\quantum.code.dll</HintPath>
+    </Reference>
+    <Reference Include="quantum.core">
+      <HintPath>Quantum\quantum.core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

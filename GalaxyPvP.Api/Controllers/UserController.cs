@@ -6,9 +6,12 @@ using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using PlayFab;
-using PlayFab.ClientModels;
+using PlayFab.AdminModels;
+using PlayFab.ServerModels;
 using Serilog;
 using System.Net;
+using UserDataRecord = PlayFab.ServerModels.UserDataRecord;
+
 
 namespace GalaxyPvP.Api.Controllers
 {
@@ -33,39 +36,50 @@ namespace GalaxyPvP.Api.Controllers
             ApiResponse<LoginResponseDTO> loginResponse = await _userRepo.Login(model);
             if (loginResponse.StatusCode == 400)
             {
-                LoginWithEmailAddressRequest playfabRequest = new()
+                LookupUserAccountInfoRequest userInfoRequest = new()
                 {
                     Email = model.Email,
-                    Password = model.Password,
-                    InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
+                };
+
+                var userInfoResp = await PlayFabAdminAPI.GetUserAccountInfoAsync(userInfoRequest);
+                if (userInfoResp.Error != null)
+                {
+                    loginResponse = ApiResponse<LoginResponseDTO>.ReturnFailed(404, userInfoResp.Error.ErrorMessage);
+                    return ReturnFormatedResponse(loginResponse);
+                }
+
+                string playfabId = userInfoResp.Result.UserInfo.PlayFabId;
+
+                GetPlayerCombinedInfoRequest combinedInfoRequest = new()
+                {
+                    PlayFabId = playfabId,
+                    InfoRequestParameters = new()
                     {
                         GetPlayerProfile = true,
                         GetUserData = true,
                         GetUserInventory = true,
                         GetUserReadOnlyData = true,
-                        ProfileConstraints = new PlayerProfileViewConstraints
+                        ProfileConstraints = new()
                         {
                             ShowDisplayName = true,
-                        },
-                    },
+                        }
+                    }
                 };
-                var playfabResp = await PlayFabClientAPI.LoginWithEmailAddressAsync(playfabRequest);
-                if (playfabResp.Error != null)
+
+                var combinedInfoResult = await PlayFabServerAPI.GetPlayerCombinedInfoAsync(combinedInfoRequest);
+                if (combinedInfoResult.Error != null)
                 {
-                    loginResponse = ApiResponse<LoginResponseDTO>.ReturnFailed(404, playfabResp.Error.ErrorMessage);
+                    loginResponse = ApiResponse<LoginResponseDTO>.ReturnFailed(404, combinedInfoResult.Error.ErrorMessage);
                     return ReturnFormatedResponse(loginResponse);
                 }
 
-                string playfabId = playfabResp.Result.PlayFabId;
+                var profile = combinedInfoResult.Result.InfoResultPayload.PlayerProfile;
+                var inventory = combinedInfoResult.Result.InfoResultPayload.UserInventory;
+                var userData = combinedInfoResult.Result.InfoResultPayload?.UserData;
+                var readonlyData = combinedInfoResult.Result.InfoResultPayload?.UserReadOnlyData;
+
                 string email = model.Email;
-                string password = model.Password;
-
-                var profile = playfabResp.Result.InfoResultPayload.PlayerProfile;
-                var inventory = playfabResp.Result.InfoResultPayload.UserInventory;
-                var userData = playfabResp.Result.InfoResultPayload?.UserData;
-                var readonlyData = playfabResp.Result.InfoResultPayload?.UserReadOnlyData;
-
-                string nickname = profile.DisplayName == null ? string.Empty : profile.DisplayName;
+                string nickname = profile.DisplayName ?? string.Empty;
                 string walletaddress = readonlyData.TryGetValue("publicaddress", out UserDataRecord? wallet) ? wallet.Value : string.Empty;
 
                 string currentWinStreaks = userData.TryGetValue("CurrentWinStreaks", out UserDataRecord? CurrentWinStreaks) ? CurrentWinStreaks.Value : "0";
