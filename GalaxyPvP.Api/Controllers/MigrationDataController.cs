@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Dto.MigrationDB;
 using GalaxyPvP.Data.Repository.User;
@@ -27,6 +28,18 @@ namespace GalaxyPvP.Api.Controllers
             _mapper = mapper;
             _playerItemRepo = playerItemRepo;
             _migrationDataRepo = migrationDataRepo;
+        }
+
+        [HttpPost("SendMail")]
+        public async Task<IActionResult> SendEmail(string recipient)
+        {
+            await EmailExtension.SendGridEmailAsync(recipient,
+                "New password",
+                $"Your new password is: asdfasdf");
+            return ReturnFormatedResponse(ApiResponse<string>.ReturnSuccess());
+
+            //ApiResponse<string> response = await _migrationDataRepo.AddItemData();
+            //return ReturnFormatedResponse(response);
         }
 
         [HttpPost("AddItemData")]
