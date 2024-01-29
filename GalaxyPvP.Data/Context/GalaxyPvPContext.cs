@@ -14,6 +14,7 @@ namespace GalaxyPvP.Data.Context
         public DbSet<GameConfig> GameConfigs { get; set; }
         public DbSet<Friend> Friends { get; set; }
         public DbSet<ItemDataMigration> ItemData { get; set; }
+        public DbSet<MatchResult> MatchResults { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

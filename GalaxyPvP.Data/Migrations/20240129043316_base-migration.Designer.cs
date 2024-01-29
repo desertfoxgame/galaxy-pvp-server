@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GalaxyPvP.Data.Migrations
 {
     [DbContext(typeof(GalaxyPvPContext))]
-    [Migration("20240123050237_BaseMigration")]
-    partial class BaseMigration
+    [Migration("20240129043316_base-migration")]
+    partial class basemigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -182,6 +182,36 @@ namespace GalaxyPvP.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ItemData");
+                });
+
+            modelBuilder.Entity("GalaxyPvP.Data.Model.MatchResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MatchData")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MatchId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MatchResults");
                 });
 
             modelBuilder.Entity("GalaxyPvP.Data.Model.Player", b =>

@@ -8,21 +8,15 @@ using System.Threading.Tasks;
 
 namespace GalaxyPvP.Data.Model
 {
-    public class Friend : BaseModel
+    public class MatchResult : BaseModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [Required]
-        public string Player1Id {  get; set; }
-        [ForeignKey("Player1Id")]
-        public Player Player1 {  get; set; }
-        [Required]
-        public string Player2Id { get; set; }
-        [ForeignKey("Player2Id")]
-        public Player Player2 { get; set; }
-        [Required]
-        public short state { get; set; } = 0;
 
+        [Required]
+        public string MatchId { get; set; }
+        [Required]
+        public string MatchData { get; set; }
     }
 }
