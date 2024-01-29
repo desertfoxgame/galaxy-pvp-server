@@ -7,6 +7,7 @@ public class MatchMakingTicket
     public string Region { get; set; }
     public int ModeId { get; set; }
     public int Trophy {  get; set; }
+    public bool IsHost { get; set; } = false;
 
     public DateTime SubmitedTime { get; set; }
 

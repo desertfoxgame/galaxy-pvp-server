@@ -75,6 +75,7 @@ namespace GalaxyPvP.Api.Controllers
             var ticket = _mapper.Map<MatchMakingTicket>(createDto);
             ticket.PlayerId = player.UserId;
             ticket.Trophy = player.Trophy;
+            ticket.IsHost = false;
             ticket.SubmitedTime = DateTime.Now;
             PlayerPools.Add(player.UserId, ticket);
             SaveDictionaryToCache(PlayerPools);

@@ -92,7 +92,7 @@ namespace GalaxyPvP.Api.Services
             for (int i = 0; i < totalTeams; i++)
             {
                 List<MatchMakingTicket> team = sortedPool.Skip(i * teamSize).Take(teamSize).ToList();
-
+                team.FirstOrDefault().IsHost = true;
                 // Fill in bots if the team size is below the minimum and over 30 seconds
                 if (team.Count >= 4 && team.Count < 6)
                 {
@@ -176,7 +176,7 @@ namespace GalaxyPvP.Api.Services
         private string ConvertTeamsToJson(List<List<MatchMakingTicket>> teams)
         {
             List<List<Dictionary<string, object>>> playerIdsAndTrophies = teams
-                    .Select(team => team.Select(ticket => new Dictionary<string, object> { { "PlayerId", ticket.PlayerId }, { "Trophy", ticket.Trophy } }).ToList())
+                    .Select(team => team.Select(ticket => new Dictionary<string, object> { { "PlayerId", ticket.PlayerId }, { "Trophy", ticket.Trophy }, {"IsHost", ticket.IsHost} }).ToList())
                     .ToList();
             // Serialize the list of teams to JSON
             string json = JsonSerializer.Serialize(playerIdsAndTrophies);
