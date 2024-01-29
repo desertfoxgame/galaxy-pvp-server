@@ -21,13 +21,13 @@ namespace GalaxyPvP.Data
         {
             isSubmitMatchResult = false;
             matchType = dto.matchType;
-            sessionInfos = [];
+            sessionInfos = new List<PlayerSessionInfo>();
             sessionInfos.Add(new PlayerSessionInfo()
             {
                 UserId = dto.playfabId,
                 SessionTicket = dto.sessionTicket,
             });
-            playerPostGames = [];
+            playerPostGames = new List<PlayerPostGameStatsDto>();
             submitValid = -1;
         }
 
@@ -62,7 +62,7 @@ namespace GalaxyPvP.Data
 
         public CommandPostGameStats[] ConvertGameStatsToCommand()
         {
-            List<CommandPostGameStats> results = [];
+            List<CommandPostGameStats> results = new List<CommandPostGameStats>();
             PlayerPostGameStatsDto? dto = playerPostGames?.FirstOrDefault();
             if (dto != null && dto != default)
             {

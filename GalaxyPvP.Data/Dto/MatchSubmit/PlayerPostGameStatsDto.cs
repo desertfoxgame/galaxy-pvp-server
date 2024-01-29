@@ -30,7 +30,7 @@ namespace GalaxyPvP.Data
             int count = 0;
             for (int i = 0; i < GameStats?.Count; i++)
             {
-                if (GameStats[i].isDisconnected == false && 
+                if (GameStats[i].isDisconnected == false &&
                     GameStats[i].userId != string.Empty)
                     count++;
             }
@@ -39,7 +39,7 @@ namespace GalaxyPvP.Data
 
         internal List<Quantum.PlayerStats> GetQuantumPlayerStats()
         {
-            List<Quantum.PlayerStats> result = [];
+            List<Quantum.PlayerStats> result = new List<Quantum.PlayerStats>();
             for (int i = 0; i < GameStats?.Count; i++)
             {
                 Quantum.PlayerStats playerStats = new()
