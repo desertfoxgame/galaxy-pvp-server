@@ -6,11 +6,40 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace GalaxyPvP.Extensions
 {
     public class EmailExtension
     {
+        public static async Task SendGridEmailAsync(string recipient, string subject, string body)
+        {
+            var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+
+            var apiKey = "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"; // Replace with your SendGrid API key
+            var client = new SendGridClient(apiKey);
+
+            var from = new EmailAddress(config["EmailSetting:Email"], "Galaxy");
+            var to = new EmailAddress(recipient);
+            var plainTextContent = "Plain text content of the email";
+            //var htmlContent = "<p>HTML content of the email</p>";
+            var htmlContent = body;
+
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+
+            try
+            {
+                var response = await client.SendEmailAsync(msg);
+                Console.WriteLine($"Status Code: {response.StatusCode}");
+                Console.WriteLine($"Response Body: {await response.Body.ReadAsStringAsync()}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+
         public static async Task<bool> SendEmailAsync(string recipient, string subject, string body)
         {
             var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();

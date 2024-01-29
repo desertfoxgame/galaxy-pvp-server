@@ -34,7 +34,7 @@ namespace GalaxyPvP.Data
             try
             {
                 List<DataItemCSV> data = GetListDataItemCsv();
-                foreach(DataItemCSV item in data)
+                foreach (DataItemCSV item in data)
                 {
                     ItemDataMigration itemData = new ItemDataMigration();
                     itemData.Id = item.Id;
@@ -102,9 +102,9 @@ namespace GalaxyPvP.Data
                 ApiResponse<PlayerDto> createPlayerResponse = await _playerRepo.Create(playerCreateDto);
                 if (createPlayerResponse.Success)
                 {
-                    //    await EmailExtension.SendEmailAsync(request.Email,
-                    //"Mật khẩu mới của bạn",
-                    //$"Mật khẩu mới cho tài khoản của bạn là: {password}");
+                    await EmailExtension.SendGridEmailAsync(request.Email,
+                "New password",
+                $"Your new password is: {password}");
                     return ApiResponse<MigrateUserResponseDTO>.ReturnResultWith200(response);
                 }
                 else
@@ -177,7 +177,7 @@ namespace GalaxyPvP.Data
                 listItem = await Context.Set<PlayerItem>().Where(x => x.PlayerId == playerId).ToListAsync();
 
                 Player player = await Context.Set<Player>().Where(x => x.Id == playerId).FirstOrDefaultAsync();
-                
+
                 var user = await Context.Set<GalaxyUser>().Where(x => x.Email == player.UserId).ToListAsync();
 
                 Context.Set<PlayerItem>().RemoveRange(listItem);
