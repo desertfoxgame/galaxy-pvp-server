@@ -1,4 +1,5 @@
 using GalaxyPvP.Api.Helpers.Mapping;
+using GalaxyPvP.Api.Hubs;
 using GalaxyPvP.Api.Services;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
@@ -14,11 +15,17 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", build => build.AllowAnyMethod()
+        .AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(_ => true).Build());
+});
+
 /////////////LOG
 Log.Logger = new LoggerConfiguration().
     MinimumLevel.Debug()
     .WriteTo.Console()
-    .WriteTo.File("log/debugLogs.txt", rollingInterval:RollingInterval.Day)
+    .WriteTo.File("log/debugLogs.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -54,7 +61,10 @@ builder.Services.AddControllers();
 
 builder.Services.AddMemoryCache();
 
-JwtSettings settings = new JwtSettings() 
+//SignalR
+builder.Services.AddSignalR();
+
+JwtSettings settings = new JwtSettings()
 {
     Key = builder.Configuration.GetValue<string>("ApiSettings:Secret")
 };
@@ -65,6 +75,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHostedService<MatchMakingBackgroundService>();
+builder.Services.AddSingleton<ConnectionIdService>();
+builder.Services.AddSingleton<MatchSubmitDictionary>();
 
 PlayFabSettings.staticSettings.TitleId = "903AC";
 PlayFabSettings.staticSettings.DeveloperSecretKey = "I8BHKCU9NFZPM1NF74PNCGB4WPYM8HEMOSOZGHW6XSIT9PKY5B";
@@ -78,9 +90,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+app.UseCors("CorsPolicy");
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.MapHub<MatchMakingHub>("/matchMakingHub");
+app.MapHub<ChatHub>("/chatHub");
 
 app.MapControllers();
 

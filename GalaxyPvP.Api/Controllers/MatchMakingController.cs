@@ -68,49 +68,18 @@ namespace GalaxyPvP.Api.Controllers
                 SaveDictionaryToCache(PlayerPools);
             }
 
-            if (PlayerPools.ContainsKey(player.Id))
+            if (PlayerPools.ContainsKey(player.UserId))
             {
                 return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "Already in queued"));
             }
             var ticket = _mapper.Map<MatchMakingTicket>(createDto);
-            ticket.PlayerId = player.Id;
-            ticket.SubmitedTime = DateTime.UtcNow;
-            PlayerPools.Add(player.Id, ticket);
+            ticket.PlayerId = player.UserId;
+            ticket.Trophy = player.Trophy;
+            ticket.SubmitedTime = DateTime.Now;
+            PlayerPools.Add(player.UserId, ticket);
             SaveDictionaryToCache(PlayerPools);
 
             return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Success"));
-        }
-
-        [HttpPost("CheckForMatch")]
-        [Authorize]
-        public async Task<IActionResult> CheckForMatch([FromBody] MatchRequestDto request)
-        {
-            Dictionary<string, MatchMakingTicket> PlayerPools = GetCachedDictionary();
-
-            if (PlayerPools == null)
-            {
-                PlayerPools = new Dictionary<string, MatchMakingTicket>();
-                SaveDictionaryToCache(PlayerPools);
-            }
-
-            if (PlayerPools.ContainsKey(request.PlayerId))
-            {
-                if(PlayerPools.Count >= 6)
-                {
-                    return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Game ready!"));
-                }
-                else if (PlayerPools.Count >= 4 && request.WaitTime >= 30) {
-                    return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Game ready with bot!"));
-                }
-
-                return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Already in queued"));
-            }
-            else
-            {
-                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "Player not in queued"));
-            }
-
-            //return ReturnFormatedResponse(ApiResponse<string>.ReturnSuccess());
         }
 
         void SaveDictionaryToCache(Dictionary<string, MatchMakingTicket> data)

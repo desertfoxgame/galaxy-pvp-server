@@ -14,17 +14,22 @@ namespace GalaxyPvP.Api.Controllers
     [ApiController]
     public class MatchSubmitController : BaseController
     {
-        private readonly Dictionary<string, PlayerMatchInfo> matchSubmit = new ();
+        //private readonly Dictionary<string, PlayerMatchInfo> matchSubmit = new ();
         private readonly IMapper _mapper;
-        public MatchSubmitController(IMapper mapper)
+        private readonly IMemoryCache _memoryCache;
+
+        public MatchSubmitController(IMapper mapper, IMemoryCache memoryCache)
         {
             _mapper = mapper;
+            _memoryCache = memoryCache;
         }
         [HttpPost("RegisterMatch")]
         public async Task<IActionResult> RegisterMatch([FromBody] PlayerRegisterMatchDto dto)
         {
+            Dictionary<string, PlayerMatchInfo> matchSubmit = GetMatchSubmitDic();
+
             var player = _mapper.Map<PlayerRegisterMatchDto>(dto);
-            if (matchSubmit.TryGetValue(player.matchId, out PlayerMatchInfo info))
+            if (GetMatchSubmitDic().TryGetValue(player.matchId, out PlayerMatchInfo info))
             {
                 info.AddPlayer(player);
                 matchSubmit[player.matchId] = info;
@@ -32,12 +37,16 @@ namespace GalaxyPvP.Api.Controllers
             {
                 matchSubmit.Add(player.matchId, new PlayerMatchInfo(player));
             }
+
+            SaveMatchSubmitDic(matchSubmit);
             return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Success"));
         }
 
         [HttpPost("MatchResult")]
         public async Task<IActionResult> MatchResult([FromBody] PlayerPostGameStatsDto dto)
         {
+            Dictionary<string, PlayerMatchInfo> matchSubmit = GetMatchSubmitDic();
+
             var result = _mapper.Map<PlayerPostGameStatsDto>(dto);
             if (matchSubmit.TryGetValue(result.MatchId, out PlayerMatchInfo info))
             {
@@ -59,6 +68,8 @@ namespace GalaxyPvP.Api.Controllers
                         info.isSubmitMatchResult = true;
                     }
                     matchSubmit[result.MatchId] = info;
+                    SaveMatchSubmitDic(matchSubmit);
+
                     return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Success"));
                 }
                 else
@@ -67,6 +78,28 @@ namespace GalaxyPvP.Api.Controllers
             {
                 return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "Match Not Found"));
             }
+        }
+
+        Dictionary<string, PlayerMatchInfo> GetMatchSubmitDic()
+        {
+            // Try to get the dictionary from the cache
+            if (_memoryCache.TryGetValue("MatchSubmit", out Dictionary<string, PlayerMatchInfo> cachedData))
+            {
+                return cachedData;
+            }
+
+            // If not in the cache, return null or fetch it from the data source
+            return new Dictionary<string, PlayerMatchInfo>();
+        }
+
+        void SaveMatchSubmitDic(Dictionary<string, PlayerMatchInfo> data)
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // Set expiration time to 10 minutes
+            };
+            // Set the dictionary in the cache with a specific key and expiration time
+            _memoryCache.Set("MatchSubmit", data);
         }
     }
 }
