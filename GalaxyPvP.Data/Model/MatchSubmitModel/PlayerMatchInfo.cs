@@ -82,6 +82,7 @@ namespace GalaxyPvP.Data
                             playfab_id = playerStats.userId,
                             player_stats = dto.GetQuantumPlayerStats()
                         };
+                        results.Add(cmd);
                     }
                 }
             }
