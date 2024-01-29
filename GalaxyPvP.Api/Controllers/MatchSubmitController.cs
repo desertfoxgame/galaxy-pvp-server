@@ -64,8 +64,19 @@ namespace GalaxyPvP.Api.Controllers
                         string apiKey = "729FA88E-152A-458E-B8D5-EC1CABA7DD81";
                         client.DefaultRequestHeaders.Add("Authorization", "Bearer " + apiKey);
                         GameRewardAPI _api = new("https://gfc-game.azurewebsites.net/", client);
-                        await _api.HistoryAsync(model, model.MatchId);
-                        info.isSubmitMatchResult = true;
+                        try
+                        {
+                            await _api.HistoryAsync(model, model.MatchId);
+                            info.isSubmitMatchResult = true;
+                            // Save to sql MatchResult
+                            MatchResult matchResult = new(info.matchType, result.WinTeam, result.GameStats);
+
+                        } catch (Exception ex)
+                        {
+                            ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, $"History Async error {ex.Message}"));
+                        }
+                        
+
                     }
                     matchSubmit[result.MatchId] = info;
                     SaveMatchSubmitDic(matchSubmit);

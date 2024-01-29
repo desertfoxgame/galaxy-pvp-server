@@ -54,6 +54,7 @@ namespace GalaxyPvP.Data
         }
         public bool IsSubmidMatch()
         {
+            if (isSubmitMatchResult) return false;
             if (playerPostGames?.Count >= sessionInfos?.Count || 
                 playerPostGames?.Count >= submitValid ||
                 playerPostGames?.Count > 2) return true;
