@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace GalaxyPvP.Data
 {
-    public class MatchResult
+    public class MatchResult2
     {
         public string MatchType { get; set; }
         public int WinTeam { get; set; }
         public List<PlayerStats> GameStats { get; set; }
 
-        public MatchResult(string matchType, int winTeam, List<PlayerStats> gameStats)
+        public MatchResult2(string matchType, int winTeam, List<PlayerStats> gameStats)
         {
             MatchType = matchType;
             WinTeam = winTeam;

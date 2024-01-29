@@ -3,6 +3,7 @@ using GalaxyPvP.Api.Hubs;
 using GalaxyPvP.Api.Services;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
+using GalaxyPvP.Data.Repository.MatchMaking;
 using GalaxyPvP.Data.Repository.Player;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Helper;
@@ -46,6 +47,7 @@ builder.Services.AddScoped<IPlayerItemRepository, PlayerItemRepository>();
 builder.Services.AddScoped<IMigrationDataRepository, MigrationDataRepository>();
 builder.Services.AddScoped<IGameConfigRepository, GameConfigRepository>();
 builder.Services.AddScoped<IFriendRepository, FriendRepository>();
+builder.Services.AddScoped<IMatchResultRepository, MatchResultRepository>();
 builder.Services.AddScoped<UserInfoToken>(c => new UserInfoToken() { Id = "" });
 
 //builder.Services.AddIdentity<GalaxyUser, IdentityRole>().AddEntityFrameworkStores<GalaxyPvPContext>();

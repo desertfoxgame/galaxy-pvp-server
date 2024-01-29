@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GalaxyPvP.Data.Model
+namespace GalaxyPvP.Data
 {
     public class MatchResult : BaseModel
     {

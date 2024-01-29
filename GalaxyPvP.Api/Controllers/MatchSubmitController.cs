@@ -1,6 +1,8 @@
 ﻿
 using AutoMapper;
 using GalaxyPvP.Data;
+using GalaxyPvP.Data.Dto.MatchSubmit;
+using GalaxyPvP.Data.Repository.MatchMaking;
 using GalaxyPvP.Extensions;
 using GalaxyPvP.Helper;
 using Microsoft.AspNetCore.Identity;
@@ -16,12 +18,14 @@ namespace GalaxyPvP.Api.Controllers
     {
         //private readonly Dictionary<string, PlayerMatchInfo> matchSubmit = new ();
         private readonly IMapper _mapper;
+        private readonly IMatchResultRepository _resultRepository;
         private readonly IMemoryCache _memoryCache;
 
-        public MatchSubmitController(IMapper mapper, IMemoryCache memoryCache)
+        public MatchSubmitController(IMapper mapper, IMemoryCache memoryCache, IMatchResultRepository resultRepository)
         {
             _mapper = mapper;
             _memoryCache = memoryCache;
+            _resultRepository = resultRepository;
         }
         [HttpPost("RegisterMatch")]
         public async Task<IActionResult> RegisterMatch([FromBody] PlayerRegisterMatchDto dto)
@@ -69,14 +73,18 @@ namespace GalaxyPvP.Api.Controllers
                             await _api.HistoryAsync(model, model.MatchId);
                             info.isSubmitMatchResult = true;
                             // Save to sql MatchResult
-                            MatchResult matchResult = new(info.matchType, result.WinTeam, result.GameStats);
+                            //MatchResult matchResult = new(info.matchType, result.WinTeam, result.GameStats);
+                            MatchResultDto matchResultDto = new MatchResultDto();
+                            MatchDataDto matchDataDto = new(info.matchType, result.WinTeam, result.GameStats);
+
+                            matchResultDto.MatchId = result.MatchId;
+                            matchResultDto.MatchData = matchDataDto;
+                            await _resultRepository.Create(matchResultDto);
 
                         } catch (Exception ex)
                         {
                             ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, $"History Async error {ex.Message}"));
                         }
-                        
-
                     }
                     matchSubmit[result.MatchId] = info;
                     SaveMatchSubmitDic(matchSubmit);
