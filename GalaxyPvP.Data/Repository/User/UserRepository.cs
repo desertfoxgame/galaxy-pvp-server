@@ -141,7 +141,7 @@ namespace GalaxyPvP.Data.Repository.User
                 "New password",
                 $"Your new password is: {password}");
 
-                return ApiResponse<string>.ReturnResultWith200(password);
+                return ApiResponse<string>.ReturnResultWith200("Success!");
             }
             catch (Exception ex)
             {
