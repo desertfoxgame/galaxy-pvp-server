@@ -11,6 +11,7 @@ using System.Text;
 using Serilog;
 using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Azure.Core;
 
 namespace GalaxyPvP.Data.Repository.User
 {
@@ -22,7 +23,7 @@ namespace GalaxyPvP.Data.Repository.User
         private readonly IMapper _mapper;
 
         public UserRepository(GalaxyPvPContext db, IConfiguration configuration,
-            UserManager<GalaxyUser> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager):base(db)
+            UserManager<GalaxyUser> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager) : base(db)
         {
             _userManager = userManager;
             secretKey = configuration.GetValue<string>("ApiSettings:Secret");
@@ -32,8 +33,8 @@ namespace GalaxyPvP.Data.Repository.User
 
         public bool IsUniqueUser(string username)
         {
-            var user = Context.GalaxyUsers.FirstOrDefault(x=>x.UserName == username);
-            if (user == null) 
+            var user = Context.GalaxyUsers.FirstOrDefault(x => x.UserName == username);
+            if (user == null)
                 return true;
             return false;
         }
@@ -41,7 +42,7 @@ namespace GalaxyPvP.Data.Repository.User
         public async Task<ApiResponse<LoginResponseDTO>> Login(LoginRequestDTO request)
         {
             var user = Context.GalaxyUsers.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower());
-            
+
             if (user == default)
             {
                 return ApiResponse<LoginResponseDTO>.ReturnUserNotFound();
@@ -86,7 +87,7 @@ namespace GalaxyPvP.Data.Repository.User
                 return ApiResponse<UserDTO>.Return409("Password is Empty.");
             }
             var existUser = await _userManager.FindByEmailAsync(request.Email);
-            if(existUser != null)
+            if (existUser != null)
             {
                 return ApiResponse<UserDTO>.Return409("Email is already exist.");
             }
@@ -95,7 +96,7 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 UserName = request.UserName,
                 Email = request.Email,
-                NormalizedEmail = request.Email.ToUpper(),    
+                NormalizedEmail = request.Email.ToUpper(),
             };
 
             IdentityResult result = await _userManager.CreateAsync(entity, request.Password);
@@ -116,6 +117,36 @@ namespace GalaxyPvP.Data.Repository.User
             await _userManager.AddToRoleAsync(entity, "player");
 
             return ApiResponse<UserDTO>.ReturnResultWith200(_mapper.Map<UserDTO>(entity));
+        }
+
+        public async Task<ApiResponse<string>> ForgotPassword(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return ApiResponse<string>.Return409("Email is Empty.");
+            }
+            try
+            {
+                GalaxyUser user = await Context.Users.FirstOrDefaultAsync(x => x.Email == email);
+                if (user == null)
+                {
+                    return ApiResponse<string>.Return409("Email user not exist!");
+
+                }
+                string password = GenerateExtension.GeneratePassword(16);
+                user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, password);
+                await Context.SaveChangesAsync();
+
+                await EmailExtension.SendGridEmailAsync(email,
+                "New password",
+                $"Your new password is: {password}");
+
+                return ApiResponse<string>.ReturnResultWith200(password);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+            }
         }
 
         public async Task<ApiResponse<UserDTO>> GetById(string userId)

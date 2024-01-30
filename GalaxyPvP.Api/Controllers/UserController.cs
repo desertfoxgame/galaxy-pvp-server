@@ -129,6 +129,13 @@ namespace GalaxyPvP.Api.Controllers
             return ReturnFormatedResponse(user);
         }
 
+        [HttpPost("forgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] string email)
+        {
+            var user = await _userRepo.ForgotPassword(email);
+            return ReturnFormatedResponse(user);
+        }
+
         [HttpGet("GetById")]
         public async Task<IActionResult> GetById(string userId)
         {

@@ -10,6 +10,7 @@ namespace GalaxyPvP.Data.Repository.User
         bool IsUniqueUser(string username);
         Task<ApiResponse<LoginResponseDTO>> Login(LoginRequestDTO loginRequestDTO);
         Task<ApiResponse<UserDTO>> Register(RegisterRequestDTO registerationRequestDTO);
+        Task<ApiResponse<string>> ForgotPassword(string email);
 
         Task<ApiResponse<UserDTO>> GetById(string userId);
         Task<ApiResponse<UserDTO>> GetByEmail(string email);
