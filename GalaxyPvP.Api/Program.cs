@@ -48,6 +48,7 @@ builder.Services.AddScoped<IMigrationDataRepository, MigrationDataRepository>();
 builder.Services.AddScoped<IGameConfigRepository, GameConfigRepository>();
 builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 builder.Services.AddScoped<IMatchResultRepository, MatchResultRepository>();
+builder.Services.AddScoped<ILeaderboardRepository, LeaderboardRepository>();
 builder.Services.AddScoped<UserInfoToken>(c => new UserInfoToken() { Id = "" });
 
 //builder.Services.AddIdentity<GalaxyUser, IdentityRole>().AddEntityFrameworkStores<GalaxyPvPContext>();

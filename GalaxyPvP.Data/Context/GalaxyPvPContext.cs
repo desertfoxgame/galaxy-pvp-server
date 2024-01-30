@@ -16,6 +16,7 @@ namespace GalaxyPvP.Data.Context
         public DbSet<ItemDataMigration> ItemData { get; set; }
         public DbSet<MatchResult> MatchResults { get; set; }
         public DbSet<VerifyCode> VerifyCodes { get; set; }
+        public DbSet<Leaderboard> Leaderboards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -37,6 +38,12 @@ namespace GalaxyPvP.Data.Context
                 .HasOne(f => f.Player2)
                 .WithMany(p => p.FriendsAsPlayer2)
                 .HasForeignKey(f => f.Player2Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Leaderboard>()
+                .HasOne(f => f.Player)
+                .WithOne(p => p.Leaderboard)
+                .HasForeignKey<Leaderboard>(f => f.PlayerId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
