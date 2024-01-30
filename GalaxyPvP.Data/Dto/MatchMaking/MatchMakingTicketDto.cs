@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace GalaxyPvP.Data
 {
-    public class MatchMakingTicketDto
+    public class MatchMakingTicketDTO
     {
-        
+        public string ClientVersion { get; set; }
+        public string Region { get; set; }
+        public int ModeId { get; set; }
+        public int Trophy {  get; set; }
     }
 }

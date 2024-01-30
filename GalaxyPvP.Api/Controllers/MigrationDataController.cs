@@ -1,21 +1,15 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Dto.MigrationDB;
-using GalaxyPvP.Data.Dto.Player;
-using GalaxyPvP.Data.Dto.User;
-using GalaxyPvP.Data.DTO;
-using GalaxyPvP.Data.Model;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
-using GalaxyPvP.Helper;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic.FileIO;
-using System.Reflection;
 
 namespace GalaxyPvP.Api.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class MigrationDataController : BaseController
     {
         private readonly ILogger<UserController> _logger;
@@ -34,6 +28,18 @@ namespace GalaxyPvP.Api.Controllers
             _mapper = mapper;
             _playerItemRepo = playerItemRepo;
             _migrationDataRepo = migrationDataRepo;
+        }
+
+        [HttpPost("SendMail")]
+        public async Task<IActionResult> SendEmail(string recipient)
+        {
+            await EmailExtension.SendGridEmailAsync(recipient,
+                "New password",
+                $"Your new password is: asdfasdf");
+            return ReturnFormatedResponse(ApiResponse<string>.ReturnSuccess());
+
+            //ApiResponse<string> response = await _migrationDataRepo.AddItemData();
+            //return ReturnFormatedResponse(response);
         }
 
         [HttpPost("AddItemData")]

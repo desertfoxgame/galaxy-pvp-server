@@ -15,9 +15,11 @@ namespace GalaxyPvP.Data.Model
         public int Id { get; set; }
         [Required]
         public string Player1Id {  get; set; }
+        [ForeignKey("Player1Id")]
         public Player Player1 {  get; set; }
         [Required]
         public string Player2Id { get; set; }
+        [ForeignKey("Player2Id")]
         public Player Player2 { get; set; }
         [Required]
         public short state { get; set; } = 0;

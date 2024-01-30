@@ -1,14 +1,6 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Dto.User;
-using GalaxyPvP.Data.DTO;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Serilog;
 using GalaxyPvP.Extensions;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Data.Dto.Player;
@@ -42,10 +34,10 @@ namespace GalaxyPvP.Data
             try
             {
                 List<DataItemCSV> data = GetListDataItemCsv();
-                foreach(DataItemCSV item in data)
+                foreach (DataItemCSV item in data)
                 {
                     ItemDataMigration itemData = new ItemDataMigration();
-                    itemData.DataId = item.Id;
+                    itemData.Id = item.Id;
                     itemData.Name = item.Name;
                     Context.Set<ItemDataMigration>().Add(itemData);
                 }
@@ -87,15 +79,18 @@ namespace GalaxyPvP.Data
 
                 foreach (string name in request.PlayerItems)
                 {
-                    var itemData = await Context.Set<ItemDataMigration>().FirstOrDefaultAsync(x => x.Name == name);
-                    if (itemData != null)
+                    int dataId = GetItemDataId(name);
+                    if (dataId != 0)
                     {
-                        int dataId = itemData.DataId;
                         PlayerItemCreateDto itemCreateDto = new PlayerItemCreateDto();
                         itemCreateDto.PlayerId = player.Id;
                         itemCreateDto.DataId = dataId;
 
-                        await _playerItemRepo.Create(itemCreateDto);
+                        ApiResponse<PlayerItemDto> itemResponse = await _playerItemRepo.Create(itemCreateDto);
+                        if (!itemResponse.Success)
+                        {
+                            return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, "Can't Create Item");
+                        }
                     }
                     else
                     {
@@ -107,9 +102,9 @@ namespace GalaxyPvP.Data
                 ApiResponse<PlayerDto> createPlayerResponse = await _playerRepo.Create(playerCreateDto);
                 if (createPlayerResponse.Success)
                 {
-                    //    await EmailExtension.SendEmailAsync(request.Email,
-                    //"Mật khẩu mới của bạn",
-                    //$"Mật khẩu mới cho tài khoản của bạn là: {password}");
+                    await EmailExtension.SendGridEmailAsync(request.Email,
+                "New password",
+                $"Your new password is: {password}");
                     return ApiResponse<MigrateUserResponseDTO>.ReturnResultWith200(response);
                 }
                 else
@@ -182,7 +177,7 @@ namespace GalaxyPvP.Data
                 listItem = await Context.Set<PlayerItem>().Where(x => x.PlayerId == playerId).ToListAsync();
 
                 Player player = await Context.Set<Player>().Where(x => x.Id == playerId).FirstOrDefaultAsync();
-                
+
                 var user = await Context.Set<GalaxyUser>().Where(x => x.Email == player.UserId).ToListAsync();
 
                 Context.Set<PlayerItem>().RemoveRange(listItem);

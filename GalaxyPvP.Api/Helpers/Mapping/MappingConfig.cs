@@ -33,6 +33,9 @@ namespace GalaxyPvP.Api.Helpers.Mapping
             CreateMap<PlayerItemCreateDto, PlayerItemDto>().ReverseMap();
             CreateMap<PlayerItemCreateDto, PlayerItem>().ReverseMap();
             CreateMap<PlayerItemUpdateDto, PlayerItem>().ReverseMap();
+
+            //MatchMaking
+            CreateMap<MatchMakingTicket, MatchMakingTicketDTO>().ReverseMap();
         }
 
     }

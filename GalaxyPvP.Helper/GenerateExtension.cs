@@ -1,12 +1,11 @@
 ﻿using NanoidDotNet;
-using System.Security.Cryptography;
 
 
 namespace GalaxyPvP.Extensions
 {
     public class GenerateExtension
     {
-        public static string GenerateRandomCode(int length)
+        public static string GenerateID(int length)
         {
             return Nanoid.Generate("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", length);
         }

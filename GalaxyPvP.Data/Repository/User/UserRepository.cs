@@ -11,6 +11,8 @@ using System.Text;
 using Serilog;
 using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Azure.Core;
+using GalaxyPvP.Data.Model;
 
 namespace GalaxyPvP.Data.Repository.User
 {
@@ -22,7 +24,7 @@ namespace GalaxyPvP.Data.Repository.User
         private readonly IMapper _mapper;
 
         public UserRepository(GalaxyPvPContext db, IConfiguration configuration,
-            UserManager<GalaxyUser> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager):base(db)
+            UserManager<GalaxyUser> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager) : base(db)
         {
             _userManager = userManager;
             secretKey = configuration.GetValue<string>("ApiSettings:Secret");
@@ -32,8 +34,8 @@ namespace GalaxyPvP.Data.Repository.User
 
         public bool IsUniqueUser(string username)
         {
-            var user = Context.GalaxyUsers.FirstOrDefault(x=>x.UserName == username);
-            if (user == null) 
+            var user = Context.GalaxyUsers.FirstOrDefault(x => x.UserName == username);
+            if (user == null)
                 return true;
             return false;
         }
@@ -42,6 +44,10 @@ namespace GalaxyPvP.Data.Repository.User
         {
             var user = Context.GalaxyUsers.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower());
 
+            if (user == default)
+            {
+                return ApiResponse<LoginResponseDTO>.ReturnUserNotFound();
+            }
             bool isValid = await _userManager.CheckPasswordAsync(user, request.Password);
 
             if (user == null || isValid == false)
@@ -58,7 +64,7 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.UserName.ToString()),
+                    new Claim(ClaimTypes.Name, user.Id.ToString()),
                     new Claim(ClaimTypes.Role, roles.FirstOrDefault())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
@@ -82,7 +88,7 @@ namespace GalaxyPvP.Data.Repository.User
                 return ApiResponse<UserDTO>.Return409("Password is Empty.");
             }
             var existUser = await _userManager.FindByEmailAsync(request.Email);
-            if(existUser != null)
+            if (existUser != null)
             {
                 return ApiResponse<UserDTO>.Return409("Email is already exist.");
             }
@@ -91,7 +97,7 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 UserName = request.UserName,
                 Email = request.Email,
-                NormalizedEmail = request.Email.ToUpper(),    
+                NormalizedEmail = request.Email.ToUpper(),
             };
 
             IdentityResult result = await _userManager.CreateAsync(entity, request.Password);
@@ -112,6 +118,74 @@ namespace GalaxyPvP.Data.Repository.User
             await _userManager.AddToRoleAsync(entity, "player");
 
             return ApiResponse<UserDTO>.ReturnResultWith200(_mapper.Map<UserDTO>(entity));
+        }
+
+        public async Task<ApiResponse<string>> ForgotPassword(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return ApiResponse<string>.Return409("Email is Empty.");
+            }
+            try
+            {
+                GalaxyUser user = await Context.Users.FirstOrDefaultAsync(x => x.Email == email);
+                if (user == null)
+                {
+                    return ApiResponse<string>.Return409("Email user not exist!");
+
+                }
+                VerifyCode existCode = await Context.VerifyCodes.FirstOrDefaultAsync(x => x.UserId == user.Id);
+                string verifyCode = GenerateExtension.GenerateID(16);
+
+                if (existCode == null)
+                {
+                    VerifyCode userCode = new VerifyCode();
+                    userCode.UserId = user.Id;
+                    userCode.Code = verifyCode;
+                    Context.VerifyCodes.Add(userCode);
+                }
+                else
+                {
+                    existCode.Code = verifyCode;
+                }
+
+                Context.SaveChanges();
+
+                await EmailExtension.SendGridEmailAsync(email,
+                "Verify Code",
+                $"Your verify code is: {verifyCode}");
+
+                return ApiResponse<string>.ReturnResultWith200(verifyCode);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<string>> ResetPassword(string verifyCode, string newPassword)
+        {
+            try
+            {
+                VerifyCode userCode = await Context.VerifyCodes.FirstOrDefaultAsync(x => x.Code == verifyCode);
+                if (userCode == null)
+                {
+                    return ApiResponse<string>.Return409("Verify Code not exist!");
+
+                }
+                GalaxyUser user = await Context.Users.FirstOrDefaultAsync(x => x.Id == userCode.UserId);
+
+                string password = newPassword;
+                user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, password);
+
+                await Context.SaveChangesAsync();
+
+                return ApiResponse<string>.ReturnResultWith200("Success!");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+            }
         }
 
         public async Task<ApiResponse<UserDTO>> GetById(string userId)

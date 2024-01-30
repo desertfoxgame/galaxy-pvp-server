@@ -26,27 +26,28 @@ namespace GalaxyPvP.Api.Controllers
         [HttpGet("GetFriendList")]
         public async Task<IActionResult> GetFriendList(string playerId)
         {
-            //ApiResponse<List<Player>> response = await _repoFriend.GetFriendList(playerId);
-            //return ReturnFormatedResponse(response);
-            ApiResponse<List<Player>> response = await _repoFriend.GetFriendList(playerId);
-
-            // Use JsonSerializerOptions with ReferenceHandler.Preserve
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                // Add any other serialization options if needed
-            };
-
-            // Serialize the object using JsonSerializer with options
-            var json = JsonSerializer.Serialize(response, options);
-
-            return Ok(json);
+            ApiResponse<List<PlayerDto>> response = await _repoFriend.GetFriendList(playerId);
+            return ReturnFormatedResponse(response);
         }
 
         [HttpPost("SentFriendRequest")]
         public async Task<IActionResult> SentFriendRequest([FromBody] FriendRequestDto request)
         {
             ApiResponse<string> response = await _repoFriend.CreateFriendRequest(request);
+            return ReturnFormatedResponse(response);
+        }
+
+        [HttpPut("UpdateFriendRequest")]
+        public async Task<IActionResult> UpdateFriendRequest(short state, FriendRequestDto request)
+        {
+            ApiResponse<string> response = await _repoFriend.UpdateFriendRequest(state, request);
+            return ReturnFormatedResponse(response);
+        }
+
+        [HttpGet("GetFriendNotification")]
+        public async Task<IActionResult> GetFriendNotification(string playerId)
+        {
+            ApiResponse<int> response = await _repoFriend.GetFriendNotification(playerId);
             return ReturnFormatedResponse(response);
         }
     }

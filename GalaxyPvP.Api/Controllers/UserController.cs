@@ -1,9 +1,17 @@
-﻿using GalaxyPvP.Data.Dto.User;
+﻿using Azure.Core;
+using GalaxyPvP.Data;
+using GalaxyPvP.Data.Dto.MigrationDB;
+using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using PlayFab;
+using PlayFab.AdminModels;
+using PlayFab.ServerModels;
 using Serilog;
 using System.Net;
+using UserDataRecord = PlayFab.ServerModels.UserDataRecord;
+
 
 namespace GalaxyPvP.Api.Controllers
 {
@@ -13,17 +21,104 @@ namespace GalaxyPvP.Api.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserRepository _userRepo;
-
-        public UserController(ILogger<UserController> logger, IUserRepository userRepo)
+        private readonly IMigrationDataRepository _migrationDataRepo;
+        
+        public UserController(ILogger<UserController> logger, IUserRepository userRepo, IMigrationDataRepository migrationDataRepo)
         {
             _logger = logger;
             _userRepo = userRepo;
+            _migrationDataRepo = migrationDataRepo;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO model)
         {
             ApiResponse<LoginResponseDTO> loginResponse = await _userRepo.Login(model);
+            if (loginResponse.StatusCode == 400)
+            {
+                LookupUserAccountInfoRequest userInfoRequest = new()
+                {
+                    Email = model.Email,
+                };
+
+                var userInfoResp = await PlayFabAdminAPI.GetUserAccountInfoAsync(userInfoRequest);
+                if (userInfoResp.Error != null)
+                {
+                    loginResponse = ApiResponse<LoginResponseDTO>.ReturnFailed(404, userInfoResp.Error.ErrorMessage);
+                    return ReturnFormatedResponse(loginResponse);
+                }
+
+                string playfabId = userInfoResp.Result.UserInfo.PlayFabId;
+
+                GetPlayerCombinedInfoRequest combinedInfoRequest = new()
+                {
+                    PlayFabId = playfabId,
+                    InfoRequestParameters = new()
+                    {
+                        GetPlayerProfile = true,
+                        GetUserData = true,
+                        GetUserInventory = true,
+                        GetUserReadOnlyData = true,
+                        ProfileConstraints = new()
+                        {
+                            ShowDisplayName = true,
+                        }
+                    }
+                };
+
+                var combinedInfoResult = await PlayFabServerAPI.GetPlayerCombinedInfoAsync(combinedInfoRequest);
+                if (combinedInfoResult.Error != null)
+                {
+                    loginResponse = ApiResponse<LoginResponseDTO>.ReturnFailed(404, combinedInfoResult.Error.ErrorMessage);
+                    return ReturnFormatedResponse(loginResponse);
+                }
+
+                var profile = combinedInfoResult.Result.InfoResultPayload.PlayerProfile;
+                var inventory = combinedInfoResult.Result.InfoResultPayload.UserInventory;
+                var userData = combinedInfoResult.Result.InfoResultPayload?.UserData;
+                var readonlyData = combinedInfoResult.Result.InfoResultPayload?.UserReadOnlyData;
+
+                string email = model.Email;
+                string nickname = profile.DisplayName ?? string.Empty;
+                string walletaddress = readonlyData.TryGetValue("publicaddress", out UserDataRecord? wallet) ? wallet.Value : string.Empty;
+
+                string currentWinStreaks = userData.TryGetValue("CurrentWinStreaks", out UserDataRecord? CurrentWinStreaks) ? CurrentWinStreaks.Value : "0";
+                string mvp = userData.TryGetValue("MVP", out UserDataRecord? MVP) ? MVP.Value : "0";
+                string totalGames = userData.TryGetValue("TotalGames", out UserDataRecord? TotalGames) ? TotalGames.Value : "0";
+                string winGames = userData.TryGetValue("WinGames", out UserDataRecord? WinGames) ? WinGames.Value : "0";
+                string winStreaks = userData.TryGetValue("WinStreaks", out UserDataRecord? WinStreaks) ? WinStreaks.Value : "0";
+                string tutorial = userData.TryGetValue("tutorial", out UserDataRecord? Tutorial) ? Tutorial.Value : string.Empty;
+                string developer = userData.TryGetValue("developer", out UserDataRecord? Developer) ? Developer.Value : string.Empty;
+
+                string[] playerItems = new string[inventory.Count];
+                for (int i = 0; i < inventory?.Count; i++)
+                {
+                    playerItems[i] = (inventory[i].DisplayName);
+                }
+
+                // Migrate data and return response here
+                MigrateUserRequestDTO migrationRequestDTO = new MigrateUserRequestDTO();
+                migrationRequestDTO.PlayfabID = playfabId;
+                migrationRequestDTO.Email = email;
+                migrationRequestDTO.Nickname = nickname;
+                migrationRequestDTO.WalletAddress = walletaddress;
+                migrationRequestDTO.WinGames = int.Parse(winGames);
+                migrationRequestDTO.TotalGames = int.Parse(totalGames);
+                migrationRequestDTO.MVP = int.Parse(mvp);
+                migrationRequestDTO.WinStreaks = int.Parse(winStreaks);
+                migrationRequestDTO.CurrentWinStreak = int.Parse(currentWinStreaks);
+                migrationRequestDTO.PlayerItems = playerItems;
+
+                ApiResponse<MigrateUserResponseDTO> response = await _migrationDataRepo.MigrationUser(migrationRequestDTO);
+                if(response.Success)
+                {
+                    return ReturnFormatedResponse(response);
+                }
+                else
+                {
+                    return ReturnFormatedResponse(ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, response.Errors));
+                }
+            }
             return ReturnFormatedResponse(loginResponse);
         }
 
@@ -31,6 +126,20 @@ namespace GalaxyPvP.Api.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterRequestDTO model)
         {
             var user = await _userRepo.Register(model);
+            return ReturnFormatedResponse(user);
+        }
+
+        [HttpPost("forgotPassword")]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            var user = await _userRepo.ForgotPassword(email);
+            return ReturnFormatedResponse(user);
+        }
+
+        [HttpPost("resetPassword")]
+        public async Task<IActionResult> ResetPassword(string verifyCode, string newPassword)
+        {
+            var user = await _userRepo.ResetPassword(verifyCode, newPassword);
             return ReturnFormatedResponse(user);
         }
 
