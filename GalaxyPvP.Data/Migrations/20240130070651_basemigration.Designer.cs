@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GalaxyPvP.Data.Migrations
 {
     [DbContext(typeof(GalaxyPvPContext))]
-    [Migration("20240129043316_base-migration")]
+    [Migration("20240130070651_basemigration")]
     partial class basemigration
     {
         /// <inheritdoc />
@@ -127,6 +127,36 @@ namespace GalaxyPvP.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("GalaxyPvP.Data.MatchResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MatchData")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MatchId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MatchResults");
+                });
+
             modelBuilder.Entity("GalaxyPvP.Data.Model.Friend", b =>
                 {
                     b.Property<int>("Id")
@@ -182,36 +212,6 @@ namespace GalaxyPvP.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ItemData");
-                });
-
-            modelBuilder.Entity("GalaxyPvP.Data.Model.MatchResult", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MatchData")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MatchId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MatchResults");
                 });
 
             modelBuilder.Entity("GalaxyPvP.Data.Model.Player", b =>
@@ -310,6 +310,21 @@ namespace GalaxyPvP.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PlayerItem");
+                });
+
+            modelBuilder.Entity("GalaxyPvP.Data.Model.VerifyCode", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("VerifyCodes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
