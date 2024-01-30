@@ -136,6 +136,13 @@ namespace GalaxyPvP.Api.Controllers
             return ReturnFormatedResponse(user);
         }
 
+        [HttpPost("resetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDTO resetRequest)
+        {
+            var user = await _userRepo.ResetPassword(resetRequest);
+            return ReturnFormatedResponse(user);
+        }
+
         [HttpGet("GetById")]
         public async Task<IActionResult> GetById(string userId)
         {

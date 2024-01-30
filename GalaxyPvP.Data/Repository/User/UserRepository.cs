@@ -12,6 +12,7 @@ using Serilog;
 using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Azure.Core;
+using GalaxyPvP.Data.Model;
 
 namespace GalaxyPvP.Data.Repository.User
 {
@@ -133,13 +134,51 @@ namespace GalaxyPvP.Data.Repository.User
                     return ApiResponse<string>.Return409("Email user not exist!");
 
                 }
-                string password = GenerateExtension.GeneratePassword(16);
-                user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, password);
-                await Context.SaveChangesAsync();
+                VerifyCode existCode = await Context.VerifyCodes.FirstOrDefaultAsync(x => x.UserId == user.Id);
+                string verifyCode = GenerateExtension.GenerateID(16);
+
+                if (existCode == null)
+                {
+                    VerifyCode userCode = new VerifyCode();
+                    userCode.UserId = user.Id;
+                    userCode.Code = verifyCode;
+                    Context.VerifyCodes.Add(userCode);
+                }
+                else
+                {
+                    existCode.Code = verifyCode;
+                }
+
+                Context.SaveChanges();
 
                 await EmailExtension.SendGridEmailAsync(email,
-                "New password",
-                $"Your new password is: {password}");
+                "Verify Code",
+                $"Your verify code is: {verifyCode}");
+
+                return ApiResponse<string>.ReturnResultWith200(verifyCode);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<string>> ResetPassword(ResetPasswordRequestDTO request)
+        {
+            try
+            {
+                VerifyCode userCode = await Context.VerifyCodes.FirstOrDefaultAsync(x => x.Code == request.VerifyCode);
+                if (userCode == null)
+                {
+                    return ApiResponse<string>.Return409("Verify Code not exist!");
+
+                }
+                GalaxyUser user = await Context.Users.FirstOrDefaultAsync(x => x.Id == userCode.UserId);
+
+                string password = request.NewPassword;
+                user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, password);
+
+                await Context.SaveChangesAsync();
 
                 return ApiResponse<string>.ReturnResultWith200("Success!");
             }
