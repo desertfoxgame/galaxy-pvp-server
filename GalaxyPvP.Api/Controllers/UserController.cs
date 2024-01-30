@@ -59,6 +59,7 @@ namespace GalaxyPvP.Api.Controllers
                         GetUserData = true,
                         GetUserInventory = true,
                         GetUserReadOnlyData = true,
+                        GetPlayerStatistics = true,
                         ProfileConstraints = new()
                         {
                             ShowDisplayName = true,
@@ -77,6 +78,7 @@ namespace GalaxyPvP.Api.Controllers
                 var inventory = combinedInfoResult.Result.InfoResultPayload.UserInventory;
                 var userData = combinedInfoResult.Result.InfoResultPayload?.UserData;
                 var readonlyData = combinedInfoResult.Result.InfoResultPayload?.UserReadOnlyData;
+                var statistic = combinedInfoResult.Result.InfoResultPayload?.PlayerStatistics;
 
                 string email = model.Email;
                 string nickname = profile.DisplayName ?? string.Empty;
@@ -89,6 +91,14 @@ namespace GalaxyPvP.Api.Controllers
                 string winStreaks = userData.TryGetValue("WinStreaks", out UserDataRecord? WinStreaks) ? WinStreaks.Value : "0";
                 string tutorial = userData.TryGetValue("tutorial", out UserDataRecord? Tutorial) ? Tutorial.Value : string.Empty;
                 string developer = userData.TryGetValue("developer", out UserDataRecord? Developer) ? Developer.Value : string.Empty;
+                string isAdmin = userData.TryGetValue("isAdmin", out UserDataRecord? IsAdmin) ? IsAdmin.Value : string.Empty;
+
+                int trophy = 0;
+                for (int i = 0; i < statistic?.Count; i++)
+                {
+                    if (statistic[i].StatisticName == "Trophy")
+                        trophy = statistic[i].Value;
+                }
 
                 string[] playerItems = new string[inventory.Count];
                 for (int i = 0; i < inventory?.Count; i++)
