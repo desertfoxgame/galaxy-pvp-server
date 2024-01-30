@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using SendGrid.Helpers.Mail.Model;
 
 namespace GalaxyPvP.Extensions
 {
@@ -17,20 +18,23 @@ namespace GalaxyPvP.Extensions
         {
             var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
-            var apiKey = "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"; // Replace with your SendGrid API key
+            var apiKey = config["EmailSetting:ApiKey"]; // Replace with your SendGrid API key
             var client = new SendGridClient(apiKey);
 
-            var from = new EmailAddress(config["EmailSetting:Email"], "Galaxy");
-            var to = new EmailAddress(recipient);
-            var plainTextContent = "Plain text content of the email";
-            //var htmlContent = "<p>HTML content of the email</p>";
-            var htmlContent = body;
+            var msg = new SendGridMessage
+            {
+                From = new EmailAddress(config["EmailSetting:Email"], "Galaxy"),
+                Subject = subject,
+                PlainTextContent = "Plain text content of the email",
+                HtmlContent = body,
+            };
 
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+            var to = new EmailAddress(recipient);
+            msg.AddTo(to);
 
             try
             {
-                var response = await client.SendEmailAsync(msg);
+                var response = client.SendEmailAsync(msg).Result;
                 Console.WriteLine($"Status Code: {response.StatusCode}");
                 Console.WriteLine($"Response Body: {await response.Body.ReadAsStringAsync()}");
             }

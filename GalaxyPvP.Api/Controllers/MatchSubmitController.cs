@@ -31,7 +31,6 @@ namespace GalaxyPvP.Api.Controllers
         public async Task<IActionResult> RegisterMatch([FromBody] PlayerRegisterMatchDto dto)
         {
             Dictionary<string, PlayerMatchInfo> matchSubmit = GetMatchSubmitDic();
-
             var player = _mapper.Map<PlayerRegisterMatchDto>(dto);
             if (GetMatchSubmitDic().TryGetValue(player.matchId, out PlayerMatchInfo info))
             {
@@ -65,7 +64,8 @@ namespace GalaxyPvP.Api.Controllers
                             Sessions = info.sessionInfos.ToArray(),
                         };
                         var client = new HttpClient();
-                        string apiKey = "729FA88E-152A-458E-B8D5-EC1CABA7DD81";
+                        var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+                        string apiKey = config["SubmitKey:ApiKey"];
                         client.DefaultRequestHeaders.Add("Authorization", "Bearer " + apiKey);
                         GameRewardAPI _api = new("https://gfc-game.azurewebsites.net/", client);
                         try

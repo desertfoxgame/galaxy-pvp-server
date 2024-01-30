@@ -80,8 +80,8 @@ builder.Services.AddHostedService<MatchMakingBackgroundService>();
 builder.Services.AddSingleton<ConnectionIdService>();
 builder.Services.AddSingleton<MatchSubmitDictionary>();
 
-PlayFabSettings.staticSettings.TitleId = "903AC";
-PlayFabSettings.staticSettings.DeveloperSecretKey = "I8BHKCU9NFZPM1NF74PNCGB4WPYM8HEMOSOZGHW6XSIT9PKY5B";
+PlayFabSettings.staticSettings.TitleId = builder.Configuration.GetValue<string>("PlayFab:TitleId");
+PlayFabSettings.staticSettings.DeveloperSecretKey = builder.Configuration.GetValue<string>("PlayFab:ApiKey");
 
 var app = builder.Build();
 
