@@ -11,7 +11,7 @@ namespace GalaxyPvP.Data.Repository.User
         Task<ApiResponse<LoginResponseDTO>> Login(LoginRequestDTO loginRequestDTO);
         Task<ApiResponse<UserDTO>> Register(RegisterRequestDTO registerationRequestDTO);
         Task<ApiResponse<string>> ForgotPassword(string email);
-        Task<ApiResponse<string>> ResetPassword(ResetPasswordRequestDTO request);
+        Task<ApiResponse<string>> ResetPassword(string verifyCode, string newPassword);
 
         Task<ApiResponse<UserDTO>> GetById(string userId);
         Task<ApiResponse<UserDTO>> GetByEmail(string email);

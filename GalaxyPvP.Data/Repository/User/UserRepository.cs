@@ -163,11 +163,11 @@ namespace GalaxyPvP.Data.Repository.User
             }
         }
 
-        public async Task<ApiResponse<string>> ResetPassword(ResetPasswordRequestDTO request)
+        public async Task<ApiResponse<string>> ResetPassword(string verifyCode, string newPassword)
         {
             try
             {
-                VerifyCode userCode = await Context.VerifyCodes.FirstOrDefaultAsync(x => x.Code == request.VerifyCode);
+                VerifyCode userCode = await Context.VerifyCodes.FirstOrDefaultAsync(x => x.Code == verifyCode);
                 if (userCode == null)
                 {
                     return ApiResponse<string>.Return409("Verify Code not exist!");
@@ -175,7 +175,7 @@ namespace GalaxyPvP.Data.Repository.User
                 }
                 GalaxyUser user = await Context.Users.FirstOrDefaultAsync(x => x.Id == userCode.UserId);
 
-                string password = request.NewPassword;
+                string password = newPassword;
                 user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, password);
 
                 await Context.SaveChangesAsync();
