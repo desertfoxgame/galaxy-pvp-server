@@ -4,12 +4,14 @@ using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Dto.User;
+using GalaxyPvP.Data.Migrations;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Quantum;
 using System.Net;
 
 namespace GalaxyPvP.Api.Controllers
@@ -69,6 +71,20 @@ namespace GalaxyPvP.Api.Controllers
         public async Task<IActionResult> GetLeaderboard(int amount)
         {
             ApiResponse<List<PlayerDto>> response = await _dbPlayer.GetLeaderboard(amount);
+            return ReturnFormatedResponse(response);
+        }
+
+        [HttpPut("UpdatePlayerEquipData")]
+        public async Task<IActionResult> UpdatePlayerEquipData(string playerId, string equipData)
+        {
+            ApiResponse<PlayerDto> response = await _dbPlayer.UpdatePlayerEquipData(playerId, equipData);
+            return ReturnFormatedResponse(response);
+        }
+
+        [HttpGet("GetPlayerEquipData")]
+        public async Task<IActionResult> GetPlayerEquipData(string playerId)
+        {
+            ApiResponse<string> response = await _dbPlayer.GetPlayerEquipData(playerId);
             return ReturnFormatedResponse(response);
         }
     }

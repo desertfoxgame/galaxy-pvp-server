@@ -244,6 +244,10 @@ namespace GalaxyPvP.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
 
+                    b.Property<string>("EquipData")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Exp")
                         .HasColumnType("int");
 

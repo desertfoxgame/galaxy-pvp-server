@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GalaxyPvP.Data.Migrations
 {
     [DbContext(typeof(GalaxyPvPContext))]
-    [Migration("20240130092312_Leaderboard")]
-    partial class Leaderboard
+    [Migration("20240131123418_equipdata2")]
+    partial class equipdata2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -246,6 +246,10 @@ namespace GalaxyPvP.Data.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
+
+                    b.Property<string>("EquipData")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Exp")
                         .HasColumnType("int");

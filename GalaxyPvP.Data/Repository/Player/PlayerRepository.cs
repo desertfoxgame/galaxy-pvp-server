@@ -163,5 +163,48 @@ namespace GalaxyPvP.Data
                 return ApiResponse<List<PlayerDto>>.ReturnFailed(401, ex.Message);
             }
         }
+
+        public async Task<ApiResponse<string>> GetPlayerEquipData(string playerId)
+        {
+            try
+            {
+                var player = Context.Set<Player>().FirstOrDefault(x => x.Id == playerId);
+                if(player == null)
+                {
+                    return ApiResponse<string>.ReturnFailed(401, "Player not exist!");
+                }
+                else
+                {
+                    return ApiResponse<string>.ReturnResultWith200(player.EquipData);
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<PlayerDto>> UpdatePlayerEquipData(string playerId, string equipdata)
+        {
+            try
+            {
+                var player = Context.Set<Player>().FirstOrDefault(x => x.Id == playerId);
+                if (player == null)
+                {
+                    return ApiResponse<PlayerDto>.ReturnFailed(401, "Player not exist!");
+                }
+                else
+                {
+                    player.EquipData = equipdata;
+                    await Context.SaveChangesAsync();
+
+                    return ApiResponse<PlayerDto>.ReturnResultWith200(_mapper.Map<PlayerDto>(player));
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
+            }
+        }
     }
 }
