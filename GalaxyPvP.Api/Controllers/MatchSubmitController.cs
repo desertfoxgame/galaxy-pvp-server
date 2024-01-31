@@ -8,6 +8,7 @@ using GalaxyPvP.Helper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Text.RegularExpressions;
 
 namespace GalaxyPvP.Api.Controllers
@@ -44,6 +45,28 @@ namespace GalaxyPvP.Api.Controllers
             SaveMatchSubmitDic(matchSubmit);
             return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Success"));
         }
+        //
+
+        // id, matchid
+        // call server nft game matchid win or lose, get keyfragment
+        // win -> updateUserdata: totalgame, trophy, ...wingamestreak
+        [HttpPost("GetMatchStage")]
+        public async Task<IActionResult> GetMatchStage(string matchId)
+        {
+            var client = new HttpClient();
+            string url = "https://gfc-game.azurewebsites.net/Match/state/" + matchId;
+            HttpResponseMessage response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                // Read the content as a string
+                string data = await response.Content.ReadAsStringAsync();
+                return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200(data));
+            }
+            else
+            {
+                return ReturnFormatedResponse(ApiResponse<string>.Return404("Server Error"));
+            }
+        }
 
         [HttpPost("MatchResult")]
         public async Task<IActionResult> MatchResult([FromBody] PlayerPostGameStatsDto dto)
@@ -72,14 +95,20 @@ namespace GalaxyPvP.Api.Controllers
                         {
                             await _api.HistoryAsync(model, model.MatchId);
                             info.isSubmitMatchResult = true;
-                            // Save to sql MatchResult
-                            //MatchResult matchResult = new(info.matchType, result.WinTeam, result.GameStats);
-                            MatchResultDto matchResultDto = new MatchResultDto();
-                            MatchDataDto matchDataDto = new(info.matchType, result.WinTeam, result.GameStats);
 
+                            // Update userData
+                            Dictionary<string, bool> users = info.GetUsers();
+                            foreach (var user in users)
+                            {
+                                await UpdateUserData(user.Key, user.Value);
+                            }
+                            // Add MatchResult to table
+                            MatchResultDto matchResultDto = new ();
+                            MatchDataDto matchDataDto = new(info.matchType, result.WinTeam, result.GameStats);
                             matchResultDto.MatchId = result.MatchId;
                             matchResultDto.MatchData = matchDataDto;
                             await _resultRepository.Create(matchResultDto);
+
 
                         } catch (Exception ex)
                         {
@@ -97,6 +126,12 @@ namespace GalaxyPvP.Api.Controllers
             {
                 return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "Match Not Found"));
             }
+        }
+
+        private async Task UpdateUserData(string userId, bool isWon)
+        {
+            // update user data here
+            // using GalaxyExtensions.GetRewardTrophy go get reward trophy
         }
 
         Dictionary<string, PlayerMatchInfo> GetMatchSubmitDic()
