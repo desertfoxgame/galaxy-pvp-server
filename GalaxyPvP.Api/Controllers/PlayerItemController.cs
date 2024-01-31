@@ -3,7 +3,6 @@ using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Model;
-using GalaxyPvP.Data.Repository.Player;
 using GalaxyPvP.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

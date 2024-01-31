@@ -4,7 +4,6 @@ using GalaxyPvP.Api.Services;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Repository.MatchMaking;
-using GalaxyPvP.Data.Repository.Player;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Helper;
 using Microsoft.AspNetCore.Identity;

@@ -70,6 +70,9 @@ namespace GalaxyPvP.Data
                     return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, user.Errors);
                 }
 
+                var verifycode = _userRepo.ForgotPassword(request.Email);
+                response.VerifyCode = verifycode.Result.Data;
+
                 Player player = _mapper.Map<Player>(request);
                 var newUser = _userRepo.FindBy(x => x.Email == request.Email).FirstOrDefault();
                 player.Id = request.PlayfabID;

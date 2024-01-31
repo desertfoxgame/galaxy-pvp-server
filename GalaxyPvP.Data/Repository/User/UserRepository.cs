@@ -72,12 +72,20 @@ namespace GalaxyPvP.Data.Repository.User
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
+            Player player = Context.Set<Player>().FirstOrDefault(x => x.UserId == user.Id);
+
             LoginResponseDTO loginResponseDTO = new LoginResponseDTO()
             {
                 Token = tokenHandler.WriteToken(token),
                 User = _mapper.Map<UserDTO>(user),
                 Role = roles.FirstOrDefault(),
             };
+
+            if(player != null)
+            {
+                loginResponseDTO.Player = _mapper.Map<PlayerDto>(player);
+            }
+
             return ApiResponse<LoginResponseDTO>.ReturnResultWith200(loginResponseDTO);
         }
 

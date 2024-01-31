@@ -5,7 +5,7 @@ using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace GalaxyPvP.Data.Repository.Player
+namespace GalaxyPvP.Data
 {
     public class PlayerItemRepository : GenericRepository<PlayerItem, GalaxyPvPContext>, IPlayerItemRepository
     {
