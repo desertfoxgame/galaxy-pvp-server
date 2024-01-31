@@ -136,7 +136,7 @@ namespace GalaxyPvP.Data.Repository.User
             }
             try
             {
-                GalaxyUser user = await Context.Users.FirstOrDefaultAsync(x => x.Email == email);
+                GalaxyUser user = await Context.Users.FirstOrDefaultAsync(x => x.Email == email.Trim());
                 if (user == null)
                 {
                     return ApiResponse<string>.Return409("Email user not exist!");
@@ -157,7 +157,7 @@ namespace GalaxyPvP.Data.Repository.User
                     existCode.Code = verifyCode;
                 }
 
-                Context.SaveChanges();
+                await Context.SaveChangesAsync();
 
                 await EmailExtension.SendGridEmailAsync(email,
                 "Verify Code",

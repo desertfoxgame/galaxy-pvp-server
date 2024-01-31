@@ -92,7 +92,7 @@ namespace GalaxyPvP.Data
 
         public Dictionary<string, bool> GetUsers()
         {
-            Dictionary<string, bool> result = [];
+            Dictionary<string, bool> result = new Dictionary<string, bool>();
             PlayerPostGameStatsDto? dto = playerPostGames?.FirstOrDefault();
             if (dto != null && dto != default)
             {
