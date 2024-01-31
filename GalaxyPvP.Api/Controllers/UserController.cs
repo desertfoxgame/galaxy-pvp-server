@@ -92,7 +92,12 @@ namespace GalaxyPvP.Api.Controllers
                 string tutorial = userData.TryGetValue("tutorial", out UserDataRecord? Tutorial) ? Tutorial.Value : string.Empty;
                 string developer = userData.TryGetValue("developer", out UserDataRecord? Developer) ? Developer.Value : string.Empty;
                 string isAdmin = userData.TryGetValue("isAdmin", out UserDataRecord? IsAdmin) ? IsAdmin.Value : string.Empty;
+                
+                // current equipment, add it to table
+                // we need 1 api to update equip data
+                string equip = userData.TryGetValue("NftInformation", out UserDataRecord? Infomation) ? Infomation.Value : string.Empty;
 
+                // add trophy to leaderboard
                 int trophy = 0;
                 for (int i = 0; i < statistic?.Count; i++)
                 {
@@ -122,6 +127,7 @@ namespace GalaxyPvP.Api.Controllers
                 ApiResponse<MigrateUserResponseDTO> response = await _migrationDataRepo.MigrationUser(migrationRequestDTO);
                 if(response.Success)
                 {
+                    // send verify code
                     return ReturnFormatedResponse(response);
                 }
                 else

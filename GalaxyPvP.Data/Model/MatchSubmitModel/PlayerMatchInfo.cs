@@ -89,5 +89,23 @@ namespace GalaxyPvP.Data
 
             return results.ToArray();
         }
+
+        public Dictionary<string, bool> GetUsers()
+        {
+            Dictionary<string, bool> result = [];
+            PlayerPostGameStatsDto? dto = playerPostGames?.FirstOrDefault();
+            if (dto != null && dto != default)
+            {
+                for (int i = 0; i < dto.GameStats?.Count; i++)
+                {
+                    PlayerStats stat = dto.GameStats[i];
+                    if (stat.userId != string.Empty && stat.isDisconnected == false)
+                    {
+                        result.Add(stat.userId, stat.TeamID == dto.WinTeam);
+                    }
+                }
+            }
+            return result;
+        }
     }
 }
