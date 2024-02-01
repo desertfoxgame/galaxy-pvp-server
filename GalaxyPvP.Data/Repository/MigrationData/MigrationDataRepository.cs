@@ -37,7 +37,7 @@ namespace GalaxyPvP.Data
                 foreach (DataItemCSV item in data)
                 {
                     ItemDataMigration itemData = new ItemDataMigration();
-                    itemData.Id = item.Id;
+                    itemData.DataId = item.Id;
                     itemData.Name = item.Name;
                     Context.Set<ItemDataMigration>().Add(itemData);
                 }
