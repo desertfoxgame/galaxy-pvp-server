@@ -82,7 +82,7 @@ namespace GalaxyPvP.Data
 
                 foreach (string name in request.PlayerItems)
                 {
-                    int dataId = GetItemDataId(name);
+                    int dataId = Context.Set<ItemDataMigration>().FirstOrDefault(x => x.Name == name).DataId;
                     if (dataId != 0)
                     {
                         PlayerItemCreateDto itemCreateDto = new PlayerItemCreateDto();
