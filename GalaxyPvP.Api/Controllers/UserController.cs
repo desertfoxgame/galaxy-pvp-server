@@ -139,7 +139,7 @@ namespace GalaxyPvP.Api.Controllers
                     //add player to leaderboard
                     await _leaderboardRepo.AddPlayer(playfabId);
 
-                    return ReturnFormatedResponse(response);
+                    return ReturnFormatedResponse(ApiResponse<MigrateUserResponseDTO>.ReturnSuccess());
                 }
                 else
                 {

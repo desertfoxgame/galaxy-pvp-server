@@ -158,7 +158,6 @@ namespace GalaxyPvP.Data.Repository.User
                 }
 
                 await Context.SaveChangesAsync();
-
                 await EmailExtension.SendGridEmailAsync(email,
                 "Verify Code",
                 $"Your verify code is: {verifyCode}");
