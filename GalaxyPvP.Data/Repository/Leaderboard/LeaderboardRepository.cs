@@ -117,6 +117,33 @@ namespace GalaxyPvP.Data
             }
         }
 
+        public async Task<ApiResponse<string>> AddPlayer(string playerId)
+        {
+            try
+            {
+                Player? player = Context.Set<Player>().FirstOrDefault(x => x.Id == playerId);
+                Leaderboard? leaderboard = Context.Set<Leaderboard>().Where(x => x.PlayerId == player.Id).FirstOrDefault();
+                if (leaderboard == null)
+                {
+                    leaderboard = new Leaderboard();
+                    leaderboard.PlayerId = player.Id;
+                    Context.Set<Leaderboard>().Add(leaderboard);
+
+                }
+                leaderboard.DisplayName = player.Nickname;
+                leaderboard.Rank = 0;
+
+                await Context.SaveChangesAsync();
+                SortList(0);
+
+                return ApiResponse<string>.ReturnResultWith200("Success");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+            }
+        }
+
         public async Task<ApiResponse<ListLeaderboardDTO>> Update()
         {
             List<Leaderboard> topList = SortList(0);

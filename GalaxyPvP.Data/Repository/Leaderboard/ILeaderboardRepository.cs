@@ -12,6 +12,6 @@ namespace GalaxyPvP.Data
         Task<ApiResponse<LeaderboardDTO>> GetByPlayerId(string playerId);
         Task<ApiResponse<LeaderboardDTO>> Create(PlayerDto playerDto);
         Task<ApiResponse<string>> AddAllPlayer();
-
+        Task<ApiResponse<string>> AddPlayer(string playerId);
     }
 }

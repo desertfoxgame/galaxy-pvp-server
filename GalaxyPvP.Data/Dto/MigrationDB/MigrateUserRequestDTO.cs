@@ -13,11 +13,16 @@ namespace GalaxyPvP.Data
         public string Email { get; set; }
         public string Nickname { get; set; }
         public string WalletAddress {  get; set; }
+        public string EquipData {  get; set; }
+        public int Trophy {  get; set; }
         public int WinGames {  get; set; }
         public int TotalGames { get; set; }
         public int MVP {  get; set; }
         public int WinStreaks {  get; set; }
         public int CurrentWinStreak {  get; set; }
+        public short Tutorial {  get; set; }
+        public short IsAdmin {  get; set; }
+        public short Developer {  get; set; }
         public string[] PlayerItems {  get; set; }
 
         ///foreach string => get dataid, dataid => create item

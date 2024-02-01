@@ -21,6 +21,9 @@ namespace GalaxyPvP.Data.Model
         public int WinStreakCurrent { get; set; }
         public int MVP { get; set; }
         public string EquipData { get; set; }
+        public short Tutorial { get; set; }
+        public short isAdmin { get; set; }
+        public short Developer { get; set; }
 
         public ICollection<Friend> FriendsAsPlayer1 { get; set; }
         public ICollection<Friend> FriendsAsPlayer2 { get; set; }

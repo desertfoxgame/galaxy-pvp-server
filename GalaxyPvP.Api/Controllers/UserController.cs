@@ -22,12 +22,14 @@ namespace GalaxyPvP.Api.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly IUserRepository _userRepo;
         private readonly IMigrationDataRepository _migrationDataRepo;
+        private readonly ILeaderboardRepository _leaderboardRepo;
         
-        public UserController(ILogger<UserController> logger, IUserRepository userRepo, IMigrationDataRepository migrationDataRepo)
+        public UserController(ILogger<UserController> logger, IUserRepository userRepo, IMigrationDataRepository migrationDataRepo, ILeaderboardRepository leaderboardRepository)
         {
             _logger = logger;
             _userRepo = userRepo;
             _migrationDataRepo = migrationDataRepo;
+            _leaderboardRepo = leaderboardRepository;
         }
 
         [HttpPost("login")]
@@ -99,6 +101,7 @@ namespace GalaxyPvP.Api.Controllers
 
                 // add trophy to leaderboard
                 int trophy = 0;
+
                 for (int i = 0; i < statistic?.Count; i++)
                 {
                     if (statistic[i].StatisticName == "Trophy")
@@ -123,11 +126,19 @@ namespace GalaxyPvP.Api.Controllers
                 migrationRequestDTO.WinStreaks = int.Parse(winStreaks);
                 migrationRequestDTO.CurrentWinStreak = int.Parse(currentWinStreaks);
                 migrationRequestDTO.PlayerItems = playerItems;
+                migrationRequestDTO.EquipData = equip;
+                migrationRequestDTO.Trophy = trophy;
+                migrationRequestDTO.Tutorial = short.Parse(tutorial);
+                migrationRequestDTO.IsAdmin = short.Parse(isAdmin);
+                migrationRequestDTO.Developer = short.Parse(developer);
 
                 ApiResponse<MigrateUserResponseDTO> response = await _migrationDataRepo.MigrationUser(migrationRequestDTO);
                 if(response.Success)
                 {
                     // send verify code
+                    //add player to leaderboard
+                    await _leaderboardRepo.AddPlayer(playfabId);
+
                     return ReturnFormatedResponse(response);
                 }
                 else
