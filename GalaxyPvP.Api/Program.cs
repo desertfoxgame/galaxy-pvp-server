@@ -5,6 +5,7 @@ using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Repository.MatchMaking;
 using GalaxyPvP.Data.Repository.User;
+using GalaxyPvP.Extensions;
 using GalaxyPvP.Helper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -68,7 +69,7 @@ builder.Services.AddSignalR();
 
 JwtSettings settings = new JwtSettings()
 {
-    Key = builder.Configuration.GetValue<string>("ApiSettings:Secret")
+    Key = builder.Configuration.GetValue<string>("ApiSettingsSecret")
 };
 builder.Services.AddJwtAutheticationConfiguration(settings);
 
@@ -80,8 +81,11 @@ builder.Services.AddHostedService<MatchMakingBackgroundService>();
 builder.Services.AddSingleton<ConnectionIdService>();
 builder.Services.AddSingleton<MatchSubmitDictionary>();
 
-PlayFabSettings.staticSettings.TitleId = builder.Configuration.GetValue<string>("PlayFab:TitleId");
-PlayFabSettings.staticSettings.DeveloperSecretKey = builder.Configuration.GetValue<string>("PlayFab:ApiKey");
+PlayFabSettings.staticSettings.TitleId = builder.Configuration.GetValue<string>("PlayFabTitleId");
+PlayFabSettings.staticSettings.DeveloperSecretKey = builder.Configuration.GetValue<string>("PlayFabApiKey");
+EmailExtension.SendGridEmail = builder.Configuration.GetValue<string>("SendGridEmail");
+EmailExtension.SendGridKey = builder.Configuration.GetValue<string>("SendGridApiKey");
+EmailExtension.SendGridPass = builder.Configuration.GetValue<string>("SendGridPass");
 
 var app = builder.Build();
 
