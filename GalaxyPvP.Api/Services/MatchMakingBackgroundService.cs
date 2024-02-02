@@ -35,7 +35,7 @@ namespace GalaxyPvP.Api.Services
                     SavePlayerPool(playerPool);
                 }
 
-                _logger.LogInformation($"Counter: {playerPool.Count}");
+                //_logger.LogInformation($"Counter: {playerPool.Count}");
 
                 foreach (MatchMakingTicket ticket in playerPool.Values)
                 {
@@ -54,7 +54,7 @@ namespace GalaxyPvP.Api.Services
                     }
                 }
 
-                _logger.LogInformation($"{_connectionIdService.GetAllConnection().Count}");
+                //_logger.LogInformation($"{_connectionIdService.GetAllConnection().Count}");
 
                 if (playerPool.Count >= 4)
                 {
@@ -67,7 +67,7 @@ namespace GalaxyPvP.Api.Services
                     // Remove matched players from the pool
                     RemovePlayersFromPool(playerPool, teams);
 
-                    _logger.LogInformation($"Match Found: {teams.Count} teams formed.");
+                    //_logger.LogInformation($"Match Found: {teams.Count} teams formed.");
                 }
 
                 // Adjust the delay to run every 5 seconds

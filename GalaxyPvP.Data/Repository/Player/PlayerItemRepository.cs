@@ -55,7 +55,7 @@ namespace GalaxyPvP.Data
                 _mapper.Map(itemCreateDto, item);
                 item.CreatedAt = DateTime.Now;
                 item.UpdatedAt = DateTime.Now;
-                Add(item);
+                Context.Set<PlayerItem>().Add(item);
                 Context.SaveChanges();
                 PlayerItemDto playerDTO = _mapper.Map<PlayerItemDto>(item);
                 return ApiResponse<PlayerItemDto>.ReturnResultWith200(playerDTO);

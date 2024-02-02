@@ -57,9 +57,9 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpDelete("DeleteMigrateUser")]
-        public async Task<IActionResult> DeleteMigrateUser(string playerId)
+        public async Task<IActionResult> DeleteMigrateUser(string userId)
         {
-            ApiResponse<string> response = await _migrationDataRepo.DeleteMigrationUser(playerId);
+            ApiResponse<string> response = await _migrationDataRepo.DeleteMigrationUser(userId);
             return ReturnFormatedResponse(response);
         }
     }

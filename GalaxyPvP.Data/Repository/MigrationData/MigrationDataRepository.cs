@@ -8,6 +8,7 @@ using GalaxyPvP.Data.Model;
 using Microsoft.VisualBasic.FileIO;
 using GalaxyPvP.Data.Dto.MigrationDB;
 using Microsoft.EntityFrameworkCore;
+using Quantum;
 
 namespace GalaxyPvP.Data
 {
@@ -74,25 +75,38 @@ namespace GalaxyPvP.Data
                 response.VerifyCode = verifycode.Result.Data;
 
                 Player player = _mapper.Map<Player>(request);
+
+
                 var newUser = _userRepo.FindBy(x => x.Email == request.Email).FirstOrDefault();
                 player.Id = request.PlayfabID;
                 player.UserId = newUser.Id;
 
-                PlayerCreateDto playerCreateDto = _mapper.Map<PlayerCreateDto>(player);
-
                 foreach (string name in request.PlayerItems)
                 {
-                    int dataId = Context.Set<ItemDataMigration>().FirstOrDefault(x => x.Name == name).DataId;
-                    if (dataId != 0)
+                    int dataId = 0;
+                    if (await Context.Set<ItemDataMigration>().FirstOrDefaultAsync(x => x.Name == name) != null)
                     {
+                        dataId = Context.Set<ItemDataMigration>().FirstOrDefault(x => x.Name == name).DataId;
+
                         PlayerItemCreateDto itemCreateDto = new PlayerItemCreateDto();
                         itemCreateDto.PlayerId = player.Id;
                         itemCreateDto.DataId = dataId;
 
-                        ApiResponse<PlayerItemDto> itemResponse = await _playerItemRepo.Create(itemCreateDto);
-                        if (!itemResponse.Success)
+                        if (itemCreateDto == null)
                         {
-                            return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, "Can't Create Item");
+                            response.PlayerItemsCantCreate.Add(name);
+                        }
+                        if (await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == itemCreateDto.DataId && p.PlayerId == itemCreateDto.PlayerId) != null)
+                        {
+                            response.PlayerItemsCantCreate.Add(name);
+                        }
+                        else
+                        {
+                            PlayerItem item = new PlayerItem();
+                            _mapper.Map(itemCreateDto, item);
+                            item.CreatedAt = DateTime.Now;
+                            item.UpdatedAt = DateTime.Now;
+                            Context.Set<PlayerItem>().Add(item);
                         }
                     }
                     else
@@ -101,6 +115,7 @@ namespace GalaxyPvP.Data
                     }
                 }
 
+                PlayerCreateDto playerCreateDto = _mapper.Map<PlayerCreateDto>(player);
                 PlayerCreateDto playerDTO = _mapper.Map<PlayerCreateDto>(player);
                 ApiResponse<PlayerDto> createPlayerResponse = await _playerRepo.Create(playerCreateDto);
                 if (createPlayerResponse.Success)
@@ -172,20 +187,37 @@ namespace GalaxyPvP.Data
             return data;
         }
 
-        public async Task<ApiResponse<string>> DeleteMigrationUser(string playerId)
+        public async Task<ApiResponse<string>> DeleteMigrationUser(string userId)
         {
             try
             {
-                List<PlayerItem> listItem = new List<PlayerItem>();
-                listItem = await Context.Set<PlayerItem>().Where(x => x.PlayerId == playerId).ToListAsync();
+                var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(x => x.Id == userId);
 
-                Player player = await Context.Set<Player>().Where(x => x.Id == playerId).FirstOrDefaultAsync();
+                Player player = await Context.Set<Player>().Where(x => x.UserId == userId).FirstOrDefaultAsync();
 
-                var user = await Context.Set<GalaxyUser>().Where(x => x.Email == player.UserId).ToListAsync();
+                if (player != null)
+                {
+                    List<PlayerItem> listItem = new List<PlayerItem>();
+                    listItem = await Context.Set<PlayerItem>().Where(x => x.PlayerId == player.Id).ToListAsync();
+                    var leaderBoard = await Context.Set<Leaderboard>().FirstOrDefaultAsync(x => x.PlayerId == player.Id);
 
-                Context.Set<PlayerItem>().RemoveRange(listItem);
-                Context.Set<Player>().Remove(player);
-                Context.Set<GalaxyUser>().RemoveRange(user);
+                    if (leaderBoard != null)
+                    {
+                        Context.Set<Leaderboard>().Remove(leaderBoard);
+                    }
+                    if (listItem.Count > 0)
+                    {
+                        Context.Set<PlayerItem>().RemoveRange(listItem);
+
+                    }
+
+                    Context.Set<Player>().Remove(player);
+                }
+
+                if(user != null)
+                {
+                    Context.Set<GalaxyUser>().Remove(user);
+                }
 
                 Context.SaveChanges();
 

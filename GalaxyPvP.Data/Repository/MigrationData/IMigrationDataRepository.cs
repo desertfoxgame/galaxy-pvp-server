@@ -9,6 +9,6 @@ namespace GalaxyPvP.Data.Repository.User
     {
         Task<ApiResponse<MigrateUserResponseDTO>> MigrationUser(MigrateUserRequestDTO request);
         Task<ApiResponse<string>> AddItemData();
-        Task<ApiResponse<string>> DeleteMigrationUser(string playerId);
+        Task<ApiResponse<string>> DeleteMigrationUser(string userId);
     }
 }
