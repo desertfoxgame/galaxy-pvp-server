@@ -9,7 +9,7 @@ namespace GalaxyPvP.Data
 {
     public class MigrateUserRequestDTO
     {
-        public string PlayfabID {  get; set; }
+        public string? PlayfabID {  get; set; }
         public string Email { get; set; }
         public string Nickname { get; set; }
         public string WalletAddress {  get; set; }

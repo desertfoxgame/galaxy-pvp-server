@@ -136,14 +136,26 @@ namespace GalaxyPvP.Api.Controllers
         {
             // update user data here
             // using GalaxyExtensions.GetRewardTrophy go get reward trophy
-            int inputTrophy = _playerRepository.GetByUserId(userId).Result.Data.Trophy;
-            // update: Win, Winstreak, currentwinstreak, totalgames, mvp
+            PlayerDto player = _playerRepository.GetByUserId(userId).Result.Data;
 
-            await _playerRepository.UpdatePlayerTrophyByUserId(userId, GalaxyExtensions.GetRewardTrophy(inputTrophy, isWon));
+            // update: Win, Winstreak, currentwinstreak, totalgames, mvp
+            int inputTrophy = _playerRepository.GetByUserId(userId).Result.Data.Trophy;
+            player.Trophy += GalaxyExtensions.GetRewardTrophy(inputTrophy, isWon);
+            player.Win = (isWon) ? player.Win++ : player.Win;
+            player.WinStreakCurrent = (isWon) ? player.WinStreakCurrent++ : 0;
+            if(player.WinStreakCurrent > player.WinStreak)
+            {
+                player.WinStreak = player.WinStreakCurrent;
+            }
+            player.MVP = (isMvp) ? player.MVP++ : player.MVP;
+            player.TotalGames++;
+            PlayerUpdateDto playerUpdateDto = _mapper.Map<PlayerUpdateDto>(player);
+
+            await _playerRepository.Update(playerUpdateDto);
         }
         private string CaculateMVP(List<PlayerStats> player_stats, int winnerTeam)
         {
-            List<HeroStatsData> list = [];
+            List<HeroStatsData> list = new List<HeroStatsData>();
             for (int i = 0; i < player_stats?.Count; i++)
             {
                 if (winnerTeam == player_stats[i].TeamID)
