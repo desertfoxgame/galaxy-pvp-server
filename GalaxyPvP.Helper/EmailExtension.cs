@@ -16,7 +16,7 @@ namespace GalaxyPvP.Extensions
     {
         public static async Task SendGridEmailAsync(string recipient, string subject, string body)
         {
-            var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            var config = new ConfigurationBuilder().AddJsonFile("sendGridSetting.json").Build();
 
             var apiKey = config["EmailSetting:ApiKey"]; // Replace with your SendGrid API key
             var client = new SendGridClient(apiKey);
