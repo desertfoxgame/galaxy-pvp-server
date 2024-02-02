@@ -15,6 +15,7 @@ namespace GalaxyPvP.Data
         Task<ApiResponse<PlayerUpdateDto>> Update(PlayerUpdateDto playerUpdateDto);
         Task<ApiResponse<PlayerDto>> Delete(string playerId);
         Task<ApiResponse<List<PlayerDto>>> GetLeaderboard(int amount);
+        Task<ApiResponse<PlayerDto>> UpdatePlayerTrophyByUserId(string userId, int trophy);
 
     }
 }
