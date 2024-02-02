@@ -36,4 +36,21 @@ namespace GalaxyPvP.Data
             return true;
         }
     }
+
+    public class HeroStatsData
+    {
+        public string playerId;
+        public int Kills;
+        public int Deaths;
+        public int Assits;
+        public int Score => (Kills * 2 + Assits) - Deaths;
+
+        public HeroStatsData(string playerId, int kills, int deaths, int assit)
+        {
+            this.playerId = playerId;
+            this.Kills = kills;
+            this.Deaths = deaths;
+            this.Assits = assit;
+        }
+    }
 }
