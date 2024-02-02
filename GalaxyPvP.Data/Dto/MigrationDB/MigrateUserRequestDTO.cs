@@ -15,13 +15,13 @@ namespace GalaxyPvP.Data
         public string WalletAddress {  get; set; }
         public string EquipData {  get; set; }
         public int Trophy {  get; set; }
-        public int WinGames {  get; set; }
         public int TotalGames { get; set; }
         public int MVP {  get; set; }
-        public int WinStreaks {  get; set; }
-        public int CurrentWinStreak {  get; set; }
+        public int Win {  get; set; }
+        public int WinStreak {  get; set; }
+        public int WinStreakCurrent {  get; set; }
         public short Tutorial {  get; set; }
-        public short IsAdmin {  get; set; }
+        public short isAdmin {  get; set; }
         public short Developer {  get; set; }
         public string[] PlayerItems {  get; set; }
 

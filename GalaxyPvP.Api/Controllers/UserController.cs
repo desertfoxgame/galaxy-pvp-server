@@ -120,16 +120,16 @@ namespace GalaxyPvP.Api.Controllers
                 migrationRequestDTO.Email = email;
                 migrationRequestDTO.Nickname = nickname;
                 migrationRequestDTO.WalletAddress = walletaddress;
-                migrationRequestDTO.WinGames = int.Parse(winGames);
+                migrationRequestDTO.Win = int.Parse(winGames);
                 migrationRequestDTO.TotalGames = int.Parse(totalGames);
                 migrationRequestDTO.MVP = int.Parse(mvp);
-                migrationRequestDTO.WinStreaks = int.Parse(winStreaks);
-                migrationRequestDTO.CurrentWinStreak = int.Parse(currentWinStreaks);
+                migrationRequestDTO.WinStreak = int.Parse(winStreaks);
+                migrationRequestDTO.WinStreakCurrent = int.Parse(currentWinStreaks);
                 migrationRequestDTO.PlayerItems = playerItems;
                 migrationRequestDTO.EquipData = equip;
                 migrationRequestDTO.Trophy = trophy;
                 migrationRequestDTO.Tutorial = short.Parse(tutorial);
-                migrationRequestDTO.IsAdmin = short.Parse(isAdmin);
+                migrationRequestDTO.isAdmin = short.Parse(isAdmin);
                 migrationRequestDTO.Developer = short.Parse(developer);
 
                 ApiResponse<MigrateUserResponseDTO> response = await _migrationDataRepo.MigrationUser(migrationRequestDTO);
