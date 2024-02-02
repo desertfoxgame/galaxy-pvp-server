@@ -23,13 +23,15 @@ namespace GalaxyPvP.Api.Controllers
         private readonly IMatchResultRepository _resultRepository;
         private readonly IPlayerRepository _playerRepository;
         private readonly IMemoryCache _memoryCache;
+        private string submitApiKey;
 
-        public MatchSubmitController(IMapper mapper, IMemoryCache memoryCache, IMatchResultRepository resultRepository, IPlayerRepository playerRepository)
+        public MatchSubmitController(IConfiguration configuration, IMapper mapper, IMemoryCache memoryCache, IMatchResultRepository resultRepository, IPlayerRepository playerRepository)
         {
             _mapper = mapper;
             _memoryCache = memoryCache;
             _resultRepository = resultRepository;
             _playerRepository = playerRepository;
+            submitApiKey = configuration.GetValue<string>("SubmitApiKey");
         }
         [HttpPost("RegisterMatch")]
         public async Task<IActionResult> RegisterMatch([FromBody] PlayerRegisterMatchDto dto)
@@ -90,9 +92,7 @@ namespace GalaxyPvP.Api.Controllers
                             Sessions = info.sessionInfos.ToArray(),
                         };
                         var client = new HttpClient();
-                        var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-                        string apiKey = config["SubmitKey:ApiKey"];
-                        client.DefaultRequestHeaders.Add("Authorization", "Bearer " + apiKey);
+                        client.DefaultRequestHeaders.Add("Authorization", "Bearer " + submitApiKey);
                         GameRewardAPI _api = new("https://gfc-game.azurewebsites.net/", client);
                         try
                         {
