@@ -2,6 +2,7 @@
 using AutoMapper;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Dto.MatchSubmit;
+using GalaxyPvP.Data.Model;
 using GalaxyPvP.Data.Repository.MatchMaking;
 using GalaxyPvP.Extensions;
 using GalaxyPvP.Helper;
@@ -20,13 +21,15 @@ namespace GalaxyPvP.Api.Controllers
         //private readonly Dictionary<string, PlayerMatchInfo> matchSubmit = new ();
         private readonly IMapper _mapper;
         private readonly IMatchResultRepository _resultRepository;
+        private readonly IPlayerRepository _playerRepository;
         private readonly IMemoryCache _memoryCache;
 
-        public MatchSubmitController(IMapper mapper, IMemoryCache memoryCache, IMatchResultRepository resultRepository)
+        public MatchSubmitController(IMapper mapper, IMemoryCache memoryCache, IMatchResultRepository resultRepository, IPlayerRepository playerRepository)
         {
             _mapper = mapper;
             _memoryCache = memoryCache;
             _resultRepository = resultRepository;
+            _playerRepository = playerRepository;
         }
         [HttpPost("RegisterMatch")]
         public async Task<IActionResult> RegisterMatch([FromBody] PlayerRegisterMatchDto dto)
@@ -98,9 +101,10 @@ namespace GalaxyPvP.Api.Controllers
 
                             // Update userData
                             Dictionary<string, bool> users = info.GetUsers();
+                            string mvpPlayer = CaculateMVP(dto.GameStats, dto.WinTeam);
                             foreach (var user in users)
                             {
-                                await UpdateUserData(user.Key, user.Value);
+                                await UpdateUserData(user.Key, user.Value, mvpPlayer == user.Key);
                             }
                             // Add MatchResult to table
                             MatchResultDto matchResultDto = new ();
@@ -128,11 +132,43 @@ namespace GalaxyPvP.Api.Controllers
             }
         }
 
-        private async Task UpdateUserData(string userId, bool isWon)
+        private async Task UpdateUserData(string userId, bool isWon, bool isMvp)
         {
             // update user data here
             // using GalaxyExtensions.GetRewardTrophy go get reward trophy
+            int inputTrophy = _playerRepository.GetByUserId(userId).Result.Data.Trophy;
+            // update: Win, Winstreak, currentwinstreak, totalgames, mvp
+
+            await _playerRepository.UpdatePlayerTrophyByUserId(userId, GalaxyExtensions.GetRewardTrophy(inputTrophy, isWon));
         }
+        private string CaculateMVP(List<PlayerStats> player_stats, int winnerTeam)
+        {
+            List<HeroStatsData> list = [];
+            for (int i = 0; i < player_stats?.Count; i++)
+            {
+                if (winnerTeam == player_stats[i].TeamID)
+                {
+                    string[] arrListStr = player_stats[i].KDA.Split(',');
+                    int kills = int.Parse(arrListStr[0]);
+                    int deaths = int.Parse(arrListStr[1]);
+                    int assits = int.Parse(arrListStr[2]);
+                    HeroStatsData heroStatsData = new (player_stats[i].userId, kills, deaths, assits);
+                    list.Add(heroStatsData);
+                }
+            }
+            list.Sort((a, b) =>
+            {
+                if (a.Score != b.Score)
+                    return (b.Score - a.Score);
+                if (a.Kills != b.Kills)
+                    return b.Kills - a.Kills;
+                if (b.Deaths != a.Deaths)
+                    return a.Deaths - b.Deaths;
+                return b.Assits - a.Assits;
+            });
+            return list[0].playerId;
+        }
+
 
         Dictionary<string, PlayerMatchInfo> GetMatchSubmitDic()
         {

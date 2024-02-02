@@ -39,63 +39,65 @@ namespace GalaxyPvP.Helper
 
         public static int GetRewardTrophy(int inputTrophy, bool isWon)
         {
+            int rewardTrophy = 0;
             if (inputTrophy >= 0 && inputTrophy < 100)
             {
-                if (isWon) return 8;
-                else return 0;
+                if (isWon) rewardTrophy = 8;
+                else rewardTrophy = 0;
             }
             //Bronze
             else if (inputTrophy > 99 && inputTrophy < 300)
             {
-                if (isWon) return 8;
-                else return -2;
+                if (isWon) rewardTrophy = 8;
+                else rewardTrophy = -2;
             }
             //Silver
             else if (inputTrophy > 299 && inputTrophy < 500)
             {
-                if (isWon) return 8;
-                else return -4;
+                if (isWon) rewardTrophy = 8;
+                else rewardTrophy = -4;
             }
             //Gold
             else if (inputTrophy > 499 && inputTrophy < 700)
             {
-                if (isWon) return 8;
-                else return -6;
+                if (isWon) rewardTrophy = 8;
+                else rewardTrophy = -6;
             }
             //Platinum
             else if (inputTrophy > 699 && inputTrophy < 900)
             {
-                if (isWon) return 7;
-                else return -8;
+                if (isWon) rewardTrophy = 7;
+                else rewardTrophy = -8;
             }
             //Diamond
             else if (inputTrophy > 899 && inputTrophy < 1100)
             {
-                if (isWon) return 6;
-                else return -10;
+                if (isWon) rewardTrophy = 6;
+                else rewardTrophy = -10;
             }
             //Master
             else if (inputTrophy > 1099 && inputTrophy < 1300)
             {
-                if (isWon) return 5;
-                else return -12;
+                if (isWon) rewardTrophy = 5;
+                else rewardTrophy = -12;
             }
             //Champion
             else if (inputTrophy > 1299 && inputTrophy < 1500)
             {
-                if (isWon) return 4;
-                else return -14;
+                if (isWon) rewardTrophy = 4;
+                else rewardTrophy = -14;
             }
             else if (inputTrophy > 1499)
             {
-                if (isWon) return 3;
-                else return -14;
+                if (isWon) rewardTrophy = 3;
+                else rewardTrophy = -14;
             }
             else
             {
-                if (isWon) return 2;
-                else return -16;
+                if (isWon) rewardTrophy = 2;
+                else rewardTrophy = -16;
             }
+            return inputTrophy + rewardTrophy;
         }
 
         //public static void SaveDictionaryToCache(Dictionary<string, MatchMakingTicket> data)

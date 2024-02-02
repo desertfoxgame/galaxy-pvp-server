@@ -3,10 +3,12 @@ using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.DTO;
+using GalaxyPvP.Data.Migrations;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
 using NanoidDotNet;
+using Quantum;
 using System.Linq;
 
 namespace GalaxyPvP.Data
@@ -196,6 +198,29 @@ namespace GalaxyPvP.Data
                 else
                 {
                     player.EquipData = equipdata;
+                    await Context.SaveChangesAsync();
+
+                    return ApiResponse<PlayerDto>.ReturnResultWith200(_mapper.Map<PlayerDto>(player));
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<PlayerDto>> UpdatePlayerTrophyByUserId(string userId, int trophy)
+        {
+            try
+            {
+                var player = Context.Set<Player>().FirstOrDefault(x => x.UserId == userId);
+                if (player == null)
+                {
+                    return ApiResponse<PlayerDto>.ReturnFailed(401, "Player not exist!");
+                }
+                else
+                {
+                    player.Trophy += trophy;
                     await Context.SaveChangesAsync();
 
                     return ApiResponse<PlayerDto>.ReturnResultWith200(_mapper.Map<PlayerDto>(player));
