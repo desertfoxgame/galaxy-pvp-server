@@ -15,5 +15,8 @@ namespace GalaxyPvP.Data
         public int WinStreak { get; set; }
         public int WinStreakCurrent { get; set; }
         public int MVP { get; set; }
+        public short Tutorial { get; set; }
+        public short isAdmin { get; set; }
+        public short Developer { get; set; }
     }
 }
