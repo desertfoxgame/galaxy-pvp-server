@@ -84,6 +84,7 @@ namespace GalaxyPvP.Data.Repository.User
             if(player != null)
             {
                 loginResponseDTO.Player = _mapper.Map<PlayerDto>(player);
+                loginResponseDTO.Player.WalletAddress = user.WalletAddress;
             }
 
             return ApiResponse<LoginResponseDTO>.ReturnResultWith200(loginResponseDTO);
