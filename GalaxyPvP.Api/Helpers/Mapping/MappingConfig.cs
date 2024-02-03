@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Dto.Game;
-using GalaxyPvP.Data.Dto.Leaderboard;
 using GalaxyPvP.Data.Dto.MigrationDB;
 using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Dto.User;
@@ -40,8 +39,6 @@ namespace GalaxyPvP.Api.Helpers.Mapping
             //MatchMaking
             CreateMap<MatchMakingTicket, MatchMakingTicketDTO>().ReverseMap();
 
-            //Leaderboard
-            CreateMap<Leaderboard, LeaderboardDTO>().ReverseMap();
         }
 
     }

@@ -22,14 +22,12 @@ namespace GalaxyPvP.Api.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly IUserRepository _userRepo;
         private readonly IMigrationDataRepository _migrationDataRepo;
-        private readonly ILeaderboardRepository _leaderboardRepo;
         
-        public UserController(ILogger<UserController> logger, IUserRepository userRepo, IMigrationDataRepository migrationDataRepo, ILeaderboardRepository leaderboardRepository)
+        public UserController(ILogger<UserController> logger, IUserRepository userRepo, IMigrationDataRepository migrationDataRepo)
         {
             _logger = logger;
             _userRepo = userRepo;
             _migrationDataRepo = migrationDataRepo;
-            _leaderboardRepo = leaderboardRepository;
         }
 
         [HttpPost("login")]
@@ -136,8 +134,6 @@ namespace GalaxyPvP.Api.Controllers
                 if(response.Success)
                 {
                     // send verify code
-                    //add player to leaderboard
-                    await _leaderboardRepo.AddPlayer(playfabId);
 
                     //return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Success!"));
                     return ReturnFormatedResponse(response);

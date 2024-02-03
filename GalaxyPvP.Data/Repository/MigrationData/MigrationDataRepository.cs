@@ -199,12 +199,7 @@ namespace GalaxyPvP.Data
                 {
                     List<PlayerItem> listItem = new List<PlayerItem>();
                     listItem = await Context.Set<PlayerItem>().Where(x => x.PlayerId == player.Id).ToListAsync();
-                    var leaderBoard = await Context.Set<Leaderboard>().FirstOrDefaultAsync(x => x.PlayerId == player.Id);
 
-                    if (leaderBoard != null)
-                    {
-                        Context.Set<Leaderboard>().Remove(leaderBoard);
-                    }
                     if (listItem.Count > 0)
                     {
                         Context.Set<PlayerItem>().RemoveRange(listItem);
