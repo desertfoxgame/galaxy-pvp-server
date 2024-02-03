@@ -1,7 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using GalaxyPvP.Data.Model;
+﻿using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
-using GalaxyPvP.Data.Dto.Player;
 
 namespace GalaxyPvP.Data
 {
@@ -14,6 +12,7 @@ namespace GalaxyPvP.Data
         Task<ApiResponse<PlayerDto>> Create(PlayerCreateDto playerCreateDto);
         Task<ApiResponse<PlayerUpdateDto>> Update(PlayerUpdateDto playerUpdateDto);
         Task<ApiResponse<PlayerDto>> Delete(string playerId);
+        Task<ApiResponse<int>> GetPlayerRank(string playerId);
         Task<ApiResponse<List<PlayerDto>>> GetLeaderboard(int amount);
         Task<ApiResponse<PlayerDto>> UpdatePlayerTrophyByUserId(string userId, int trophy);
 

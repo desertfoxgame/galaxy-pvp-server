@@ -27,6 +27,5 @@ namespace GalaxyPvP.Data.Model
 
         public ICollection<Friend> FriendsAsPlayer1 { get; set; }
         public ICollection<Friend> FriendsAsPlayer2 { get; set; }
-        public Leaderboard Leaderboard { get; set; }
     }
 }

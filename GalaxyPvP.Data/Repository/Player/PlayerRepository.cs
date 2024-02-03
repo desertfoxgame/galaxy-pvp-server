@@ -166,6 +166,27 @@ namespace GalaxyPvP.Data
             }
         }
 
+        public async Task<ApiResponse<int>> GetPlayerRank(string playerId)
+        {
+            try
+            {
+                Player player = Context.Set<Player>().FirstOrDefault(x => x.Id == playerId);
+                if(player == null)
+                {
+                    return ApiResponse<int>.ReturnFailed(404, "Player not exist!");
+                }
+
+                List<Player> list = await Context.Set<Player>().OrderByDescending(x => x.Trophy).ToListAsync();
+                int playerRank = list.FindIndex(p => p.Id == playerId) + 1;
+
+                return ApiResponse<int>.ReturnResultWith200(playerRank);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<int>.ReturnFailed(401, ex.Message);
+            }
+        }
+
         public async Task<ApiResponse<string>> GetPlayerEquipData(string playerId)
         {
             try
