@@ -73,6 +73,7 @@ namespace GalaxyPvP.Data.Repository.User
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             Player player = Context.Set<Player>().FirstOrDefault(x => x.UserId == user.Id);
+            List<PlayerItem> playerItems = Context.Set<PlayerItem>().Where(x => x.PlayerId == player.Id).ToList();
 
             LoginResponseDTO loginResponseDTO = new LoginResponseDTO()
             {
@@ -86,6 +87,8 @@ namespace GalaxyPvP.Data.Repository.User
                 loginResponseDTO.Player = _mapper.Map<PlayerDto>(player);
                 loginResponseDTO.Player.WalletAddress = user.WalletAddress;
             }
+
+            loginResponseDTO.Items = playerItems;
 
             return ApiResponse<LoginResponseDTO>.ReturnResultWith200(loginResponseDTO);
         }

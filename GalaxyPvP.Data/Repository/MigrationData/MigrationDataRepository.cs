@@ -72,7 +72,6 @@ namespace GalaxyPvP.Data
                 }
 
                 var verifycode = _userRepo.ForgotPassword(request.Email);
-                response.VerifyCode = verifycode.Result.Data;
 
                 Player player = _mapper.Map<Player>(request);
 
@@ -120,9 +119,9 @@ namespace GalaxyPvP.Data
                 ApiResponse<PlayerDto> createPlayerResponse = await _playerRepo.Create(playerCreateDto);
                 if (createPlayerResponse.Success)
                 {
-                    await EmailExtension.SendGridEmailAsync(request.Email,
-                "New password",
-                $"Your new password is: {password}");
+                //    await EmailExtension.SendGridEmailAsync(request.Email,
+                //"Verify Code",
+                //$"Your verify code is: {verifycode}");
                     return ApiResponse<MigrateUserResponseDTO>.ReturnResultWith200(response);
                 }
                 else
