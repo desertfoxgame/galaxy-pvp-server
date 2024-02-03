@@ -69,7 +69,7 @@ builder.Services.AddSignalR();
 
 JwtSettings settings = new JwtSettings()
 {
-    Key = builder.Configuration.GetValue<string>("ApiSettingsSecret")
+    Key = builder.Configuration.GetValue<string>("ApiSettings:Secret")
 };
 builder.Services.AddJwtAutheticationConfiguration(settings);
 
