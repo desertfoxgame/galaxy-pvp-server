@@ -363,4 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 /GalaxyPvP.Api/appsettings.json
 /GalaxyPvP.Api/sendGridSetting.json
+GalaxyPvP.Api/sendGridSetting.json
+GalaxyPvP.Api/sendGridSetting.json
 /GalaxyPvP.Api/sendGridSetting.json
