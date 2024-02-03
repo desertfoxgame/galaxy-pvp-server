@@ -107,6 +107,8 @@ namespace GalaxyPvP.Data.Repository.User
                 UserName = request.UserName,
                 Email = request.Email,
                 NormalizedEmail = request.Email.ToUpper(),
+                PlayfabId = request.PlayfabId,
+                WalletAddress = request.WalletAddress
             };
 
             IdentityResult result = await _userManager.CreateAsync(entity, request.Password);

@@ -187,13 +187,13 @@ namespace GalaxyPvP.Data
             return data;
         }
 
-        public async Task<ApiResponse<string>> DeleteMigrationUser(string userId)
+        public async Task<ApiResponse<string>> DeleteMigrationUser(string email)
         {
             try
             {
-                var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(x => x.Id == userId);
+                var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(x => x.Email == email);
 
-                Player player = await Context.Set<Player>().Where(x => x.UserId == userId).FirstOrDefaultAsync();
+                Player player = await Context.Set<Player>().Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
 
                 if (player != null)
                 {

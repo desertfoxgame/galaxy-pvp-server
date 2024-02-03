@@ -7,6 +7,7 @@ namespace GalaxyPvP.Data
         public string? Id { get; set; }
         public string UserId { get; set; }
         public string? Nickname { get; set; }
+        public string? EquipData { get; set; }
         public int Level { get; set; }
         public int Exp { get; set; }
         public int Trophy { get; set; }
