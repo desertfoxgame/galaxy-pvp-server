@@ -9,7 +9,6 @@ namespace GalaxyPvP.Data.Dto.MigrationDB
     public class MigrateUserResponseDTO
     {
         public string PlayfabID { get; set; }
-        public string VerifyCode { get; set; }
         public string Email { get; set; }
         public string Nickname { get; set; }
         public string WalletAddress { get; set; }

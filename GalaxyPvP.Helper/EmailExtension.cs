@@ -38,7 +38,7 @@ namespace GalaxyPvP.Extensions
                 From = new EmailAddress(SendGridEmail, "Galaxy"),
                 Subject = subject,
                 PlainTextContent = "Plain text content of the email",
-                HtmlContent = body,
+                HtmlContent = GetEmailHtmlContent(subject, body),
             };
 
             var to = new EmailAddress(recipient);
@@ -54,6 +54,18 @@ namespace GalaxyPvP.Extensions
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
+        }
+
+        private static string GetEmailHtmlContent(string subject, string body)
+        {
+            // Get the current directory of the application
+            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            // Combine the current directory with the relative path to the template
+            string templatePath = Path.Combine(currentDirectory, "emailTemplate.html");
+
+            string htmlTemplate = templatePath;
+            return htmlTemplate.Replace("{subject}", subject).Replace("{body}", body);
         }
 
         public static async Task<bool> SendEmailAsync(string recipient, string subject, string body)
