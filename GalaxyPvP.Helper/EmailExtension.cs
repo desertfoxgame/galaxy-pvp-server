@@ -19,6 +19,24 @@ namespace GalaxyPvP.Extensions
         public static string SendGridPass;
         public static async Task SendGridEmailAsync(string recipient, string subject, string body)
         {
+            var configuration = new ConfigurationBuilder()
+            .AddJsonFile("sendGridSetting.json")
+            .Build();
+
+            if (string.IsNullOrEmpty(SendGridEmail))
+            {
+                SendGridEmail = configuration["SendGridEmail"];
+            }
+            if(string.IsNullOrEmpty(SendGridKey))
+            {
+                SendGridKey = configuration["SendGridApiKey"];
+
+            }
+            if (string.IsNullOrEmpty(SendGridPass))
+            {
+                SendGridPass = configuration["SendGridPass"];
+            }
+
             var client = new SendGridClient(SendGridKey);
 
             var msg = new SendGridMessage
