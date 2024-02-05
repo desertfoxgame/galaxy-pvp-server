@@ -31,6 +31,13 @@ namespace GalaxyPvP.Api.Controllers
             _migrationDataRepo = migrationDataRepo;
         }
 
+        [HttpPost("GetPath")]
+        public async Task<IActionResult> GetPath()
+        {
+            string htmlTemplatePath = Environment.GetEnvironmentVariable("HOME") + "\\wwwroot\\emailTemplate.json";
+            return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200(htmlTemplatePath));
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO model)
         {
