@@ -20,11 +20,11 @@ namespace GalaxyPvP.Data
             _playerRepo = playerRepo;
         }
 
-        public async Task<ApiResponse<PlayerItemDto>> Get(int itemId)
+        public async Task<ApiResponse<PlayerItemDto>> Get(int itemId, string playerId)
         {
             try
             {
-                var item = await FindAsync(p => p.Id == itemId);
+                var item = await FindAsync(p => p.DataId == itemId && p.PlayerId == playerId);
                 if (item == null)
                 {
                     return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Not Found!");

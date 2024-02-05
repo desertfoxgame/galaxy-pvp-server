@@ -74,6 +74,13 @@ namespace GalaxyPvP.Api.Controllers
             return ReturnFormatedResponse(response);
         }
 
+        [HttpGet("GetPlayerRank")]
+        public async Task<IActionResult> GetPlayerRank(string playerId)
+        {
+            ApiResponse<int> response = await _dbPlayer.GetPlayerRank(playerId);
+            return ReturnFormatedResponse(response);
+        }
+
         [HttpPut("UpdatePlayerEquipData")]
         public async Task<IActionResult> UpdatePlayerEquipData(string playerId, string equipData)
         {

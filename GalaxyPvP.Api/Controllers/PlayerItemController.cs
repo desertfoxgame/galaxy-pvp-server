@@ -26,9 +26,9 @@ namespace GalaxyPvP.Api.Controllers
 
         [HttpGet("GetPlayerItem")]
         //[Authorize]
-        public async Task<IActionResult> GetPlayerItem(int itemId)
+        public async Task<IActionResult> GetPlayerItem(int itemId, string playerId)
         {
-            ApiResponse<PlayerItemDto> response = await _repository.Get(itemId);
+            ApiResponse<PlayerItemDto> response = await _repository.Get(itemId, playerId);
             return ReturnFormatedResponse(response);
         }
 
