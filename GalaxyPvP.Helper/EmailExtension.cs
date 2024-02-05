@@ -20,8 +20,7 @@ namespace GalaxyPvP.Extensions
 
         public static async Task SendGridEmailAsync(string recipient, string subject, string body)
         {
-            string rootPath = Environment.GetEnvironmentVariable("HOME") + "\\site\\wwwroot\\";
-            string htmlTemplatePath = rootPath + "\\emailTemplate.json";
+            string htmlTemplatePath = Directory.GetCurrentDirectory() + "\\emailTemplate.json";
             string htmlContentTemplate = File.ReadAllText(htmlTemplatePath);
 
             // Replace the placeholder with the actual body content
