@@ -20,7 +20,7 @@ namespace GalaxyPvP.Data
 
         public string userId { get; set; }
 
-        public List<TokenInfo> TokenInfos { get; set; }
+        public List<TokenInfo>? TokenInfos { get; set; }
 
         public bool Equals(PlayerStats obj)
         {
