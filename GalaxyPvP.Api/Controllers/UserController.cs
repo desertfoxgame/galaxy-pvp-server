@@ -4,6 +4,7 @@ using GalaxyPvP.Data.Dto.MigrationDB;
 using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
+using Microsoft.AspNet.SignalR.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using PlayFab;
 using PlayFab.AdminModels;
@@ -136,7 +137,7 @@ namespace GalaxyPvP.Api.Controllers
                     // send verify code
 
                     //return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Success!"));
-                    return ReturnFormatedResponse(response);
+                    return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith201(""));
                 }
                 else
                 {
