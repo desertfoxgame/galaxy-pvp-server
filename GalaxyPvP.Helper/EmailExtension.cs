@@ -17,9 +17,17 @@ namespace GalaxyPvP.Extensions
         public static string SendGridEmail;
         public static string SendGridKey;
         public static string SendGridPass;
+
         public static async Task SendGridEmailAsync(string recipient, string subject, string body)
         {
-            
+            string htmlTemplatePath = "emailTemplate.html";
+            string htmlContentTemplate = File.ReadAllText(htmlTemplatePath);
+
+            // Replace the placeholder with the actual body content
+            string finalHtmlContent = htmlContentTemplate
+                        .Replace("{EMAIL_SUBJECT}", subject)
+                        .Replace("{BODY_CONTENT}", body);
+
 
             if (string.IsNullOrEmpty(SendGridEmail) || string.IsNullOrEmpty(SendGridPass) || string.IsNullOrEmpty(SendGridKey))
             {
@@ -39,7 +47,7 @@ namespace GalaxyPvP.Extensions
                 Subject = subject,
                 PlainTextContent = "Plain text content of the email",
                 //HtmlContent = GetEmailHtmlContent(subject, body),
-                HtmlContent = body,
+                HtmlContent = finalHtmlContent,
             };
 
             var to = new EmailAddress(recipient);
