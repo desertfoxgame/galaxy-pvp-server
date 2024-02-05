@@ -34,7 +34,7 @@ namespace GalaxyPvP.Api.Controllers
         [HttpPost("GetPath")]
         public async Task<IActionResult> GetPath()
         {
-            string htmlTemplatePath = Environment.GetEnvironmentVariable("HOME") + "\\site\\wwwroot\\emailTemplate.json";
+            string htmlTemplatePath = Environment.GetEnvironmentVariable("HOME") + "\\galaxy-pvp-us.scm.azurewebsites.net\\wwwroot\\emailTemplate.json";
             try 
             {
                 string htmlContentTemplate = System.IO.File.ReadAllText(htmlTemplatePath);
