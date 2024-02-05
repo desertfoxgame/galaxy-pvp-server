@@ -71,7 +71,7 @@ namespace GalaxyPvP.Data
                     return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, user.Errors);
                 }
 
-                var verifycode = _userRepo.ForgotPassword(request.Email);
+                var verifycode = await _userRepo.ForgotPassword(request.Email);
 
                 Player player = _mapper.Map<Player>(request);
 
