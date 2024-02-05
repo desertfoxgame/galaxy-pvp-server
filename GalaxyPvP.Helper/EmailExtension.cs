@@ -38,7 +38,8 @@ namespace GalaxyPvP.Extensions
                 From = new EmailAddress(SendGridEmail, "Galaxy"),
                 Subject = subject,
                 PlainTextContent = "Plain text content of the email",
-                HtmlContent = GetEmailHtmlContent(subject, body),
+                //HtmlContent = GetEmailHtmlContent(subject, body),
+                HtmlContent = body,
             };
 
             var to = new EmailAddress(recipient);

@@ -6,7 +6,7 @@ namespace GalaxyPvP.Data
 {
     public interface IPlayerItemRepository : IGenericRepository<PlayerItem>
     {
-        Task<ApiResponse<PlayerItemDto>> Get(int itemId);
+        Task<ApiResponse<PlayerItemDto>> Get(int itemId, string playerId);
         Task<ApiResponse<ListPlayerItemDto>> GetAll(string playerId);
         Task<ApiResponse<ListPlayerItemDto>> GetAllByNFT(string nftId);
         Task<ApiResponse<PlayerItemDto>> Create(PlayerItemCreateDto playerCreateDto);
