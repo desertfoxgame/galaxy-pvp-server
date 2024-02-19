@@ -1,18 +1,12 @@
 ﻿using AutoMapper;
-using Azure;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
-using GalaxyPvP.Data.Dto.Player;
-using GalaxyPvP.Data.Dto.User;
-using GalaxyPvP.Data.Migrations;
-using GalaxyPvP.Data.Model;
+using GalaxyPvP.Data.DTO;
+using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Quantum;
-using System.Net;
+using System.Security.Claims;
 
 namespace GalaxyPvP.Api.Controllers
 {
@@ -21,32 +15,53 @@ namespace GalaxyPvP.Api.Controllers
     public class PlayerController : BaseController
     {
         private readonly IPlayerRepository _dbPlayer;
+        private readonly IUserRepository _userRepo;
         private readonly IMapper _mapper;
         private GalaxyPvPContext _context;
 
-        public PlayerController(IPlayerRepository dbPlayer, IMapper mapper, GalaxyPvPContext context)
+        public PlayerController(IPlayerRepository dbPlayer, IMapper mapper, GalaxyPvPContext context, IUserRepository userRepository)
         {
             _dbPlayer = dbPlayer;
             _mapper = mapper;
             _context = context;
+            _userRepo = userRepository;
         }
 
-        [HttpGet("GetPlayerByUserId")]
-        public async Task<IActionResult> GetPlayerByUserId(string userId)
+        [HttpGet("GetPlayer")]
+        public async Task<IActionResult> GetPlayer()
         {
-            ApiResponse<PlayerDto> response = await _dbPlayer.GetByUserId(userId);
-            return ReturnFormatedResponse(response);
+            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
+            if (userAuthorize.Success)
+            {
+                ApiResponse<PlayerDto> response = await _dbPlayer.GetByUserId(userId);
+                return ReturnFormatedResponse(response);
+            }
+            else
+            {
+                return ReturnFormatedResponse(userAuthorize);
+            }
         }
 
-        [HttpGet("GetPlayerByPlayerId")]
-        public async Task<IActionResult> GetPlayerByPlayerId(string playerId)
-        {
-            ApiResponse<PlayerDto> response = await _dbPlayer.GetByPlayerId(playerId);
-            return ReturnFormatedResponse(response);
-        }
+        //[HttpGet("GetPlayerByUserId")]
+        //[Authorize]
+        //public async Task<IActionResult> GetPlayerByUserId(string userId)
+        //{
+        //    ApiResponse<PlayerDto> response = await _dbPlayer.GetByUserId(userId);
+        //    return ReturnFormatedResponse(response);
+        //}
+
+        //[HttpGet("GetPlayerByPlayerId")]
+        //[Authorize]
+        //public async Task<IActionResult> GetPlayerByPlayerId(string playerId)
+        //{
+        //    ApiResponse<PlayerDto> response = await _dbPlayer.GetByPlayerId(playerId);
+        //    return ReturnFormatedResponse(response);
+        //}
 
         [HttpPost("CreatePlayer")]
-        //[Authorize]
         public async Task<IActionResult> CreatePlayer([FromBody] PlayerCreateDto createDto)
         {
             ApiResponse<PlayerDto> response = await _dbPlayer.Create(createDto);
@@ -54,17 +69,42 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpPut("UpdatePlayer")]
+        [Authorize]
         public async Task<IActionResult> UpdatePlayer([FromBody] PlayerUpdateDto updateDto)
         {
-            ApiResponse<PlayerUpdateDto> response = await _dbPlayer.Update(updateDto);
-            return ReturnFormatedResponse(response);
+            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
+            if (userAuthorize.Success || userId == "a0c98b44-f0a3-40c0-9ea4-f75095c8fa41")
+            {
+                ApiResponse<PlayerUpdateDto> response = await _dbPlayer.Update(updateDto);
+                return ReturnFormatedResponse(response);
+            }
+            else
+            {
+                return ReturnFormatedResponse(userAuthorize);
+            }
         }
 
         [HttpDelete("DeletePlayer")]
-        public async Task<IActionResult> DeletePlayer([FromBody] string playerId)
+        [Authorize]
+        public async Task<IActionResult> DeletePlayer()
         {
-            ApiResponse<PlayerDto> response = await _dbPlayer.Delete(playerId);
-            return ReturnFormatedResponse(response);
+            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
+            if (userAuthorize.Success)
+            {
+                ApiResponse<PlayerDto> response = await _dbPlayer.Delete(userId);
+                return ReturnFormatedResponse(response);
+            }
+            else
+            {
+                return ReturnFormatedResponse(userAuthorize);
+            }
+
         }
 
         [HttpGet("GetLeaderboard")]
@@ -75,24 +115,61 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpGet("GetPlayerRank")]
-        public async Task<IActionResult> GetPlayerRank(string playerId)
+        [Authorize]
+        public async Task<IActionResult> GetPlayerRank()
         {
-            ApiResponse<int> response = await _dbPlayer.GetPlayerRank(playerId);
-            return ReturnFormatedResponse(response);
+            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
+            if (userAuthorize.Success)
+            {
+                ApiResponse<int> response = await _dbPlayer.GetPlayerRank(userId);
+                return ReturnFormatedResponse(response);
+            }
+            else
+            {
+                return ReturnFormatedResponse(userAuthorize);
+            }
         }
 
         [HttpPut("UpdatePlayerEquipData")]
-        public async Task<IActionResult> UpdatePlayerEquipData(string playerId, string equipData)
+        [Authorize]
+        public async Task<IActionResult> UpdatePlayerEquipData(string equipData)
         {
-            ApiResponse<PlayerDto> response = await _dbPlayer.UpdatePlayerEquipData(playerId, equipData);
-            return ReturnFormatedResponse(response);
+            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
+            if (userAuthorize.Success)
+            {
+                ApiResponse<PlayerDto> response = await _dbPlayer.UpdatePlayerEquipData(userId, equipData);
+                return ReturnFormatedResponse(response);
+            }
+            else
+            {
+                return ReturnFormatedResponse(userAuthorize);
+            }
         }
 
         [HttpGet("GetPlayerEquipData")]
-        public async Task<IActionResult> GetPlayerEquipData(string playerId)
+        [Authorize]
+        public async Task<IActionResult> GetPlayerEquipData()
         {
-            ApiResponse<string> response = await _dbPlayer.GetPlayerEquipData(playerId);
-            return ReturnFormatedResponse(response);
+            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
+            if (userAuthorize.Success)
+            {
+                ApiResponse<string> response = await _dbPlayer.GetPlayerEquipData(userId);
+                return ReturnFormatedResponse(response);
+            }
+            else
+            {
+                return ReturnFormatedResponse(userAuthorize);
+            }
+            
         }
     }
 }

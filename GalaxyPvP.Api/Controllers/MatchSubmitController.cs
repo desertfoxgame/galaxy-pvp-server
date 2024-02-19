@@ -6,6 +6,7 @@ using GalaxyPvP.Data.Model;
 using GalaxyPvP.Data.Repository.MatchMaking;
 using GalaxyPvP.Extensions;
 using GalaxyPvP.Helper;
+using Microsoft.AspNet.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -34,6 +35,7 @@ namespace GalaxyPvP.Api.Controllers
             submitApiKey = configuration.GetValue<string>("SubmitApiKey");
         }
         [HttpPost("RegisterMatch")]
+        [Authorize]
         public async Task<IActionResult> RegisterMatch([FromBody] PlayerRegisterMatchDto dto)
         {
             Dictionary<string, PlayerMatchInfo> matchSubmit = GetMatchSubmitDic();
@@ -56,6 +58,7 @@ namespace GalaxyPvP.Api.Controllers
         // call server nft game matchid win or lose, get keyfragment
         // win -> updateUserdata: totalgame, trophy, ...wingamestreak
         [HttpPost("GetMatchStage")]
+        [Authorize]
         public async Task<IActionResult> GetMatchStage(string matchId)
         {
             var client = new HttpClient();
@@ -74,6 +77,7 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpPost("MatchResult")]
+        [Authorize]
         public async Task<IActionResult> MatchResult([FromBody] PlayerPostGameStatsDto dto)
         {
             Dictionary<string, PlayerMatchInfo> matchSubmit = GetMatchSubmitDic();

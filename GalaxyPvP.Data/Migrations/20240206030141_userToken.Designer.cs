@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GalaxyPvP.Data.Migrations
 {
     [DbContext(typeof(GalaxyPvPContext))]
-    [Migration("20240201031134_updatePlayer")]
-    partial class updatePlayer
+    [Migration("20240206030141_userToken")]
+    partial class userToken
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,6 +71,9 @@ namespace GalaxyPvP.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -214,31 +217,6 @@ namespace GalaxyPvP.Data.Migrations
                     b.ToTable("ItemData");
                 });
 
-            modelBuilder.Entity("GalaxyPvP.Data.Model.Leaderboard", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PlayerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Rank")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PlayerId")
-                        .IsUnique();
-
-                    b.ToTable("Leaderboards");
-                });
-
             modelBuilder.Entity("GalaxyPvP.Data.Model.Player", b =>
                 {
                     b.Property<string>("Id")
@@ -251,7 +229,6 @@ namespace GalaxyPvP.Data.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<string>("EquipData")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Exp")
@@ -517,17 +494,6 @@ namespace GalaxyPvP.Data.Migrations
                     b.Navigation("Player2");
                 });
 
-            modelBuilder.Entity("GalaxyPvP.Data.Model.Leaderboard", b =>
-                {
-                    b.HasOne("GalaxyPvP.Data.Model.Player", "Player")
-                        .WithOne("Leaderboard")
-                        .HasForeignKey("GalaxyPvP.Data.Model.Leaderboard", "PlayerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Player");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -584,9 +550,6 @@ namespace GalaxyPvP.Data.Migrations
                     b.Navigation("FriendsAsPlayer1");
 
                     b.Navigation("FriendsAsPlayer2");
-
-                    b.Navigation("Leaderboard")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

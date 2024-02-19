@@ -8,8 +8,6 @@ namespace GalaxyPvP.Data.Dto.Player
 {
     public class PlayerItemCreateDto 
     {
-        public string PlayerId { get; set; }
-
         public int DataId { get; set; }
 
         public string? NftType { get; set; }

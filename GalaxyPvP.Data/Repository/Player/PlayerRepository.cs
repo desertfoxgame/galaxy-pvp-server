@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Dto.User;
@@ -110,7 +111,7 @@ namespace GalaxyPvP.Data
                 }
 
                 //Player player = await FindAsync(p => p.Id == playerUpdateDto.Id);
-                Player player = await Context.Set<Player>().FirstOrDefaultAsync(p => p.Id == playerUpdateDto.Id);
+                Player player = await Context.Set<Player>().FirstOrDefaultAsync(p => p.Nickname == playerUpdateDto.Nickname);
                 if (player == null)
                 {
                     return ApiResponse<PlayerUpdateDto>.Return404("Player not found");
@@ -129,11 +130,11 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<PlayerDto>> Delete(string playerId)
+        public async Task<ApiResponse<PlayerDto>> Delete(string userId)
         {
             try
             {
-                Player removePlayer = await FindAsync(x => x.Id == playerId);
+                Player removePlayer = await FindAsync(x => x.UserId == userId);
                 PlayerDto responsePlayer = _mapper.Map<PlayerDto>(removePlayer);
                 Delete(removePlayer);
                 Context.SaveChanges();
@@ -166,18 +167,18 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<int>> GetPlayerRank(string playerId)
+        public async Task<ApiResponse<int>> GetPlayerRank(string userId)
         {
             try
             {
-                Player player = Context.Set<Player>().FirstOrDefault(x => x.Id == playerId);
-                if(player == null)
+                Player player = Context.Set<Player>().FirstOrDefault(x => x.UserId == userId);
+                if (player == null)
                 {
                     return ApiResponse<int>.ReturnFailed(404, "Player not exist!");
                 }
 
                 List<Player> list = await Context.Set<Player>().OrderByDescending(x => x.Trophy).ToListAsync();
-                int playerRank = list.FindIndex(p => p.Id == playerId) + 1;
+                int playerRank = list.FindIndex(p => p.Id == player.Id) + 1;
 
                 return ApiResponse<int>.ReturnResultWith200(playerRank);
             }
@@ -192,7 +193,7 @@ namespace GalaxyPvP.Data
             try
             {
                 var player = Context.Set<Player>().FirstOrDefault(x => x.Id == playerId);
-                if(player == null)
+                if (player == null)
                 {
                     return ApiResponse<string>.ReturnFailed(401, "Player not exist!");
                 }
@@ -207,11 +208,11 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<PlayerDto>> UpdatePlayerEquipData(string playerId, string equipdata)
+        public async Task<ApiResponse<PlayerDto>> UpdatePlayerEquipData(string userId, string equipdata)
         {
             try
             {
-                var player = Context.Set<Player>().FirstOrDefault(x => x.Id == playerId);
+                var player = Context.Set<Player>().FirstOrDefault(x => x.UserId == userId);
                 if (player == null)
                 {
                     return ApiResponse<PlayerDto>.ReturnFailed(401, "Player not exist!");
@@ -250,6 +251,66 @@ namespace GalaxyPvP.Data
             catch (Exception ex)
             {
                 return ApiResponse<PlayerDto>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<PageResponse<PlayerDto>>> GetAllPlayer(PageRequest request)
+        {
+            try
+            {
+                var players = await Context.Set<Player>().ToListAsync();
+                List<PlayerDto> listPlayerDTO = new List<PlayerDto>();
+                foreach (var player in players)
+                {
+                    listPlayerDTO.Add(_mapper.Map<PlayerDto>(player));
+                }
+                var pageList = PagedList<PlayerDto>.ToPagedList(listPlayerDTO, request.PageNumber, request.PageSize);
+                PageResponse<PlayerDto> response = new PageResponse<PlayerDto>
+                {
+                    TotalCount = pageList.TotalCount,
+                    PageSize = pageList.PageSize,
+                    CurrentPage = pageList.CurrentPage,
+                    TotalPages = pageList.TotalPages,
+                    HasNext = pageList.HasNext,
+                    HasPrev = pageList.HasPrev,
+                    Data = pageList
+                };
+
+                return ApiResponse<PageResponse<PlayerDto>>.ReturnResultWith200(response);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<PageResponse<PlayerDto>>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<PageResponse<PlayerDto>>> GetByPlayerNickname(PageRequest request, string nickname)
+        {
+            try
+            {
+                var players = await Context.Set<Player>().Where(x => x.Nickname.Contains(nickname.Trim())).ToListAsync();
+                List<PlayerDto> listPlayerDTO = new List<PlayerDto>();
+                foreach (var player in players)
+                {
+                    listPlayerDTO.Add(_mapper.Map<PlayerDto>(player));
+                }
+                var pageList = PagedList<PlayerDto>.ToPagedList(listPlayerDTO, request.PageNumber, request.PageSize);
+                PageResponse<PlayerDto> response = new PageResponse<PlayerDto>
+                {
+                    TotalCount = pageList.TotalCount,
+                    PageSize = pageList.PageSize,
+                    CurrentPage = pageList.CurrentPage,
+                    TotalPages = pageList.TotalPages,
+                    HasNext = pageList.HasNext,
+                    HasPrev = pageList.HasPrev,
+                    Data = pageList
+                };
+
+                return ApiResponse<PageResponse<PlayerDto>>.ReturnResultWith200(response);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<PageResponse<PlayerDto>>.ReturnFailed(401, ex.Message);
             }
         }
     }

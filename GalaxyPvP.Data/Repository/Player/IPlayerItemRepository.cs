@@ -6,14 +6,14 @@ namespace GalaxyPvP.Data
 {
     public interface IPlayerItemRepository : IGenericRepository<PlayerItem>
     {
-        Task<ApiResponse<PlayerItemDto>> Get(int itemId, string playerId);
-        Task<ApiResponse<ListPlayerItemDto>> GetAll(string playerId);
+        Task<ApiResponse<PlayerItemDto>> Get(int itemId, string userId);
+        Task<ApiResponse<ListPlayerItemDto>> GetAll(string userId);
         Task<ApiResponse<ListPlayerItemDto>> GetAllByNFT(string nftId);
-        Task<ApiResponse<PlayerItemDto>> Create(PlayerItemCreateDto playerCreateDto);
-        Task<ApiResponse<ListCreatePlayerItemDto>> CreateList(ListCreatePlayerItemDto playerCreateListDto);
-        Task<ApiResponse<PlayerItemDto>> Update(string playerId , PlayerItemUpdateDto playerUpdateDto);
-        Task<ApiResponse<ListUpdatePlayerItemDto>> UpdateList(ListUpdatePlayerItemDto playerUpdateDto);
-        Task<ApiResponse<PlayerItemDto>> Delete(string playerId, int dataId);
+        Task<ApiResponse<PlayerItemDto>> Create(string userId, PlayerItemCreateDto playerCreateDto);
+        Task<ApiResponse<ListCreatePlayerItemDto>> CreateList(string userId, ListCreatePlayerItemDto playerCreateListDto);
+        Task<ApiResponse<PlayerItemDto>> Update(string userId, PlayerItemUpdateDto playerUpdateDto);
+        Task<ApiResponse<ListUpdatePlayerItemDto>> UpdateList(string userId, ListUpdatePlayerItemDto playerUpdateDto);
+        Task<ApiResponse<PlayerItemDto>> Delete(string userId, int dataId);
         Task<ApiResponse<ListPlayerItemDto>> ValidateWallet(ListPlayerItemDto playerCreateListDto);
 
     }

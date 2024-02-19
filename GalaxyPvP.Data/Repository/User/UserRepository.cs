@@ -65,6 +65,7 @@ namespace GalaxyPvP.Data.Repository.User
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    new Claim("UserName", user.UserName),
                     new Claim(ClaimTypes.Role, roles.FirstOrDefault())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
@@ -73,7 +74,11 @@ namespace GalaxyPvP.Data.Repository.User
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             Player player = Context.Set<Player>().FirstOrDefault(x => x.UserId == user.Id);
-            List<PlayerItem> playerItems = Context.Set<PlayerItem>().Where(x => x.PlayerId == player.Id).ToList();
+            List<PlayerItem> playerItems = new List<PlayerItem>();
+            if (player != null)
+            {
+                playerItems = Context.Set<PlayerItem>().Where(x => x.PlayerId == player.Id).ToList();
+            }
 
             LoginResponseDTO loginResponseDTO = new LoginResponseDTO()
             {
@@ -82,7 +87,10 @@ namespace GalaxyPvP.Data.Repository.User
                 Role = roles.FirstOrDefault(),
             };
 
-            if(player != null)
+            user.Token = loginResponseDTO.Token;
+            await Context.SaveChangesAsync();
+
+            if (player != null)
             {
                 loginResponseDTO.Player = _mapper.Map<PlayerDto>(player);
                 loginResponseDTO.Player.WalletAddress = user.WalletAddress;
@@ -293,6 +301,72 @@ namespace GalaxyPvP.Data.Repository.User
             catch (Exception ex)
             {
                 return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<UserDTO>> AuthorizeUser(string userId, string token)
+        {
+            try
+            {
+                if (userId == null)
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "UserId Null");
+                }
+                GalaxyUser? user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(x => x.Id == userId);
+                if (user == null)
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "User not exist!");
+                }
+                if (token == user.Token)
+                {
+                    return ApiResponse<UserDTO>.ReturnSuccess();
+                }
+                else
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "UnAuthorized");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+            }
+        }
+
+        public async Task<bool> IsAdminByEmail(string email)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    // User not found
+                    return false;
+                }
+
+                return await _userManager.IsInRoleAsync(user, "Admin");
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> IsAdminByUserId(string userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    // User not found
+                    return false;
+                }
+
+                return await _userManager.IsInRoleAsync(user, "Admin");
+            }
+            catch (Exception ex)
+            {
+                return false;
             }
         }
     }

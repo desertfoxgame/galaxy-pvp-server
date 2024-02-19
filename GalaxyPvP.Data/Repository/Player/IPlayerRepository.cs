@@ -6,13 +6,15 @@ namespace GalaxyPvP.Data
     public interface IPlayerRepository: IGenericRepository<Player>
     {
         Task<ApiResponse<PlayerDto>> GetByUserId(string userId);
-        Task<ApiResponse<string>> GetPlayerEquipData(string playerId);
-        Task<ApiResponse<PlayerDto>> UpdatePlayerEquipData(string playerId, string equipdata);
+        Task<ApiResponse<PageResponse<PlayerDto>>> GetAllPlayer(PageRequest request);
+        Task<ApiResponse<string>> GetPlayerEquipData(string userId);
+        Task<ApiResponse<PlayerDto>> UpdatePlayerEquipData(string userId, string equipdata);
         Task<ApiResponse<PlayerDto>> GetByPlayerId(string playerId);
+        Task<ApiResponse<PageResponse<PlayerDto>>> GetByPlayerNickname(PageRequest request, string nickname);
         Task<ApiResponse<PlayerDto>> Create(PlayerCreateDto playerCreateDto);
         Task<ApiResponse<PlayerUpdateDto>> Update(PlayerUpdateDto playerUpdateDto);
-        Task<ApiResponse<PlayerDto>> Delete(string playerId);
-        Task<ApiResponse<int>> GetPlayerRank(string playerId);
+        Task<ApiResponse<PlayerDto>> Delete(string userId);
+        Task<ApiResponse<int>> GetPlayerRank(string? userId);
         Task<ApiResponse<List<PlayerDto>>> GetLeaderboard(int amount);
         Task<ApiResponse<PlayerDto>> UpdatePlayerTrophyByUserId(string userId, int trophy);
 
