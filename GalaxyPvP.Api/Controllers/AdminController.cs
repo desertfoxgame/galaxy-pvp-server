@@ -49,60 +49,27 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpGet("GetAllPlayer")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAllPlayer([FromQuery] PageRequest request)
         {
-            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
-            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            bool isAdmin = await _userRepo.IsAdminByUserId(userId);
-
-            if (isAdmin)
-            {
-                ApiResponse<PageResponse<PlayerDto>> response = await _dbPlayer.GetAllPlayer(request);
-                return ReturnFormatedResponse(response);
-            }
-            else
-            {
-                return BadRequest("Only Admin can access");
-            }
+            ApiResponse<PageResponse<PlayerDto>> response = await _dbPlayer.GetAllPlayer(request);
+            return ReturnFormatedResponse(response);
         }
 
         [HttpGet("GetPlayerByNickname")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetPlayerByNickname([FromQuery] PageRequest request, string nickname)
         {
-            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
-            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            bool isAdmin = await _userRepo.IsAdminByUserId(userId);
-
-            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
-            if (isAdmin)
-            {
-                ApiResponse<PageResponse<PlayerDto>> response = await _dbPlayer.GetByPlayerNickname(request, nickname);
-                return ReturnFormatedResponse(response);
-            }
-            else
-            {
-                return ReturnFormatedResponse(userAuthorize);
-            }
+            ApiResponse<PageResponse<PlayerDto>> response = await _dbPlayer.GetByPlayerNickname(request, nickname);
+            return ReturnFormatedResponse(response);
         }
 
         [HttpPut("UpdatePlayer")]
-        [Authorize]
+        [Authorize(Roles ="admin")]
         public async Task<IActionResult> UpdatePlayer([FromBody] PlayerUpdateDto updateDto)
         {
-            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
-            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            bool isAdmin = await _userRepo.IsAdminByUserId(userId);
-
-            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
-            if (isAdmin)
-            {
-                ApiResponse<PlayerUpdateDto> response = await _dbPlayer.Update(updateDto);
-                return ReturnFormatedResponse(response);
-            }
-            else
-            {
-                return ReturnFormatedResponse(userAuthorize);
-            }
+            ApiResponse<PlayerUpdateDto> response = await _dbPlayer.Update(updateDto);
+            return ReturnFormatedResponse(response);
         }
     }
 }
