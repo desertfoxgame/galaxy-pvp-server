@@ -369,5 +369,29 @@ namespace GalaxyPvP.Data.Repository.User
                 return false;
             }
         }
+
+        public async Task<ApiResponse<UserDTO>> GetByPlayerId(string playerId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(playerId))
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "PlayerId Null");
+                }
+                var player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId);
+
+                var user = await FindAsync(p => p.Id == player.UserId);
+                if (user == null)
+                {
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "Not Found!");
+                }
+                UserDTO reponse = _mapper.Map<UserDTO>(user);
+                return ApiResponse<UserDTO>.ReturnResultWith200(reponse);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+            }
+        }
     }
 }

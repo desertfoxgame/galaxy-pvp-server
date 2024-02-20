@@ -1,16 +1,8 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using GalaxyPvP.Data.Context;
-using GalaxyPvP.Data.Dto.Player;
-using GalaxyPvP.Data.Dto.User;
-using GalaxyPvP.Data.DTO;
-using GalaxyPvP.Data.Migrations;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
-using NanoidDotNet;
-using Quantum;
-using System.Linq;
 
 namespace GalaxyPvP.Data
 {
@@ -288,7 +280,9 @@ namespace GalaxyPvP.Data
         {
             try
             {
-                var players = await Context.Set<Player>().Where(x => x.Nickname.ToLower().Contains(nickname.ToLower().Trim())).ToListAsync();
+                var players = await Context.Set<Player>().Where(x => x.Nickname.ToLower().Contains(nickname.ToLower().Trim()) 
+                                                                    //|| x.ema.ToLower().Contains(nickname.ToLower().Trim())
+                                                                    ).ToListAsync();
                 List<PlayerDto> listPlayerDTO = new List<PlayerDto>();
                 foreach (var player in players)
                 {

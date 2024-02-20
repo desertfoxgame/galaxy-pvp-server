@@ -8,8 +8,8 @@ namespace GalaxyPvP.Data.Model
         [Key]
         public string Id { get; set; }
         [Required]
-        [ForeignKey("User")]
         [MaxLength(450)]
+        [ForeignKey("User")] // Specify the navigation property name
         public string UserId { get; set; }
         public string Nickname { get; set; }
         public int Level { get; set; }
@@ -25,6 +25,7 @@ namespace GalaxyPvP.Data.Model
         public short isAdmin { get; set; }
         public short Developer { get; set; }
 
+        public GalaxyUser User { get; set; }
         public ICollection<Friend> FriendsAsPlayer1 { get; set; }
         public ICollection<Friend> FriendsAsPlayer2 { get; set; }
     }
