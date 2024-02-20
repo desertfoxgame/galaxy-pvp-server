@@ -288,7 +288,7 @@ namespace GalaxyPvP.Data
         {
             try
             {
-                var players = await Context.Set<Player>().Where(x => x.Nickname.Contains(nickname.Trim())).ToListAsync();
+                var players = await Context.Set<Player>().Where(x => x.Nickname.ToLower().Contains(nickname.ToLower().Trim())).ToListAsync();
                 List<PlayerDto> listPlayerDTO = new List<PlayerDto>();
                 foreach (var player in players)
                 {
