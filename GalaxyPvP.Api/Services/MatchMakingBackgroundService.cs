@@ -26,53 +26,53 @@ namespace GalaxyPvP.Api.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                Dictionary<string, MatchMakingTicket> playerPool = GetPlayerPool();
-                if (playerPool == null)
-                {
-                    playerPool = new Dictionary<string, MatchMakingTicket>();
-                    SavePlayerPool(playerPool);
-                }
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+            //    Dictionary<string, MatchMakingTicket> playerPool = GetPlayerPool();
+            //    if (playerPool == null)
+            //    {
+            //        playerPool = new Dictionary<string, MatchMakingTicket>();
+            //        SavePlayerPool(playerPool);
+            //    }
 
-                //_logger.LogInformation($"Counter: {playerPool.Count}");
+            //    //_logger.LogInformation($"Counter: {playerPool.Count}");
 
-                foreach (MatchMakingTicket ticket in playerPool.Values)
-                {
-                    string connectionId = _connectionIdService.GetConnectionId(ticket.PlayerId);
+            //    foreach (MatchMakingTicket ticket in playerPool.Values)
+            //    {
+            //        string connectionId = _connectionIdService.GetConnectionId(ticket.PlayerId);
 
-                    if (connectionId != null)
-                    {
-                        // Send a message to the specified user using their ConnectionId
-                        await _hubContext.Clients.Client(connectionId).SendAsync("ServerMatchMakingMessage", null);
-                    }
-                    else
-                    {
-                        // Handle the case where the user is not connected
-                        // You may want to log this or take other appropriate action
-                        Console.WriteLine($"User with ID {ticket.PlayerId} is not currently connected.");
-                    }
-                }
+            //        if (connectionId != null)
+            //        {
+            //            // Send a message to the specified user using their ConnectionId
+            //            await _hubContext.Clients.Client(connectionId).SendAsync("ServerMatchMakingMessage", null);
+            //        }
+            //        else
+            //        {
+            //            // Handle the case where the user is not connected
+            //            // You may want to log this or take other appropriate action
+            //            Console.WriteLine($"User with ID {ticket.PlayerId} is not currently connected.");
+            //        }
+            //    }
 
-                //_logger.LogInformation($"{_connectionIdService.GetAllConnection().Count}");
+            //    //_logger.LogInformation($"{_connectionIdService.GetAllConnection().Count}");
 
-                if (playerPool.Count >= 4)
-                {
-                    // Matchmaking logic
-                    List<List<MatchMakingTicket>> teams = FormTeams(playerPool);
+            //    if (playerPool.Count >= 4)
+            //    {
+            //        // Matchmaking logic
+            //        List<List<MatchMakingTicket>> teams = FormTeams(playerPool);
 
-                    // Notify players about the match
-                    NotifyPlayers(teams);
+            //        // Notify players about the match
+            //        NotifyPlayers(teams);
 
-                    // Remove matched players from the pool
-                    RemovePlayersFromPool(playerPool, teams);
+            //        // Remove matched players from the pool
+            //        RemovePlayersFromPool(playerPool, teams);
 
-                    //_logger.LogInformation($"Match Found: {teams.Count} teams formed.");
-                }
+            //        //_logger.LogInformation($"Match Found: {teams.Count} teams formed.");
+            //    }
 
-                // Adjust the delay to run every 5 seconds
-                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
-            }
+            //    // Adjust the delay to run every 5 seconds
+            //    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+            //}
         }
 
         private List<List<MatchMakingTicket>> FormTeams(Dictionary<string, MatchMakingTicket> playerPool)

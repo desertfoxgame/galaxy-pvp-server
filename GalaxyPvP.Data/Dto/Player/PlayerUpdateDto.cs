@@ -9,7 +9,6 @@ namespace GalaxyPvP.Data
 {
     public class PlayerUpdateDto
     {
-        public string Id { get; set; }
         public string? Nickname { get; set; }
         public int Level { get; set; }
         public int Exp { get; set; }

@@ -20,11 +20,12 @@ namespace GalaxyPvP.Data
             _playerRepo = playerRepo;
         }
 
-        public async Task<ApiResponse<PlayerItemDto>> Get(int itemId, string playerId)
+        public async Task<ApiResponse<PlayerItemDto>> Get(int itemId, string userId)
         {
             try
             {
-                var item = await FindAsync(p => p.DataId == itemId && p.PlayerId == playerId);
+                var player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.UserId == userId);
+                var item = await FindAsync(p => p.DataId == itemId && p.PlayerId == player.Id);
                 if (item == null)
                 {
                     return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Not Found!");
@@ -38,17 +39,19 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<PlayerItemDto>> Create(PlayerItemCreateDto itemCreateDto)
+        public async Task<ApiResponse<PlayerItemDto>> Create(string userId, PlayerItemCreateDto itemCreateDto)
         {
             try
             {
+                var player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.UserId == userId);
+
                 if (itemCreateDto == null)
                 {
-                    return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Create data is null");
+                    return ApiResponse<PlayerItemDto>.ReturnFailed(404, "Create data is null");
                 }
-                if (await FindAsync(p => p.DataId == itemCreateDto.DataId && p.PlayerId == itemCreateDto.PlayerId) != null)
+                if (await FindAsync(p => p.DataId == itemCreateDto.DataId && p.PlayerId == player.Id) != null)
                 {
-                    return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Item exists");
+                    return ApiResponse<PlayerItemDto>.ReturnFailed(404, "Item exists");
                 }
 
                 PlayerItem item = new PlayerItem();
@@ -66,16 +69,18 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<PlayerItemDto>> Update(string playerId, PlayerItemUpdateDto itemUpdateDto)
+        public async Task<ApiResponse<PlayerItemDto>> Update(string userId, PlayerItemUpdateDto itemUpdateDto)
         {
             try
             {
+                var player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.UserId == userId);
+
                 if (itemUpdateDto == null)
                 {
                     return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Update data is null");
                 }
 
-                var item = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == itemUpdateDto.DataId && p.PlayerId == playerId);
+                var item = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == itemUpdateDto.DataId && p.PlayerId == player.Id);
                 if (item == null)
                 {
                     return ApiResponse<PlayerItemDto>.Return404("Player not found");
@@ -94,11 +99,12 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<PlayerItemDto>> Delete(string playerId, int dataId)
+        public async Task<ApiResponse<PlayerItemDto>> Delete(string userId, int dataId)
         {
             try
             {
-                PlayerItem removeItem = await FindAsync(x => x.PlayerId == playerId && x.DataId == dataId);
+                var player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.UserId == userId);
+                PlayerItem removeItem = await FindAsync(x => x.PlayerId == player.Id && x.DataId == dataId);
                 PlayerItemDto responseItem = _mapper.Map<PlayerItemDto>(removeItem);
                 Delete(removeItem);
                 Context.SaveChanges();
@@ -110,15 +116,17 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<ListPlayerItemDto>> GetAll(string playerId)
+        public async Task<ApiResponse<ListPlayerItemDto>> GetAll(string userId)
         {
             try
             {
-                if (playerId == null)
+                var player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.UserId == userId);
+
+                if (player == null)
                 {
-                    return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, "PlayerId is null");
+                    return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, "Player is null");
                 }
-                List<PlayerItem> items = await Context.Set<PlayerItem>().Where(p => p.PlayerId == playerId).ToListAsync();
+                List<PlayerItem> items = await Context.Set<PlayerItem>().Where(p => p.PlayerId == player.Id).ToListAsync();
                 if (items == null)
                 {
                     return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, "Not Found!");
@@ -138,13 +146,15 @@ namespace GalaxyPvP.Data
             throw new NotImplementedException();
         }
 
-        public async Task<ApiResponse<ListCreatePlayerItemDto>> CreateList(ListCreatePlayerItemDto playerCreateListDto)
+        public async Task<ApiResponse<ListCreatePlayerItemDto>> CreateList(string userId, ListCreatePlayerItemDto playerCreateListDto)
         {
             try
             {
+                var player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.UserId == userId);
+
                 foreach (var item in playerCreateListDto.PlayerItems)
                 {
-                    var existItem = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == item.DataId && p.PlayerId == playerCreateListDto.PlayerId);
+                    var existItem = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == item.DataId && p.PlayerId == player.Id);
                     if (existItem != null)
                     {
                         return ApiResponse<ListCreatePlayerItemDto>.Return404("Item of Player exist");
@@ -165,13 +175,15 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<ListUpdatePlayerItemDto>> UpdateList(ListUpdatePlayerItemDto playerUpdateDto)
+        public async Task<ApiResponse<ListUpdatePlayerItemDto>> UpdateList(string userId, ListUpdatePlayerItemDto playerUpdateDto)
         {
             try
             {
+                var player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.UserId == userId);
+
                 foreach (var item in playerUpdateDto.PlayerItems)
                 {
-                    var existItem = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == item.DataId && p.PlayerId == playerUpdateDto.PlayerId);
+                    var existItem = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == item.DataId && p.PlayerId == player.Id);
                     if (existItem == null)
                     {
                         return ApiResponse<ListUpdatePlayerItemDto>.Return404("Item not exist");

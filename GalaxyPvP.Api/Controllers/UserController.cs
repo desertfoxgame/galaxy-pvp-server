@@ -2,8 +2,10 @@
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Dto.MigrationDB;
 using GalaxyPvP.Data.Dto.User;
+using GalaxyPvP.Data.DTO;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
+using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using PlayFab;
@@ -11,6 +13,7 @@ using PlayFab.AdminModels;
 using PlayFab.ServerModels;
 using Serilog;
 using System.Net;
+using System.Security.Claims;
 using UserDataRecord = PlayFab.ServerModels.UserDataRecord;
 
 
@@ -185,24 +188,38 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpGet("GetById")]
-        public async Task<IActionResult> GetById(string userId)
+        [Authorize]
+        public async Task<IActionResult> GetById()
         {
-            var user = await _userRepo.GetById(userId);
-            return ReturnFormatedResponse(user);
+            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
+            if (userAuthorize.Success)
+            {
+                var user = await _userRepo.GetById(userId);
+                return ReturnFormatedResponse(user);
+            }
+            else
+            {
+                return ReturnFormatedResponse(userAuthorize);
+            }
         }
 
-        [HttpGet("GetByEmail")]
-        public async Task<IActionResult> GetByEmail(string userEmail)
-        {
-            var user = await _userRepo.GetByEmail(userEmail);
-            return ReturnFormatedResponse(user);
-        }
+        //[HttpGet("GetByEmail")]
+        //[Authorize]
+        //public async Task<IActionResult> GetByEmail(string userEmail)
+        //{
+        //    var user = await _userRepo.GetByEmail(userEmail);
+        //    return ReturnFormatedResponse(user);
+        //}
 
-        [HttpGet("GetByUserName")]
-        public async Task<IActionResult> GetByUserName(string userName)
-        {
-            var user = await _userRepo.GetByUserName(userName);
-            return ReturnFormatedResponse(user);
-        }
+        //[HttpGet("GetByUserName")]
+        //[Authorize]
+        //public async Task<IActionResult> GetByUserName(string userName)
+        //{
+        //    var user = await _userRepo.GetByUserName(userName);
+        //    return ReturnFormatedResponse(user);
+        //}
     }
 }

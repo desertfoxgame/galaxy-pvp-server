@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using GalaxyPvP.Data.Repository.MatchMaking;
 using GalaxyPvP.Extensions;
 using GalaxyPvP.Data.Dto.MatchSubmit;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GalaxyPvP.Api.Controllers
 {
@@ -25,7 +26,7 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpGet("GetMatchResult")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetMatchResult(string matchId)
         {
             ApiResponse<MatchResultDto> response = await _repository.Get(matchId);
@@ -33,7 +34,7 @@ namespace GalaxyPvP.Api.Controllers
         }
 
         [HttpPost("CreateMatchResult")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> CreateMatchResult(MatchResultDto matchResultDto)
         {
             ApiResponse<MatchResultDto> response = await _repository.Create(matchResultDto);

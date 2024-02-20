@@ -88,14 +88,13 @@ namespace GalaxyPvP.Data
                         dataId = Context.Set<ItemDataMigration>().FirstOrDefault(x => x.Name == name).DataId;
 
                         PlayerItemCreateDto itemCreateDto = new PlayerItemCreateDto();
-                        itemCreateDto.PlayerId = player.Id;
                         itemCreateDto.DataId = dataId;
 
                         if (itemCreateDto == null)
                         {
                             response.PlayerItemsCantCreate.Add(name);
                         }
-                        if (await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == itemCreateDto.DataId && p.PlayerId == itemCreateDto.PlayerId) != null)
+                        if (await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == itemCreateDto.DataId && p.PlayerId == player.Id) != null)
                         {
                             response.PlayerItemsCantCreate.Add(name);
                         }
@@ -103,6 +102,7 @@ namespace GalaxyPvP.Data
                         {
                             PlayerItem item = new PlayerItem();
                             _mapper.Map(itemCreateDto, item);
+                            item.PlayerId = player.Id;
                             item.CreatedAt = DateTime.Now;
                             item.UpdatedAt = DateTime.Now;
                             Context.Set<PlayerItem>().Add(item);
