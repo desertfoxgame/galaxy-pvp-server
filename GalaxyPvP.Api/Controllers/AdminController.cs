@@ -20,15 +20,17 @@ namespace GalaxyPvP.Api.Controllers
     {
         private readonly IPlayerRepository _dbPlayer;
         private readonly IUserRepository _userRepo;
+        private readonly IAdminRepository _adminRepo;
         private readonly IMapper _mapper;
         private GalaxyPvPContext _context;
 
-        public AdminController(IPlayerRepository dbPlayer, IMapper mapper, GalaxyPvPContext context, IUserRepository userRepository)
+        public AdminController(IPlayerRepository dbPlayer, IMapper mapper, GalaxyPvPContext context, IUserRepository userRepository, IAdminRepository adminRepo)
         {
             _dbPlayer = dbPlayer;
             _mapper = mapper;
             _context = context;
             _userRepo = userRepository;
+            _adminRepo = adminRepo;
         }
 
         [HttpPost("Login")]
@@ -52,23 +54,57 @@ namespace GalaxyPvP.Api.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAllPlayer([FromQuery] PageRequest request)
         {
-            ApiResponse<PageResponse<PlayerDto>> response = await _dbPlayer.GetAllPlayer(request);
+            ApiResponse<PageResponse<AdminPlayerDTO>> response = await _adminRepo.GetAllPlayer(request);
             return ReturnFormatedResponse(response);
         }
 
-        [HttpGet("GetPlayerByNickname")]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> GetPlayerByNickname([FromQuery] PageRequest request, string nickname)
+        [HttpGet("SearchPlayer")]
+        //[Authorize(Roles = "admin")]
+        public async Task<IActionResult> SearchPlayer([FromQuery] PageRequest request, string input)
         {
-            ApiResponse<PageResponse<PlayerDto>> response = await _dbPlayer.GetByPlayerNickname(request, nickname);
+            ApiResponse<PageResponse<AdminPlayerDTO>> response = null;
+            if (input.Trim() != "/")
+            {
+                response = await _adminRepo.SearchPlayer(request, input);
+
+            }
+            else
+            {
+                response = await _adminRepo.GetAllPlayer(request);
+
+            }
             return ReturnFormatedResponse(response);
         }
 
         [HttpPut("UpdatePlayer")]
-        [Authorize(Roles ="admin")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdatePlayer([FromBody] PlayerUpdateDto updateDto)
         {
             ApiResponse<PlayerUpdateDto> response = await _dbPlayer.Update(updateDto);
+            return ReturnFormatedResponse(response);
+        }
+        
+        [HttpPut("UpdateUser")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> UpdateUser([FromBody] UserDTO updateDto)
+        {
+            ApiResponse<UserDTO> response = await _userRepo.Update(updateDto);
+            return ReturnFormatedResponse(response);
+        }
+
+        [HttpGet("GetPlayer")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetPlayer(string playerId)
+        {
+            ApiResponse<PlayerDto> response = await _dbPlayer.GetByPlayerId(playerId);
+            return ReturnFormatedResponse(response);
+        }
+
+        [HttpGet("GetUser")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetUser(string playerId)
+        {
+            ApiResponse<UserDTO> response = await _userRepo.GetByPlayerId(playerId);
             return ReturnFormatedResponse(response);
         }
     }

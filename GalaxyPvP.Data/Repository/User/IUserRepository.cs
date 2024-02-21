@@ -17,6 +17,7 @@ namespace GalaxyPvP.Data.Repository.User
         Task<ApiResponse<UserDTO>> AuthorizeUser(string userId, string token);
         Task<ApiResponse<UserDTO>> GetByEmail(string email);
         Task<ApiResponse<UserDTO>> GetByUserName(string userName);
+        Task<ApiResponse<UserDTO>> GetByPlayerId(string playerId);
         Task<ApiResponse<UserDTO>> Update(UserDTO playerUpdateDto);
         Task<bool> IsAdminByEmail(string email);
         Task<bool> IsAdminByUserId(string userId);

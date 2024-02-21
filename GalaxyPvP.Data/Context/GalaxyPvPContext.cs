@@ -27,6 +27,11 @@ namespace GalaxyPvP.Data.Context
                 new GameConfig() { Key = "Version_Windows", Value = "3.0.0" }
                 );
 
+            builder.Entity<Player>()
+                .HasOne(f => f.User)
+                .WithMany()
+                .HasForeignKey(f => f.UserId);
+
             builder.Entity<Friend>()
                 .HasOne(f => f.Player1)
                 .WithMany(p => p.FriendsAsPlayer1)
