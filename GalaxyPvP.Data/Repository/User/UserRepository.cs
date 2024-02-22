@@ -125,7 +125,12 @@ namespace GalaxyPvP.Data.Repository.User
             IdentityResult result = await _userManager.CreateAsync(entity, request.Password);
             if (!result.Succeeded)
             {
-                return ApiResponse<UserDTO>.Return500();
+                string error = "";
+                foreach(IdentityError e in result.Errors)
+                {
+                    error += e.Description + "\n";
+                }
+                return ApiResponse<UserDTO>.ReturnFailed(400, error);
             }
             if (!_roleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
             {
