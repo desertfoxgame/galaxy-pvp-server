@@ -2,6 +2,7 @@
 using AutoMapper;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Dto.MatchSubmit;
+using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Data.Repository.MatchMaking;
 using GalaxyPvP.Extensions;
@@ -34,6 +35,7 @@ namespace GalaxyPvP.Api.Controllers
             _playerRepository = playerRepository;
             submitApiKey = configuration.GetValue<string>("SubmitApiKey");
         }
+
         [HttpPost("RegisterMatch")]
         [Authorize]
         public async Task<IActionResult> RegisterMatch([FromBody] PlayerRegisterMatchDto dto)
@@ -52,11 +54,19 @@ namespace GalaxyPvP.Api.Controllers
             SaveMatchSubmitDic(matchSubmit);
             return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Success"));
         }
-        //
 
-        // id, matchid
-        // call server nft game matchid win or lose, get keyfragment
-        // win -> updateUserdata: totalgame, trophy, ...wingamestreak
+        [HttpGet("PlayerPlayable")]
+        [Authorize]
+        public async Task<IActionResult> PlayerPlayable(string playerId)
+        {
+            PlayerPlayableDto playable = new()
+            {
+                isPlayable = true,
+            };
+            
+            return ReturnFormatedResponse(ApiResponse<PlayerPlayableDto>.ReturnResultWith200(playable));
+        }
+       
         [HttpPost("GetMatchStage")]
         [Authorize]
         public async Task<IActionResult> GetMatchStage(string matchId)
