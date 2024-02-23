@@ -25,7 +25,7 @@ namespace GalaxyPvP.Data
             }
             catch (Exception ex)
             {
-                return ApiResponse<List<GameConfigDTO>>.ReturnFailed(401, ex.Message);
+                return ApiResponse<List<GameConfigDTO>>.ReturnFailed(404, ex.Message);
             }
         }
     }

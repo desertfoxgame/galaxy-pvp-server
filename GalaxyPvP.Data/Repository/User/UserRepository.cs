@@ -52,7 +52,7 @@ namespace GalaxyPvP.Data.Repository.User
 
             if (user == null || isValid == false)
             {
-                return ApiResponse<LoginResponseDTO>.ReturnFailed(401, "UserName Or Password is InCorrect.");
+                return ApiResponse<LoginResponseDTO>.ReturnFailed(404, "UserName Or Password is InCorrect.");
             }
 
             //if user was found generate JWT Token
@@ -185,7 +185,7 @@ namespace GalaxyPvP.Data.Repository.User
             }
             catch (Exception ex)
             {
-                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+                return ApiResponse<string>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -210,7 +210,7 @@ namespace GalaxyPvP.Data.Repository.User
             }
             catch (Exception ex)
             {
-                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+                return ApiResponse<string>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -220,20 +220,20 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(401, "UserId Null");
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "UserId Null");
                 }
                 var list = await Context.Set<GalaxyUser>().ToListAsync();
                 var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(p => p.Id == userId);
                 if (user == null)
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(401, "Not Found!");
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "Not Found!");
                 }
                 UserDTO reponse = _mapper.Map<UserDTO>(user);
                 return ApiResponse<UserDTO>.ReturnResultWith200(reponse);
             }
             catch (Exception ex)
             {
-                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+                return ApiResponse<UserDTO>.ReturnFailed(404, ex.Message);
 
             }
         }
@@ -244,19 +244,19 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 if (string.IsNullOrEmpty(email))
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(401, "UserEmail Null");
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "UserEmail Null");
                 }
                 var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(p => p.Email == email);
                 if (user == null)
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(401, "Not Found!");
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "Not Found!");
                 }
                 UserDTO reponse = _mapper.Map<UserDTO>(user);
                 return ApiResponse<UserDTO>.ReturnResultWith200(reponse);
             }
             catch (Exception ex)
             {
-                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+                return ApiResponse<UserDTO>.ReturnFailed(404, ex.Message);
 
             }
         }
@@ -267,19 +267,19 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 if (string.IsNullOrEmpty(userName))
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(401, "UserName Null");
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "UserName Null");
                 }
                 var user = await FindAsync(p => p.UserName == userName);
                 if (user == null)
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(401, "Not Found!");
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "Not Found!");
                 }
                 UserDTO reponse = _mapper.Map<UserDTO>(user);
                 return ApiResponse<UserDTO>.ReturnResultWith200(reponse);
             }
             catch (Exception ex)
             {
-                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+                return ApiResponse<UserDTO>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -289,7 +289,7 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 if (userUpdateDto == null)
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(401, "Update data is null");
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "Update data is null");
                 }
 
                 var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(p => p.Id == userUpdateDto.ID);
@@ -305,7 +305,7 @@ namespace GalaxyPvP.Data.Repository.User
             }
             catch (Exception ex)
             {
-                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+                return ApiResponse<UserDTO>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -328,12 +328,12 @@ namespace GalaxyPvP.Data.Repository.User
                 }
                 else
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(401, "UnAuthorized");
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "UnAuthorized");
                 }
             }
             catch (Exception ex)
             {
-                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+                return ApiResponse<UserDTO>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -381,21 +381,21 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 if (string.IsNullOrEmpty(playerId))
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(401, "PlayerId Null");
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "PlayerId Null");
                 }
                 var player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId);
 
                 var user = await FindAsync(p => p.Id == player.UserId);
                 if (user == null)
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(401, "Not Found!");
+                    return ApiResponse<UserDTO>.ReturnFailed(404, "Not Found!");
                 }
                 UserDTO reponse = _mapper.Map<UserDTO>(user);
                 return ApiResponse<UserDTO>.ReturnResultWith200(reponse);
             }
             catch (Exception ex)
             {
-                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
+                return ApiResponse<UserDTO>.ReturnFailed(404, ex.Message);
             }
         }
     }

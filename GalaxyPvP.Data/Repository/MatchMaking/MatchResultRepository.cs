@@ -42,7 +42,7 @@ namespace GalaxyPvP.Data.Repository.MatchMaking
             }
             catch (Exception ex)
             {
-                return ApiResponse<MatchResultDto>.ReturnFailed(401, ex.Message);
+                return ApiResponse<MatchResultDto>.ReturnFailed(404, ex.Message);
 
             }
         }
@@ -60,7 +60,7 @@ namespace GalaxyPvP.Data.Repository.MatchMaking
                 MatchResult matchResult = await Context.Set<MatchResult>().FirstOrDefaultAsync(x => x.MatchId == matchId);
                 if (matchResult == null)
                 {
-                    return ApiResponse<MatchResultDto>.ReturnFailed(401, "Match Result not exist!");
+                    return ApiResponse<MatchResultDto>.ReturnFailed(404, "Match Result not exist!");
                 }
 
                 MatchDataDto matchDataDto = JsonConvert.DeserializeObject<MatchDataDto>(matchResult.MatchData);
@@ -70,7 +70,7 @@ namespace GalaxyPvP.Data.Repository.MatchMaking
             }
             catch (Exception ex)
             {
-                return ApiResponse<MatchResultDto>.ReturnFailed(401, ex.Message);
+                return ApiResponse<MatchResultDto>.ReturnFailed(404, ex.Message);
             }
 
         }
