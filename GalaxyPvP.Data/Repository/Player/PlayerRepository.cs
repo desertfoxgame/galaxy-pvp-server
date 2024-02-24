@@ -222,6 +222,28 @@ namespace GalaxyPvP.Data
                 return ApiResponse<PlayerDto>.ReturnFailed(404, ex.Message);
             }
         }
+        public async Task<ApiResponse<PlayerDto>> UpdatePlayerTutorial(string userId)
+        {
+            try
+            {
+                var player = Context.Set<Player>().FirstOrDefault(x => x.UserId == userId);
+                if (player == null)
+                {
+                    return ApiResponse<PlayerDto>.ReturnFailed(404, "Player not exist!");
+                }
+                else
+                {
+                    player.Tutorial = 1;
+                    await Context.SaveChangesAsync();
+
+                    return ApiResponse<PlayerDto>.ReturnResultWith200(_mapper.Map<PlayerDto>(player));
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<PlayerDto>.ReturnFailed(404, ex.Message);
+            }
+        }
 
         public async Task<ApiResponse<PlayerDto>> UpdatePlayerTrophyByUserId(string userId, int trophy)
         {
@@ -307,5 +329,7 @@ namespace GalaxyPvP.Data
                 return ApiResponse<PageResponse<PlayerDto>>.ReturnFailed(404, ex.Message);
             }
         }
+
+       
     }
 }
