@@ -12,6 +12,6 @@ namespace GalaxyPvP.Data.Dto.Player
     {
         public bool isPlayable { get; set; }
         public string banReason { get; set; }
-        public TimeSpan? banTime { get; set; }
+        public long banTime { get; set; }
     }
 }
