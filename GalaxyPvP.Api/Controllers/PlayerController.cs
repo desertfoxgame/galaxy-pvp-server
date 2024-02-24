@@ -104,7 +104,6 @@ namespace GalaxyPvP.Api.Controllers
             {
                 return ReturnFormatedResponse(userAuthorize);
             }
-
         }
 
         [HttpGet("GetLeaderboard")]
@@ -144,6 +143,25 @@ namespace GalaxyPvP.Api.Controllers
             if (userAuthorize.Success)
             {
                 ApiResponse<PlayerDto> response = await _dbPlayer.UpdatePlayerEquipData(userId, equipData);
+                return ReturnFormatedResponse(response);
+            }
+            else
+            {
+                return ReturnFormatedResponse(userAuthorize);
+            }
+        }
+
+        [HttpPut("UpdatePlayerTutorial")]
+        [Authorize]
+        public async Task<IActionResult> UpdatePlayerTutorial()
+        {
+            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
+            if (userAuthorize.Success)
+            {
+                ApiResponse<PlayerDto> response = await _dbPlayer.UpdatePlayerTutorial(userId);
                 return ReturnFormatedResponse(response);
             }
             else

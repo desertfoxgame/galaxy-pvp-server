@@ -28,14 +28,14 @@ namespace GalaxyPvP.Data
                 var item = await FindAsync(p => p.DataId == itemId && p.PlayerId == player.Id);
                 if (item == null)
                 {
-                    return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Not Found!");
+                    return ApiResponse<PlayerItemDto>.ReturnFailed(404, "Not Found!");
                 }
                 PlayerItemDto reponse = _mapper.Map<PlayerItemDto>(item);
                 return ApiResponse<PlayerItemDto>.ReturnResultWith200(reponse);
             }
             catch (Exception ex)
             {
-                return ApiResponse<PlayerItemDto>.ReturnFailed(401, ex.Message);
+                return ApiResponse<PlayerItemDto>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -65,7 +65,7 @@ namespace GalaxyPvP.Data
             }
             catch (Exception ex)
             {
-                return ApiResponse<PlayerItemDto>.ReturnFailed(401, ex.Message);
+                return ApiResponse<PlayerItemDto>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -77,7 +77,7 @@ namespace GalaxyPvP.Data
 
                 if (itemUpdateDto == null)
                 {
-                    return ApiResponse<PlayerItemDto>.ReturnFailed(401, "Update data is null");
+                    return ApiResponse<PlayerItemDto>.ReturnFailed(404, "Update data is null");
                 }
 
                 var item = await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == itemUpdateDto.DataId && p.PlayerId == player.Id);
@@ -95,7 +95,7 @@ namespace GalaxyPvP.Data
             }
             catch (Exception ex)
             {
-                return ApiResponse<PlayerItemDto>.ReturnFailed(401, ex.Message);
+                return ApiResponse<PlayerItemDto>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -112,7 +112,7 @@ namespace GalaxyPvP.Data
             }
             catch (Exception ex)
             {
-                return ApiResponse<PlayerItemDto>.ReturnFailed(401, ex.Message);
+                return ApiResponse<PlayerItemDto>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -124,12 +124,12 @@ namespace GalaxyPvP.Data
 
                 if (player == null)
                 {
-                    return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, "Player is null");
+                    return ApiResponse<ListPlayerItemDto>.ReturnFailed(404, "Player is null");
                 }
                 List<PlayerItem> items = await Context.Set<PlayerItem>().Where(p => p.PlayerId == player.Id).ToListAsync();
                 if (items == null)
                 {
-                    return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, "Not Found!");
+                    return ApiResponse<ListPlayerItemDto>.ReturnFailed(404, "Not Found!");
                 }
                 ListPlayerItemDto response = new ListPlayerItemDto();
                 response.PlayerItems = items;
@@ -137,7 +137,7 @@ namespace GalaxyPvP.Data
             }
             catch (Exception ex)
             {
-                return ApiResponse<ListPlayerItemDto>.ReturnFailed(401, ex.Message);
+                return ApiResponse<ListPlayerItemDto>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -171,7 +171,7 @@ namespace GalaxyPvP.Data
             }
             catch (Exception ex)
             {
-                return ApiResponse<ListCreatePlayerItemDto>.ReturnFailed(401, ex.Message);
+                return ApiResponse<ListCreatePlayerItemDto>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -199,7 +199,7 @@ namespace GalaxyPvP.Data
             }
             catch (Exception ex)
             {
-                return ApiResponse<ListUpdatePlayerItemDto>.ReturnFailed(401, ex.Message);
+                return ApiResponse<ListUpdatePlayerItemDto>.ReturnFailed(404, ex.Message);
             }
 
         }

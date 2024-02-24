@@ -130,7 +130,7 @@ namespace GalaxyPvP.Api.Controllers
 
                         } catch (Exception ex)
                         {
-                            ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, $"History Async error {ex.Message}"));
+                            ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(404, $"History Async error {ex.Message}"));
                         }
                     }
                     matchSubmit[result.MatchId] = info;
@@ -139,10 +139,10 @@ namespace GalaxyPvP.Api.Controllers
                     return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Success"));
                 }
                 else
-                    return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "The player is not in the match"));
+                    return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(404, "The player is not in the match"));
             } else
             {
-                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "Match Not Found"));
+                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(404, "Match Not Found"));
             }
         }
 

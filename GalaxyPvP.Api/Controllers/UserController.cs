@@ -160,7 +160,7 @@ namespace GalaxyPvP.Api.Controllers
                 }
                 else
                 {
-                    return ReturnFormatedResponse(ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, response.Errors));
+                    return ReturnFormatedResponse(ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, response.Errors));
                 }
             }
             return ReturnFormatedResponse(loginResponse);

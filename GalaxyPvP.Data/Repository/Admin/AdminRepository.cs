@@ -55,7 +55,7 @@ namespace GalaxyPvP.Data
             }
             catch (Exception ex)
             {
-                return ApiResponse<PageResponse<AdminPlayerDTO>>.ReturnFailed(401, ex.Message);
+                return ApiResponse<PageResponse<AdminPlayerDTO>>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -100,7 +100,7 @@ namespace GalaxyPvP.Data
             }
             catch (Exception ex)
             {
-                return ApiResponse<PageResponse<AdminPlayerDTO>>.ReturnFailed(401, ex.Message);
+                return ApiResponse<PageResponse<AdminPlayerDTO>>.ReturnFailed(404, ex.Message);
             }
         }
 

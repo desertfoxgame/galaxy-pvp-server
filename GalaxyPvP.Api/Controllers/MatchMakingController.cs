@@ -52,12 +52,12 @@ namespace GalaxyPvP.Api.Controllers
             Serilog.Log.Debug("----------------User ID------ " + userId);
             if(string.IsNullOrEmpty(userId))
             {
-                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "User not found"));
+                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(404, "User not found"));
             }
             var getPlayer = await _playerRepository.GetByUserId(userId);
             if(!getPlayer.Success)
             {
-                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "Player not found"));
+                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(404, "Player not found"));
             }
             PlayerDto player = getPlayer.Data;
             Dictionary<string, MatchMakingTicket> PlayerPools = GetCachedDictionary();
@@ -70,7 +70,7 @@ namespace GalaxyPvP.Api.Controllers
 
             if (PlayerPools.ContainsKey(player.UserId))
             {
-                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "Already in queued"));
+                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(404, "Already in queued"));
             }
             var ticket = _mapper.Map<MatchMakingTicket>(createDto);
             ticket.PlayerId = player.UserId;

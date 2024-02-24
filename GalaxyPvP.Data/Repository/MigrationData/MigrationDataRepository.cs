@@ -47,7 +47,7 @@ namespace GalaxyPvP.Data
             }
             catch (Exception ex)
             {
-                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+                return ApiResponse<string>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -68,7 +68,7 @@ namespace GalaxyPvP.Data
                 var user = await _userRepo.Register(registerDto);
                 if (!user.Success)
                 {
-                    return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, user.Errors);
+                    return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, user.Errors);
                 }
 
                 var verifycode = await _userRepo.ForgotPassword(request.Email);
@@ -126,14 +126,14 @@ namespace GalaxyPvP.Data
                 }
                 else
                 {
-                    return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, createPlayerResponse.Errors);
+                    return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, createPlayerResponse.Errors);
 
                 }
 
             }
             catch (Exception ex)
             {
-                return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(401, ex.Message);
+                return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -219,7 +219,7 @@ namespace GalaxyPvP.Data
             }
             catch (Exception ex)
             {
-                return ApiResponse<string>.ReturnFailed(401, ex.Message);
+                return ApiResponse<string>.ReturnFailed(404, ex.Message);
             }
         }
     }
