@@ -379,7 +379,7 @@ namespace GalaxyPvP.Data
                 var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(x => x.Id == player.UserId);
                 DanielResponse response = new DanielResponse
                 {
-                    UserId = user.Id,
+                    UserId = player.Id,
                     WalletAddress = user.WalletAddress
                 };
 
