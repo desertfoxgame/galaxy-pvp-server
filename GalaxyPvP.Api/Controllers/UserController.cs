@@ -34,22 +34,6 @@ namespace GalaxyPvP.Api.Controllers
             _migrationDataRepo = migrationDataRepo;
         }
 
-        [HttpPost("GetPath")]
-        public async Task<IActionResult> GetPath()
-        {
-            string htmlTemplatePath = Environment.GetEnvironmentVariable("HOME") + "\\galaxy-pvp-us.scm.azurewebsites.net\\wwwroot\\emailTemplate.json";
-            try 
-            {
-                string htmlContentTemplate = System.IO.File.ReadAllText(htmlTemplatePath);
-                return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200(htmlContentTemplate));
-            } catch (Exception ex)
-            {
-                return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200(ex.Message));
-            }
-            
-            
-        }
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO model)
         {
@@ -112,7 +96,7 @@ namespace GalaxyPvP.Api.Controllers
                 string tutorial = userData.TryGetValue("tutorial", out UserDataRecord? Tutorial) ? Tutorial.Value : "0";
                 string developer = userData.TryGetValue("developer", out UserDataRecord? Developer) ? Developer.Value : "0";
                 string isAdmin = userData.TryGetValue("isAdmin", out UserDataRecord? IsAdmin) ? IsAdmin.Value : "0";
-
+                
                 // current equipment, add it to table
                 // we need 1 api to update equip data
                 string equip = userData.TryGetValue("NftInformation", out UserDataRecord? Infomation) ? Infomation.Value : string.Empty;
