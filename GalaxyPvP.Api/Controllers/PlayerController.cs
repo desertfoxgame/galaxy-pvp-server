@@ -121,6 +121,19 @@ namespace GalaxyPvP.Api.Controllers
             }
         }
 
+        [HttpPost("DanielGetPlayer")]
+        public async Task<IActionResult> DanielGetPlayer([FromBody] string key, string playerId)
+        {
+            if (key.Equals("a0c98b44-f0a3-40c0-9ea4-f75095c8fa14"))
+            {
+                ApiResponse<DanielResponse> response = await _dbPlayer.DanielGetPlayer(playerId);
+                return ReturnFormatedResponse(response);
+            }
+
+            return Unauthorized();
+
+        }
+
         [HttpDelete("DeletePlayer")]
         [Authorize]
         public async Task<IActionResult> DeletePlayer()
