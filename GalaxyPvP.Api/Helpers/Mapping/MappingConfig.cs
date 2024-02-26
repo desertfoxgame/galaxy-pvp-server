@@ -29,6 +29,7 @@ namespace GalaxyPvP.Api.Helpers.Mapping
             CreateMap<MigrateUserRequestDTO, Player>().ReverseMap();
             CreateMap<MigrateUserRequestDTO, RegisterRequestDTO>().ReverseMap();
             CreateMap<MigrateUserRequestDTO, MigrateUserResponseDTO>().ReverseMap();
+            CreateMap<GalaxyUser, DanielResponse>().ReverseMap();
 
             //Player Item
             CreateMap<PlayerItem, PlayerItemDto>().ReverseMap();
