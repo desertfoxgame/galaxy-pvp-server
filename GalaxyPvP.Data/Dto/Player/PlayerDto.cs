@@ -19,6 +19,5 @@ namespace GalaxyPvP.Data
         public short Tutorial { get; set; }
         public short isAdmin { get; set; }
         public short Developer { get; set; }
-
     }
 }
