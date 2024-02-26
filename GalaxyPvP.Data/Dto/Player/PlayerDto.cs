@@ -19,12 +19,5 @@ namespace GalaxyPvP.Data
         public short Tutorial { get; set; }
         public short isAdmin { get; set; }
         public short Developer { get; set; }
-
-        public PlayerUpdateDto GetUpdateDto(string nickname)
-        {
-            PlayerUpdateDto dto = new(nickname, Level, Exp, Trophy, Win, TotalGames, WinStreak, WinStreakCurrent, MVP);
-            return dto;
-        }
-
     }
 }

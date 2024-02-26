@@ -18,19 +18,5 @@ namespace GalaxyPvP.Data
         public int WinStreak { get; set; }
         public int WinStreakCurrent { get; set; }
         public int MVP { get; set; }
-        public long banTime { get; set; }
-
-        public PlayerUpdateDto(string nickname, int Level, int Exp, int Trophy, int Win, int TotalGames, int WinStreak, int WinStreakCurrent, int Mvp) 
-        {
-            this.Nickname = nickname;
-            this.Level = Level;
-            this.Exp = Exp;
-            this.Trophy = Trophy;
-            this.Win = Win;
-            this.TotalGames = TotalGames;
-            this.WinStreak = WinStreak;
-            this.WinStreakCurrent = WinStreakCurrent;
-            this.MVP = Mvp;
-        }
     }
 }
