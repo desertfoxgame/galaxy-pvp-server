@@ -4,6 +4,7 @@ using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.DTO;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
+using Microsoft.AspNet.SignalR.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -79,6 +80,27 @@ namespace GalaxyPvP.Api.Controllers
                 return ReturnFormatedResponse(userAuthorize);
             }
             
+        }
+
+        [HttpPut("UpdateNickName")]
+        [Authorize]
+        public async Task<IActionResult> UpdateNickName(string nickname)
+        {
+            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
+            if (userAuthorize.Success)
+            {
+                ApiResponse<PlayerDto> playerDto = await _dbPlayer.GetByUserId(userId);
+                PlayerUpdateDto updateDto = playerDto.Data.GetUpdateDto(nickname);
+                ApiResponse<PlayerUpdateDto> response = await _dbPlayer.Update(updateDto);
+                return ReturnFormatedResponse(response);
+            }
+            else
+            {
+                return ReturnFormatedResponse(userAuthorize);
+            }
         }
 
         [HttpPut("UpdatePlayer")]
