@@ -62,10 +62,23 @@ namespace GalaxyPvP.Api.Controllers
         //}
 
         [HttpPost("CreatePlayer")]
+        [Authorize]
         public async Task<IActionResult> CreatePlayer([FromBody] PlayerCreateDto createDto)
         {
-            ApiResponse<PlayerDto> response = await _dbPlayer.Create(createDto);
-            return ReturnFormatedResponse(response);
+            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
+            if (userAuthorize.Success)
+            {
+                ApiResponse<PlayerDto> response = await _dbPlayer.Create(userId, createDto);
+                return ReturnFormatedResponse(response);
+            }
+            else
+            {
+                return ReturnFormatedResponse(userAuthorize);
+            }
+            
         }
 
         [HttpPut("UpdatePlayer")]
