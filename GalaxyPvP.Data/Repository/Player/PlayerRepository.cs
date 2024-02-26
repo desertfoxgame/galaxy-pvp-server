@@ -367,18 +367,19 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<DanielResponse>> DanielGetPlayer(string userId)
+        public async Task<ApiResponse<DanielResponse>> DanielGetPlayer(string playerId)
         {
             try
             {
-                if(await Context.Set<Player>().FirstOrDefaultAsync(x => x.UserId == userId) == null)
+                var player = await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == playerId);
+                if (player == null)
                 {
                     return ApiResponse<DanielResponse>.ReturnFailed(404, "Notfound");
                 }
-                var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(x => x.Id == userId);
+                var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(x => x.Id == player.UserId);
                 DanielResponse response = new DanielResponse
                 {
-                    UserId = userId,
+                    UserId = user.Id,
                     WalletAddress = user.WalletAddress
                 };
 
