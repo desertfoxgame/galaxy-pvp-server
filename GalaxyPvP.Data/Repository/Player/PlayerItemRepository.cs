@@ -55,6 +55,7 @@ namespace GalaxyPvP.Data
                 }
 
                 PlayerItem item = new PlayerItem();
+                item.PlayerId = player.Id;
                 _mapper.Map(itemCreateDto, item);
                 item.CreatedAt = DateTime.Now;
                 item.UpdatedAt = DateTime.Now;
