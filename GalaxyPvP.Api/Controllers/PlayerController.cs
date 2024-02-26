@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Context;
+using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.DTO;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
@@ -92,9 +93,7 @@ namespace GalaxyPvP.Api.Controllers
             ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
             if (userAuthorize.Success)
             {
-                ApiResponse<PlayerDto> playerDto = await _dbPlayer.GetByUserId(userId);
-                PlayerUpdateDto updateDto = playerDto.Data.GetUpdateDto(nickname);
-                ApiResponse<PlayerUpdateDto> response = await _dbPlayer.Update(updateDto);
+                ApiResponse<UpdateNameDto> response = await _dbPlayer.UpdateNickName(userId, nickname);
                 return ReturnFormatedResponse(response);
             }
             else

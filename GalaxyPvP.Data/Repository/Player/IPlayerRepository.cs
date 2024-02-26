@@ -1,4 +1,5 @@
-﻿using GalaxyPvP.Data.Model;
+﻿using GalaxyPvP.Data.Dto.Player;
+using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 
 namespace GalaxyPvP.Data
@@ -18,6 +19,7 @@ namespace GalaxyPvP.Data
         Task<ApiResponse<List<PlayerDto>>> GetLeaderboard(int amount);
         Task<ApiResponse<PlayerDto>> UpdatePlayerTrophyByUserId(string userId, int trophy);
         Task<ApiResponse<PlayerDto>> UpdatePlayerTutorial(string userId);
+        Task<ApiResponse<UpdateNameDto>> UpdateNickName(string userId, string nickname);
 
     }
 }

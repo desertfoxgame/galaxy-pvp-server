@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GalaxyPvP.Data.Context;
+using GalaxyPvP.Data.Dto.Player;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -187,6 +188,8 @@ namespace GalaxyPvP.Data
             }
         }
 
+
+
         public async Task<ApiResponse<string>> GetPlayerEquipData(string playerId)
         {
             try
@@ -204,6 +207,28 @@ namespace GalaxyPvP.Data
             catch (Exception ex)
             {
                 return ApiResponse<string>.ReturnFailed(404, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<UpdateNameDto>> UpdateNickName(string userId, string nickname)
+        {
+            try
+            {
+                var player = Context.Set<Player>().FirstOrDefault(x => x.UserId == userId);
+                if (player == null)
+                {
+                    return ApiResponse<UpdateNameDto>.ReturnFailed(404, "Player not exist!");
+                }
+                else
+                {
+                    player.Nickname = nickname;
+                    await Context.SaveChangesAsync();
+                    return ApiResponse<UpdateNameDto>.ReturnResultWith200(new UpdateNameDto());
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<UpdateNameDto>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -337,6 +362,6 @@ namespace GalaxyPvP.Data
             }
         }
 
-       
+        
     }
 }
