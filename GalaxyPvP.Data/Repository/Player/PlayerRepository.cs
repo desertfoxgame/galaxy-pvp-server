@@ -221,9 +221,14 @@ namespace GalaxyPvP.Data
                 }
                 else
                 {
-                    player.Nickname = nickname;
-                    await Context.SaveChangesAsync();
-                    return ApiResponse<UpdateNameDto>.ReturnResultWith200(new UpdateNameDto());
+                    var playerByNickName = Context.Set<Player>().FirstOrDefault(x => x.Nickname == nickname);
+                    if (playerByNickName == null)
+                    {
+                        player.Nickname = nickname;
+                        await Context.SaveChangesAsync();
+                        return ApiResponse<UpdateNameDto>.ReturnResultWith200(new UpdateNameDto());
+                    } else
+                        return ApiResponse<UpdateNameDto>.ReturnFailed(404, "This name has been used");
                 }
             }
             catch (Exception ex)
