@@ -63,7 +63,7 @@ namespace GalaxyPvP.Data
             }
         }
 
-        public async Task<ApiResponse<PlayerDto>> Create(PlayerCreateDto playerCreateDto)
+        public async Task<ApiResponse<PlayerDto>> Create(string userId, PlayerCreateDto playerCreateDto)
         {
             try
             {
@@ -71,10 +71,15 @@ namespace GalaxyPvP.Data
                 {
                     return ApiResponse<PlayerDto>.ReturnFailed(404, "Create data is null");
                 }
-                if (await FindAsync(p => p.Nickname == playerCreateDto.Nickname || p.Id == playerCreateDto.Id) != null)
+                else if (await FindAsync(p => p.Nickname == playerCreateDto.Nickname || p.Id == playerCreateDto.Id) != null)
                 {
                     return ApiResponse<PlayerDto>.ReturnFailed(404, "Player exists");
                 }
+                else if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.UserId == userId) != null)
+                {
+                    return ApiResponse<PlayerDto>.ReturnFailed(404, "This user has already created player");
+                }
+
                 Player player = _mapper.Map<Player>(playerCreateDto);
                 if (string.IsNullOrEmpty(player.Id))
                 {
@@ -83,6 +88,8 @@ namespace GalaxyPvP.Data
                 player.CreatedAt = DateTime.Now;
                 player.UpdatedAt = DateTime.Now;
                 Add(player);
+                player.UserId = userId;
+                player.Tutorial = 1;
                 Context.SaveChanges();
                 PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
                 return ApiResponse<PlayerDto>.ReturnResultWith200(playerDTO);

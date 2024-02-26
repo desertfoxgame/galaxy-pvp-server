@@ -3,7 +3,7 @@ using GalaxyPvP.Extensions;
 
 namespace GalaxyPvP.Data
 {
-    public interface IPlayerRepository: IGenericRepository<Player>
+    public interface IPlayerRepository : IGenericRepository<Player>
     {
         Task<ApiResponse<PlayerDto>> GetByUserId(string userId);
         Task<ApiResponse<PageResponse<PlayerDto>>> GetAllPlayer(PageRequest request);
@@ -11,7 +11,7 @@ namespace GalaxyPvP.Data
         Task<ApiResponse<PlayerDto>> UpdatePlayerEquipData(string userId, string equipdata);
         Task<ApiResponse<PlayerDto>> GetByPlayerId(string playerId);
         Task<ApiResponse<PageResponse<PlayerDto>>> GetByPlayerNickname(PageRequest request, string nickname);
-        Task<ApiResponse<PlayerDto>> Create(PlayerCreateDto playerCreateDto);
+        Task<ApiResponse<PlayerDto>> Create(string userId, PlayerCreateDto playerCreateDto);
         Task<ApiResponse<PlayerUpdateDto>> Update(PlayerUpdateDto playerUpdateDto);
         Task<ApiResponse<PlayerDto>> Delete(string userId);
         Task<ApiResponse<int>> GetPlayerRank(string? userId);
