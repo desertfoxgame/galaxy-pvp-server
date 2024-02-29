@@ -35,10 +35,12 @@ namespace GalaxyPvP.Data
                 }
                 else
                 {
+                    // stage == 1 ---- friend list
+                    // stage == 2 ---- invite list
                     List<Friend> listFriend = Context.Set<Friend>()
                                                     .Include(f => f.Player1)
                                                     .Include(f => f.Player2)
-                                                    .Where(f => (f.Player1Id == playerId || f.Player2Id == playerId) && f.state == 1)
+                                                    .Where(f => (f.Player1Id == playerId || f.Player2Id == playerId) && (f.state == 1 || f.state == 0) && f.IsDeleted == false)
                                                     .ToList();
                     List<PlayerDto> list = new List<PlayerDto>();
                     foreach (var f in listFriend)

@@ -90,7 +90,41 @@ namespace GalaxyPvP.Data
                 player.UpdatedAt = DateTime.Now;
                 Add(player);
                 player.UserId = userId;
-                player.Tutorial = 1;
+                player.Tutorial = 0;
+                Context.SaveChanges();
+                PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
+                return ApiResponse<PlayerDto>.ReturnResultWith200(playerDTO);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<PlayerDto>.ReturnFailed(404, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<PlayerDto>> MigrateDataCreate(string userId, Player player)
+        {
+            try
+            {
+                if (player == null)
+                {
+                    return ApiResponse<PlayerDto>.ReturnFailed(404, "Create data is null");
+                }
+                else if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.UserId == userId) != null)
+                {
+                    return ApiResponse<PlayerDto>.ReturnFailed(404, "This user has already created player");
+                }
+                else if (await FindAsync(p => p.Id == player.Id) != null)
+                {
+                    return ApiResponse<PlayerDto>.ReturnFailed(404, "Player exists");
+                }
+                if (await FindAsync(p => p.Nickname == player.Nickname) != null)
+                {
+                    player.Nickname = player.Id;
+                }
+                player.CreatedAt = DateTime.Now;
+                player.UpdatedAt = DateTime.Now;
+                Add(player);
+                player.UserId = userId;
                 Context.SaveChanges();
                 PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
                 return ApiResponse<PlayerDto>.ReturnResultWith200(playerDTO);
@@ -390,6 +424,7 @@ namespace GalaxyPvP.Data
                 return ApiResponse<DanielResponse>.ReturnFailed(500, ex.Message);
             }
         }
+
         
     }
 }

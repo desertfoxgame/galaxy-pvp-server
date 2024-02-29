@@ -114,20 +114,15 @@ namespace GalaxyPvP.Data
                     }
                 }
 
-                PlayerCreateDto playerCreateDto = _mapper.Map<PlayerCreateDto>(player);
-                PlayerCreateDto playerDTO = _mapper.Map<PlayerCreateDto>(player);
-                ApiResponse<PlayerDto> createPlayerResponse = await _playerRepo.Create(newUser.Id, playerCreateDto);
-                if (createPlayerResponse.Success)
+                ApiResponse<PlayerDto> migrateDataCreate = await _playerRepo.MigrateDataCreate(newUser.Id, player);
+
+                if (migrateDataCreate.Success)
                 {
-                //    await EmailExtension.SendGridEmailAsync(request.Email,
-                //"Verify Code",
-                //$"Your verify code is: {verifycode}");
                     return ApiResponse<MigrateUserResponseDTO>.ReturnResultWith200(response);
                 }
                 else
                 {
-                    return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, createPlayerResponse.Errors);
-
+                    return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, migrateDataCreate.Errors);
                 }
 
             }
