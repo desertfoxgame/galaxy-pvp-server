@@ -21,6 +21,7 @@ namespace GalaxyPvP.Data
         Task<ApiResponse<PlayerDto>> UpdatePlayerTutorial(string userId);
         Task<ApiResponse<DanielResponse>> DanielGetPlayer(string playerId);
         Task<ApiResponse<UpdateNameDto>> UpdateNickName(string userId, string nickname);
+        Task<ApiResponse<PlayerDto>> MigrateDataCreate(string userId, Player player);
 
     }
 }

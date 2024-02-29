@@ -14,5 +14,6 @@ namespace GalaxyPvP.Data
         Task<ApiResponse<List<PlayerDto>>> GetFriendList(string playerId);
         Task<ApiResponse<int>> GetFriendNotification(string playerId);
         Task<ApiResponse<string>> UpdateFriendRequest(short state, FriendRequestDto friend);
+        Task <ApiResponse<string>> DeleteFriendRequest (FriendRequestDto friend);
     }
 }

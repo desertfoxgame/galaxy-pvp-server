@@ -50,5 +50,12 @@ namespace GalaxyPvP.Api.Controllers
             ApiResponse<int> response = await _repoFriend.GetFriendNotification(playerId);
             return ReturnFormatedResponse(response);
         }
+
+        [HttpPost("DeleteFriendRequest")]
+        public async Task<IActionResult> DeleteFriendRequest([FromBody] FriendRequestDto request)
+        {
+            ApiResponse<string> response = await _repoFriend.DeleteFriendRequest(request);
+            return ReturnFormatedResponse(response);
+        }
     }
 }

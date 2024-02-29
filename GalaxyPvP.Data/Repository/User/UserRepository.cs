@@ -13,6 +13,7 @@ using GalaxyPvP.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Azure.Core;
 using GalaxyPvP.Data.Model;
+using System.Text.RegularExpressions;
 
 namespace GalaxyPvP.Data.Repository.User
 {
@@ -103,6 +104,10 @@ namespace GalaxyPvP.Data.Repository.User
 
         public async Task<ApiResponse<UserDTO>> Register(RegisterRequestDTO request)
         {
+            if (!IsValidEmail(request.Email))
+            {
+                return ApiResponse<UserDTO>.ReturnFailed(400,"Invalid Email.");
+            }
             if (string.IsNullOrEmpty(request.Password))
             {
                 return ApiResponse<UserDTO>.Return409("Password is Empty.");
@@ -145,6 +150,13 @@ namespace GalaxyPvP.Data.Repository.User
             await _userManager.AddToRoleAsync(entity, "player");
 
             return ApiResponse<UserDTO>.ReturnResultWith200(_mapper.Map<UserDTO>(entity));
+        }
+
+        static bool IsValidEmail(string email)
+        {
+            string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            Regex regex = new Regex(pattern);
+            return regex.IsMatch(email);
         }
 
         public async Task<ApiResponse<string>> ForgotPassword(string email)

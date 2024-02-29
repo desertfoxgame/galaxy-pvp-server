@@ -3,6 +3,7 @@ using Azure.Core;
 using GalaxyPvP.Data.Context;
 using GalaxyPvP.Data.Model;
 using GalaxyPvP.Extensions;
+using Microsoft.AspNet.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -35,10 +36,12 @@ namespace GalaxyPvP.Data
                 }
                 else
                 {
+                    // stage == 1 ---- friend list
+                    // stage == 2 ---- invite list
                     List<Friend> listFriend = Context.Set<Friend>()
                                                     .Include(f => f.Player1)
                                                     .Include(f => f.Player2)
-                                                    .Where(f => (f.Player1Id == playerId || f.Player2Id == playerId) && f.state == 1)
+                                                    .Where(f => (f.Player1Id == playerId || f.Player2Id == playerId) && (f.state == 1 || f.state == 0) && f.IsDeleted == false)
                                                     .ToList();
                     List<PlayerDto> list = new List<PlayerDto>();
                     foreach (var f in listFriend)
@@ -162,6 +165,45 @@ namespace GalaxyPvP.Data
             catch (Exception ex)
             {
                 return ApiResponse<int>.ReturnFailed(404, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<string>> DeleteFriendRequest(FriendRequestDto request)
+        {
+            try
+            {
+                if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player1) == null)
+                {
+                    return ApiResponse<string>.ReturnFailed(404, "Player1 not exist!");
+                }
+                else if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player2) == null)
+                {
+                    return ApiResponse<string>.ReturnFailed(404, "Player2 not exist!");
+                }
+                else if (request.Player1 == request.Player2)
+                {
+                    return ApiResponse<string>.ReturnFailed(404, "Player1 and Player2 can't be the same Id!");
+                }
+                else
+                {
+                    Friend friendRequest = await Context.Set<Friend>().FirstOrDefaultAsync(x => (x.Player1Id == request.Player1 && x.Player2Id == request.Player2) ||
+                                                                                                (x.Player1Id == request.Player2 && x.Player2Id == request.Player1));
+                    if (friendRequest != null)
+                    {
+                        friendRequest.IsDeleted = true;
+                        friendRequest.UpdatedAt = DateTime.Now;
+                        Context.SaveChanges();
+                        return ApiResponse<string>.ReturnResultWith200("Successful!");
+                    }
+                    else
+                    {
+                        return ApiResponse<string>.ReturnFailed(404, "Friend Request not exist!");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(404, ex.Message);
             }
         }
     }
