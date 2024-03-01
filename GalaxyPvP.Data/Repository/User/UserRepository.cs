@@ -327,12 +327,12 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 if (userId == null)
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(404, "UserId Null");
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "UserId Null");
                 }
                 GalaxyUser? user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(x => x.Id == userId);
                 if (user == null)
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(404, "User not exist!");
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "User not exist!");
                 }
                 if (token == user.Token)
                 {
@@ -340,12 +340,12 @@ namespace GalaxyPvP.Data.Repository.User
                 }
                 else
                 {
-                    return ApiResponse<UserDTO>.ReturnFailed(404, "UnAuthorized");
+                    return ApiResponse<UserDTO>.ReturnFailed(401, "UnAuthorized");
                 }
             }
             catch (Exception ex)
             {
-                return ApiResponse<UserDTO>.ReturnFailed(404, ex.Message);
+                return ApiResponse<UserDTO>.ReturnFailed(401, ex.Message);
             }
         }
 
