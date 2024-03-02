@@ -71,21 +71,28 @@ namespace GalaxyPvP.Data
                 Player player2 = await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player2 || x.Nickname == request.Player2);
                 if ( player2 == null)
                 {
-                    return ApiResponse<string>.ReturnFailed(404, "Player2 not exist!");
+                    return ApiResponse<string>.ReturnFailed(404, "Player does not exist!");
                 }
                 string player2Id = player2.Id;
+                Friend friend = await Context.Set<Friend>().FirstOrDefaultAsync(x => (x.Player1Id == request.Player1 && x.Player2Id == player2Id) ||
+                                                                        (x.Player1Id == player2Id && x.Player2Id == request.Player1));
+                if (friend != null)
+                {
+                    if (friend.IsDeleted)
+                    {
+                        return ApiResponse<string>.ReturnFailed(404, "Player does not exist!");
+                    } else if (friend.state == 0)
+                    {
+                        return ApiResponse<string>.ReturnFailed(404, "Request has been sent!");
+                    }
+                }
                 if (await Context.Set<Player>().FirstOrDefaultAsync(x => x.Id == request.Player1) == null)
                 {
-                    return ApiResponse<string>.ReturnFailed(404, "Player1 not exist!");
-                }
-                else if (await Context.Set<Friend>().FirstOrDefaultAsync(x => (x.Player1Id == request.Player1 && x.Player2Id == player2Id) ||
-                                                                        (x.Player1Id == player2Id && x.Player2Id == request.Player1)) != null)
-                {
-                    return ApiResponse<string>.ReturnFailed(404, "Request has been sent!");
+                    return ApiResponse<string>.ReturnFailed(404, "Player does not exist!");
                 }
                 else if (request.Player1 == player2Id)
                 {
-                    return ApiResponse<string>.ReturnFailed(404, "Player1 and Player2 can't be the same Id!");
+                    return ApiResponse<string>.ReturnFailed(404, "Invalid friend account id");
                 }
                 else
                 {
