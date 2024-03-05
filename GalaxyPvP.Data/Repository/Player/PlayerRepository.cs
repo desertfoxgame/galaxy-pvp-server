@@ -68,6 +68,7 @@ namespace GalaxyPvP.Data
         {
             try
             {
+                var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(x => x.Id == userId);
                 if (playerCreateDto == null)
                 {
                     return ApiResponse<PlayerDto>.ReturnFailed(404, "Create data is null");
@@ -91,6 +92,7 @@ namespace GalaxyPvP.Data
                 Add(player);
                 player.UserId = userId;
                 player.Tutorial = 0;
+                user.PlayfabId = player.Id;
                 Context.SaveChanges();
                 PlayerDto playerDTO = _mapper.Map<PlayerDto>(player);
                 return ApiResponse<PlayerDto>.ReturnResultWith200(playerDTO);
