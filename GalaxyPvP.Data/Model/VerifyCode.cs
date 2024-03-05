@@ -13,6 +13,7 @@ namespace GalaxyPvP.Data.Model
         public string UserId { get; set; }
         [MaxLength(20)]
         public string Code { get; set; }
+        public DateTime ExpiresAt { get; set; } = DateTime.UtcNow;
 
     }
 }
