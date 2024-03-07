@@ -23,8 +23,7 @@ namespace GalaxyPvP.Data
         public short Tutorial {  get; set; }
         public short isAdmin {  get; set; }
         public short Developer {  get; set; }
+        public string Verification { get; set; }
         public string[] PlayerItems {  get; set; }
-
-        ///foreach string => get dataid, dataid => create item
     }
 }

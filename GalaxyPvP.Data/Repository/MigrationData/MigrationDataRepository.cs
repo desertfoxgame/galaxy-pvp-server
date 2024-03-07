@@ -55,52 +55,46 @@ namespace GalaxyPvP.Data
         {
             try
             {
-                MigrateUserResponseDTO response = new MigrateUserResponseDTO();
+                MigrateUserResponseDTO response = new();
                 _mapper.Map(request, response);
-                response.PlayerItemsCantCreate = new List<string>();
+                response.PlayerItemsCantCreate = [];
 
+                // Create user using playfab data
                 RegisterRequestDTO registerDto = _mapper.Map<RegisterRequestDTO>(request);
-
                 string password = GenerateExtension.GeneratePassword(16);
                 registerDto.UserName = registerDto.Email;
                 registerDto.Password = password;
-
-                var user = await _userRepo.Register(registerDto);
+                var user = await _userRepo.RegisterWithEmail(registerDto);
                 if (!user.Success)
-                {
                     return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, user.Errors);
-                }
 
-                var verifycode = await _userRepo.ForgotPassword(request.Email);
+                await _userRepo.ForgotPassword(request.Email); // Send reset password to email
 
+                // Create Pvp player using playfab data
                 Player player = _mapper.Map<Player>(request);
-
-
                 var newUser = _userRepo.FindBy(x => x.Email == request.Email).FirstOrDefault();
+                newUser.EmailConfirmed = request.Verification == "Pending" ? false : true; // Email confirm with verification from playfab
                 player.Id = request.PlayfabID;
                 player.UserId = newUser.Id;
 
+                // Create Player Item from playfab inventory
                 foreach (string name in request.PlayerItems)
                 {
-                    int dataId = 0;
-                    if (await Context.Set<ItemDataMigration>().FirstOrDefaultAsync(x => x.Name == name) != null)
+                    int dataId = await GetItemDataId(name);
+                    if (dataId != 0)
                     {
-                        dataId = Context.Set<ItemDataMigration>().FirstOrDefault(x => x.Name == name).DataId;
-
-                        PlayerItemCreateDto itemCreateDto = new PlayerItemCreateDto();
-                        itemCreateDto.DataId = dataId;
-
-                        if (itemCreateDto == null)
+                        PlayerItemCreateDto itemCreateDto = new()
                         {
-                            response.PlayerItemsCantCreate.Add(name);
-                        }
-                        if (await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.DataId == itemCreateDto.DataId && p.PlayerId == player.Id) != null)
+                            DataId = dataId
+                        };
+
+                        if (await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.PlayerId == player.Id && p.DataId == itemCreateDto.DataId) != null)
                         {
                             response.PlayerItemsCantCreate.Add(name);
                         }
                         else
                         {
-                            PlayerItem item = new PlayerItem();
+                            PlayerItem item = new ();
                             _mapper.Map(itemCreateDto, item);
                             item.PlayerId = player.Id;
                             item.CreatedAt = DateTime.Now;
@@ -109,22 +103,16 @@ namespace GalaxyPvP.Data
                         }
                     }
                     else
-                    {
                         response.PlayerItemsCantCreate.Add(name);
-                    }
                 }
-
+                await Context.SaveChangesAsync();
+                // Create player
                 ApiResponse<PlayerDto> migrateDataCreate = await _playerRepo.MigrateDataCreate(newUser.Id, player);
 
                 if (migrateDataCreate.Success)
-                {
                     return ApiResponse<MigrateUserResponseDTO>.ReturnResultWith200(response);
-                }
                 else
-                {
                     return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, migrateDataCreate.Errors);
-                }
-
             }
             catch (Exception ex)
             {
@@ -132,17 +120,11 @@ namespace GalaxyPvP.Data
             }
         }
 
-        int GetItemDataId(string name)
+        async Task<int> GetItemDataId(string name)
         {
-            List<DataItemCSV> data = GetListDataItemCsv();
-            foreach (DataItemCSV item in data)
-            {
-                if (item.Name == name)
-                {
-                    return item.Id;
-                }
-            }
-            return 0;
+            var itemData = await Context.Set<ItemDataMigration>().FirstOrDefaultAsync(x => x.Name == name);
+            if (itemData == null) return 0;
+            return itemData.DataId;
         }
 
         public static List<DataItemCSV> GetListDataItemCsv()
@@ -186,28 +168,29 @@ namespace GalaxyPvP.Data
             try
             {
                 var user = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(x => x.Email == email);
-
+                if (user == null) return ApiResponse<string>.Return404("User not found");
                 Player player = await Context.Set<Player>().Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
 
                 if (player != null)
                 {
-                    List<PlayerItem> listItem = new List<PlayerItem>();
+                    // Remove player item
+                    List<PlayerItem> listItem = [];
                     listItem = await Context.Set<PlayerItem>().Where(x => x.PlayerId == player.Id).ToListAsync();
-
                     if (listItem.Count > 0)
-                    {
                         Context.Set<PlayerItem>().RemoveRange(listItem);
 
-                    }
+                    // Remove player friend
+                    List<Friend> listFriend = [];
+                    listFriend = await Context.Set<Friend>().Where(x => x.Player1Id == player.Id || x.Player2Id == player.Id).ToListAsync();
+                    if (listFriend?.Count > 0)
+                        Context.Set<Friend>().RemoveRange(listFriend);
 
+                    // Remove player
                     Context.Set<Player>().Remove(player);
                 }
 
-                if(user != null)
-                {
-                    Context.Set<GalaxyUser>().Remove(user);
-                }
-
+                // Remove User
+                Context.Set<GalaxyUser>().Remove(user);
                 Context.SaveChanges();
 
                 return ApiResponse<string>.ReturnResultWith200("Successful!");

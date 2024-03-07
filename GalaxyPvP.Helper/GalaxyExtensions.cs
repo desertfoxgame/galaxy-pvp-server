@@ -6,6 +6,7 @@ namespace GalaxyPvP.Helper
 {
     public class GalaxyExtensions
     {
+        public static string AdminApiKey;
         public static List<T> GetListDataCsv<T>() where T : new ()
         {
             // Get the current directory of the application

@@ -1,3 +1,4 @@
+using GalaxyPvP.Api.Controllers;
 using GalaxyPvP.Api.Helpers.Mapping;
 using GalaxyPvP.Api.Hubs;
 using GalaxyPvP.Api.Services;
@@ -49,11 +50,18 @@ builder.Services.AddScoped<IGameConfigRepository, GameConfigRepository>();
 builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 builder.Services.AddScoped<IMatchResultRepository, MatchResultRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
-builder.Services.AddScoped<IUserStore<GalaxyUser>, CustomUserStore>();
+//builder.Services.AddScoped<IUserStore<GalaxyUser>, CustomUserStore>();
 builder.Services.AddScoped<UserInfoToken>(c => new UserInfoToken() { Id = "" });
 
 //builder.Services.AddIdentity<GalaxyUser, IdentityRole>().AddEntityFrameworkStores<GalaxyPvPContext>();
-builder.Services.AddIdentity<GalaxyUser, IdentityRole>()
+builder.Services.AddIdentity<GalaxyUser, IdentityRole>(options => 
+    {
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 6;
+    })
     .AddEntityFrameworkStores<GalaxyPvPContext>()
     .AddDefaultTokenProviders();
 builder.Services.AddResponseCaching();
@@ -87,7 +95,7 @@ PlayFabSettings.staticSettings.DeveloperSecretKey = builder.Configuration.GetVal
 EmailExtension.SendGridEmail = builder.Configuration.GetValue<string>("SendGridEmail");
 EmailExtension.SendGridKey = builder.Configuration.GetValue<string>("SendGridApiKey");
 EmailExtension.SendGridPass = builder.Configuration.GetValue<string>("SendGridPass");
-
+GalaxyExtensions.AdminApiKey = builder.Configuration.GetValue<string>("AdminApiKey");
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

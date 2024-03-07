@@ -4,6 +4,7 @@ using GalaxyPvP.Data;
 using GalaxyPvP.Data.Dto.MigrationDB;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
+using GalaxyPvP.Helper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GalaxyPvP.Api.Controllers
@@ -59,8 +60,13 @@ namespace GalaxyPvP.Api.Controllers
         [HttpDelete("DeleteMigrateUser")]
         public async Task<IActionResult> DeleteMigrateUser(string email)
         {
-            ApiResponse<string> response = await _migrationDataRepo.DeleteMigrationUser(email);
-            return ReturnFormatedResponse(response);
+            string adminApiKey = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (adminApiKey == "a0c98b44-f0a3-40c0-9ea4-f75095c8fa14") //GalaxyExtensions.AdminApiKey)
+            {
+                ApiResponse<string> response = await _migrationDataRepo.DeleteMigrationUser(email);
+                return ReturnFormatedResponse(response);
+            } else return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "UnAuthorized"));
+
         }
     }
 }

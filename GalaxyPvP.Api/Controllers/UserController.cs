@@ -1,10 +1,12 @@
 ﻿using Azure.Core;
 using GalaxyPvP.Data;
+using GalaxyPvP.Data.Dto;
 using GalaxyPvP.Data.Dto.MigrationDB;
 using GalaxyPvP.Data.Dto.User;
 using GalaxyPvP.Data.DTO;
 using GalaxyPvP.Data.Repository.User;
 using GalaxyPvP.Extensions;
+using GalaxyPvP.Helper;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -87,6 +89,7 @@ namespace GalaxyPvP.Api.Controllers
                 string email = model.Email;
                 string nickname = profile.DisplayName ?? string.Empty;
                 string walletaddress = readonlyData.TryGetValue("publicaddress", out UserDataRecord? wallet) ? wallet.Value : string.Empty;
+                string verification = readonlyData.TryGetValue("verification", out UserDataRecord? vefiry) ? vefiry.Value : "Pending";
 
                 string currentWinStreaks = userData.TryGetValue("CurrentWinStreaks", out UserDataRecord? CurrentWinStreaks) ? CurrentWinStreaks.Value : "0";
                 string mvp = userData.TryGetValue("MVP", out UserDataRecord? MVP) ? MVP.Value : "0";
@@ -117,43 +120,46 @@ namespace GalaxyPvP.Api.Controllers
                 }
 
                 // Migrate data and return response here
-                MigrateUserRequestDTO migrationRequestDTO = new MigrateUserRequestDTO();
-                migrationRequestDTO.PlayfabID = playfabId;
-                migrationRequestDTO.Email = email;
-                migrationRequestDTO.Nickname = nickname;
-                migrationRequestDTO.WalletAddress = walletaddress;
-                migrationRequestDTO.Win = int.Parse(winGames);
-                migrationRequestDTO.TotalGames = int.Parse(totalGames);
-                migrationRequestDTO.MVP = int.Parse(mvp);
-                migrationRequestDTO.WinStreak = int.Parse(winStreaks);
-                migrationRequestDTO.WinStreakCurrent = int.Parse(currentWinStreaks);
-                migrationRequestDTO.PlayerItems = playerItems;
-                migrationRequestDTO.EquipData = equip;
-                migrationRequestDTO.Trophy = trophy;
-                migrationRequestDTO.Tutorial = short.Parse(tutorial);
-                migrationRequestDTO.isAdmin = short.Parse(isAdmin);
-                migrationRequestDTO.Developer = short.Parse(developer);
+                MigrateUserRequestDTO migrationRequestDTO = new()
+                {
+                    PlayfabID = playfabId,
+                    Email = email,
+                    Nickname = nickname,
+                    WalletAddress = walletaddress,
+                    Win = int.Parse(winGames),
+                    TotalGames = int.Parse(totalGames),
+                    MVP = int.Parse(mvp),
+                    WinStreak = int.Parse(winStreaks),
+                    WinStreakCurrent = int.Parse(currentWinStreaks),
+                    PlayerItems = playerItems,
+                    EquipData = equip,
+                    Trophy = trophy,
+                    Tutorial = short.Parse(tutorial),
+                    isAdmin = short.Parse(isAdmin),
+                    Developer = short.Parse(developer),
+                    Verification = verification,
+                };
 
                 ApiResponse<MigrateUserResponseDTO> response = await _migrationDataRepo.MigrationUser(migrationRequestDTO);
                 if(response.Success)
-                {
-                    // send verify code
-
-                    //return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith200("Success!"));
                     return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith201(""));
-                }
                 else
-                {
                     return ReturnFormatedResponse(ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, response.Errors));
-                }
             }
             return ReturnFormatedResponse(loginResponse);
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequestDTO model)
+        public async Task<IActionResult> RegisterWithEmail([FromBody] RegisterRequestDTO model)
         {
-            var user = await _userRepo.Register(model);
+            var user = await _userRepo.RegisterWithEmail(model);
+            return ReturnFormatedResponse(user);
+        }
+
+        [HttpPost("registerWithWallet")]
+        public async Task<IActionResult> RegisterWithWallet([FromBody] RegisterRequestDTO model)
+        {
+            var user = await _userRepo.RegisterWithWallet(model);
             return ReturnFormatedResponse(user);
         }
 
@@ -168,6 +174,13 @@ namespace GalaxyPvP.Api.Controllers
         public async Task<IActionResult> ResetPassword(string verifyCode, string newPassword)
         {
             var user = await _userRepo.ResetPassword(verifyCode, newPassword);
+            return ReturnFormatedResponse(user);
+        }
+
+        [HttpPost("verification")]
+        public async Task<IActionResult> Verification(string verifycode)
+        {
+            var user = await _userRepo.Verificantion(verifycode);
             return ReturnFormatedResponse(user);
         }
 
@@ -189,21 +202,5 @@ namespace GalaxyPvP.Api.Controllers
                 return ReturnFormatedResponse(userAuthorize);
             }
         }
-
-        //[HttpGet("GetByEmail")]
-        //[Authorize]
-        //public async Task<IActionResult> GetByEmail(string userEmail)
-        //{
-        //    var user = await _userRepo.GetByEmail(userEmail);
-        //    return ReturnFormatedResponse(user);
-        //}
-
-        //[HttpGet("GetByUserName")]
-        //[Authorize]
-        //public async Task<IActionResult> GetByUserName(string userName)
-        //{
-        //    var user = await _userRepo.GetByUserName(userName);
-        //    return ReturnFormatedResponse(user);
-        //}
     }
 }

@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using Azure.Core;
 using GalaxyPvP.Data.Model;
 using System.Text.RegularExpressions;
+using Microsoft.AspNet.SignalR;
+using GalaxyPvP.Data.Dto;
 
 namespace GalaxyPvP.Data.Repository.User
 {
@@ -23,6 +25,7 @@ namespace GalaxyPvP.Data.Repository.User
         private readonly RoleManager<IdentityRole> _roleManager;
         private string secretKey;
         private readonly IMapper _mapper;
+        private enum InfoType { email, username, wallet };
 
         public UserRepository(GalaxyPvPContext db, IConfiguration configuration,
             UserManager<GalaxyUser> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager) : base(db)
@@ -98,25 +101,78 @@ namespace GalaxyPvP.Data.Repository.User
             }
 
             loginResponseDTO.Items = playerItems;
-
             return ApiResponse<LoginResponseDTO>.ReturnResultWith200(loginResponseDTO);
         }
 
-        public async Task<ApiResponse<UserDTO>> Register(RegisterRequestDTO request)
+        public async Task<ApiResponse<LoginResponseDTO>> LoginWithWallet(LoginRequestDTO request)
+        {
+            if (string.IsNullOrEmpty(request.WalletAddress))
+                return ApiResponse<LoginResponseDTO>.ReturnFailed(404, "Wallet address invalid.");
+
+            var user = Context.GalaxyUsers.FirstOrDefault(u => u.WalletAddress == request.WalletAddress);
+            if (user == null)
+                return ApiResponse<LoginResponseDTO>.ReturnFailed(404, "Wallet address is InCorrect.");
+            var roles = await _userManager.GetRolesAsync(user);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(secretKey);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    new Claim("UserName", user.UserName),
+                    new Claim(ClaimTypes.Role, roles.FirstOrDefault())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            Player player = Context.Set<Player>().FirstOrDefault(x => x.UserId == user.Id);
+            List<PlayerItem> playerItems = new List<PlayerItem>();
+            if (player != null)
+            {
+                playerItems = Context.Set<PlayerItem>().Where(x => x.PlayerId == player.Id).ToList();
+            }
+
+            LoginResponseDTO loginResponseDTO = new LoginResponseDTO()
+            {
+                Token = tokenHandler.WriteToken(token),
+                User = _mapper.Map<UserDTO>(user),
+                Role = roles.FirstOrDefault(),
+            };
+
+            user.Token = loginResponseDTO.Token;
+            await Context.SaveChangesAsync();
+
+            if (player != null)
+            {
+                loginResponseDTO.Player = _mapper.Map<PlayerDto>(player);
+                loginResponseDTO.Player.WalletAddress = user.WalletAddress;
+            }
+
+            loginResponseDTO.Items = playerItems;
+            return ApiResponse<LoginResponseDTO>.ReturnResultWith200(loginResponseDTO);
+        }
+
+        public async Task<ApiResponse<UserDTO>> RegisterWithEmail(RegisterRequestDTO request)
         {
             if (!IsValidEmail(request.Email))
-            {
-                return ApiResponse<UserDTO>.ReturnFailed(400,"Invalid Email.");
-            }
+                return ApiResponse<UserDTO>.ReturnFailed(400, "Invalid Email.");
+
             if (string.IsNullOrEmpty(request.Password))
-            {
                 return ApiResponse<UserDTO>.Return409("Password is Empty.");
-            }
-            var existUser = await _userManager.FindByEmailAsync(request.Email);
-            if (existUser != null)
-            {
-                return ApiResponse<UserDTO>.Return409("Email is already exist.");
-            }
+
+            if (await UserExists(request.Email, InfoType.email))
+                return ApiResponse<UserDTO>.Return409("Email is already in use");
+
+            if (await UserExists(request.UserName, InfoType.username))
+                return ApiResponse<UserDTO>.Return409("Username is already in use");
+
+            if (await UserExists(request.WalletAddress, InfoType.wallet))
+                return ApiResponse<UserDTO>.Return409("Wallet address is already in use");
+            
 
             GalaxyUser entity = new()
             {
@@ -128,6 +184,7 @@ namespace GalaxyPvP.Data.Repository.User
             };
 
             IdentityResult result = await _userManager.CreateAsync(entity, request.Password);
+
             if (!result.Succeeded)
             {
                 string error = "";
@@ -137,16 +194,56 @@ namespace GalaxyPvP.Data.Repository.User
                 }
                 return ApiResponse<UserDTO>.ReturnFailed(400, error);
             }
+
+            var newUser = await _userManager.FindByEmailAsync(request.Email);
+
+            await SendVerifyCode(request.Email, newUser.Id);
+
             if (!_roleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
-            {
                 await _roleManager.CreateAsync(new IdentityRole("admin"));
+            if (!_roleManager.RoleExistsAsync("moderator").GetAwaiter().GetResult())
                 await _roleManager.CreateAsync(new IdentityRole("moderator"));
-                await _roleManager.CreateAsync(new IdentityRole("player"));
-            }
             if (!_roleManager.RoleExistsAsync("player").GetAwaiter().GetResult())
-            {
                 await _roleManager.CreateAsync(new IdentityRole("player"));
+
+            await _userManager.AddToRoleAsync(entity, "player");
+            await Context.SaveChangesAsync();
+            return ApiResponse<UserDTO>.ReturnResultWith200(_mapper.Map<UserDTO>(entity));
+        }
+
+        public async Task<ApiResponse<UserDTO>> RegisterWithWallet(RegisterRequestDTO request)
+        {
+            if (string.IsNullOrEmpty(request.WalletAddress))
+                return ApiResponse<UserDTO>.ReturnFailed(400, "Invalid wallet address.");
+
+            if (await UserExists(request.WalletAddress, InfoType.wallet))
+                return ApiResponse<UserDTO>.ReturnFailed(400, "Wallet address has been registered to the account.");
+
+            string username = request.WalletAddress.Substring(0, 6) + "..."
+                + request.WalletAddress.Substring(request.WalletAddress.Length - 4,4);
+            GalaxyUser entity = new()
+            {
+                UserName = username,
+                WalletAddress = request.WalletAddress
+            };
+            IdentityResult result = await _userManager.CreateAsync(entity);
+            if (!result.Succeeded)
+            {
+                string error = "";
+                foreach (IdentityError e in result.Errors)
+                {
+                    error += e.Description + "\n";
+                }
+                return ApiResponse<UserDTO>.ReturnFailed(400, error);
             }
+
+            if (!_roleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
+                await _roleManager.CreateAsync(new IdentityRole("admin"));
+            if (!_roleManager.RoleExistsAsync("moderator").GetAwaiter().GetResult())
+                await _roleManager.CreateAsync(new IdentityRole("moderator"));
+            if (!_roleManager.RoleExistsAsync("player").GetAwaiter().GetResult())
+                await _roleManager.CreateAsync(new IdentityRole("player"));
+
             await _userManager.AddToRoleAsync(entity, "player");
 
             return ApiResponse<UserDTO>.ReturnResultWith200(_mapper.Map<UserDTO>(entity));
@@ -169,31 +266,11 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 GalaxyUser user = await Context.Users.FirstOrDefaultAsync(x => x.Email == email.Trim());
                 if (user == null)
-                {
                     return ApiResponse<string>.Return409("Email user not exist!");
 
-                }
-                VerifyCode existCode = await Context.VerifyCodes.FirstOrDefaultAsync(x => x.UserId == user.Id);
-                string verifyCode = GenerateExtension.GenerateID(16);
-
-                if (existCode == null)
-                {
-                    VerifyCode userCode = new VerifyCode();
-                    userCode.UserId = user.Id;
-                    userCode.Code = verifyCode;
-                    Context.VerifyCodes.Add(userCode);
-                }
-                else
-                {
-                    existCode.Code = verifyCode;
-                }
-
+                await SendVerifyCode(email, user.Id);
                 await Context.SaveChangesAsync();
-                await EmailExtension.SendGridEmailAsync(email,
-                "Verify Code",
-                verifyCode);
-
-                return ApiResponse<string>.ReturnResultWith200(verifyCode);
+                return ApiResponse<string>.ReturnResultWith200("Success!");
             }
             catch (Exception ex)
             {
@@ -207,17 +284,12 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 VerifyCode userCode = await Context.VerifyCodes.FirstOrDefaultAsync(x => x.Code == verifyCode);
                 if (userCode == null)
-                {
-                    return ApiResponse<string>.Return409("Verify Code not exist!");
-
-                }
+                    return ApiResponse<string>.Return409("Verify Code not exists!");
                 GalaxyUser user = await Context.Users.FirstOrDefaultAsync(x => x.Id == userCode.UserId);
-
                 string password = newPassword;
                 user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, password);
-
+                Context.VerifyCodes.Remove(userCode);
                 await Context.SaveChangesAsync();
-
                 return ApiResponse<string>.ReturnResultWith200("Success!");
             }
             catch (Exception ex)
@@ -269,7 +341,6 @@ namespace GalaxyPvP.Data.Repository.User
             catch (Exception ex)
             {
                 return ApiResponse<UserDTO>.ReturnFailed(404, ex.Message);
-
             }
         }
 
@@ -409,6 +480,101 @@ namespace GalaxyPvP.Data.Repository.User
             {
                 return ApiResponse<UserDTO>.ReturnFailed(404, ex.Message);
             }
+        }
+
+        public async Task<ApiResponse<string>> Verificantion(string verifycode)
+        {
+            try
+            {
+                var userCode = await Context.VerifyCodes.FirstOrDefaultAsync(x => x.Code == verifycode);
+                if (userCode == null)
+                    return ApiResponse<string>.Return409("Verify Code not exists!");
+                GalaxyUser user = await Context.Users.FirstOrDefaultAsync(x => x.Id == userCode.UserId);
+                user.EmailConfirmed = true;
+                Context.VerifyCodes.Remove(userCode);
+                await Context.SaveChangesAsync();
+                return ApiResponse<string>.ReturnResultWith200("Success!");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(404, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<string>> UpdateWalletToUser(UpdateUserWalletDTO request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.Email))
+                    return ApiResponse<string>.ReturnFailed(400, "Invalid Email.");
+                if (await UserExists(request.Wallet, InfoType.wallet))
+                    return ApiResponse<string>.ReturnFailed(400, "Wallet address has been registered to another account.");
+
+                var user = Context.GalaxyUsers.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower());
+                if (user == default)
+                    return ApiResponse<string>.ReturnFailed(400, "Invalid Email.");
+
+                user.WalletAddress = request.Wallet;
+                await Context.SaveChangesAsync();
+                return ApiResponse<string>.ReturnResultWith200("Success!");
+            } catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(404, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<string>> UpdateEmailToUser(UpdateUserWalletDTO request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.Wallet))
+                    return ApiResponse<string>.ReturnFailed(400, "Invalid wallet address.");
+                if (await UserExists(request.Email, InfoType.email))
+                    return ApiResponse<string>.ReturnFailed(400, "Email has been registered to another account.");
+
+                var user = Context.GalaxyUsers.FirstOrDefault(u => u.WalletAddress == request.Wallet);
+                if (user == default)
+                    return ApiResponse<string>.ReturnFailed(400, "Invalid wallet address.");
+
+                await SendVerifyCode(request.Email, user.Id);
+                await Context.SaveChangesAsync();
+                return ApiResponse<string>.ReturnResultWith200("Success!");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(404, ex.Message);
+            }
+        }
+
+        private async Task<bool> UserExists(string info, InfoType infoType)
+        {
+            if (info.IsNullOrEmpty()) return false;
+            return infoType switch
+            {
+                InfoType.email => await _userManager.FindByEmailAsync(info) != null,
+                InfoType.username => await _userManager.FindByNameAsync(info) != null,
+                InfoType.wallet => await Context.Users.FirstOrDefaultAsync(x => x.WalletAddress == info) != null,
+                _ => false,
+            };
+        }
+
+        private async Task SendVerifyCode(string email, string userId)
+        {
+            VerifyCode existCode = await Context.VerifyCodes.FirstOrDefaultAsync(x => x.UserId == userId);
+            string verifyCode = GenerateExtension.GenerateID(16);
+
+            if (existCode == null)
+            {
+                VerifyCode userCode = new VerifyCode();
+                userCode.UserId = userId;
+                userCode.Code = verifyCode;
+                Context.VerifyCodes.Add(userCode);
+            }
+            else
+            {
+                existCode.Code = verifyCode;
+            }
+            await EmailExtension.SendGridEmailAsync(email, "Verify Code", verifyCode);
         }
     }
 }
