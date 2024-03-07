@@ -24,6 +24,7 @@ namespace GalaxyPvP.Data.Model
         public short Tutorial { get; set; }
         public short isAdmin { get; set; }
         public short Developer { get; set; }
+        public bool ConfirmTermsOfService { get; set; }
 
         public GalaxyUser User { get; set; }
         public ICollection<Friend> FriendsAsPlayer1 { get; set; }

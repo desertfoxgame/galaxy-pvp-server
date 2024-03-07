@@ -47,22 +47,6 @@ namespace GalaxyPvP.Api.Controllers
             }
         }
 
-        //[HttpGet("GetPlayerByUserId")]
-        //[Authorize]
-        //public async Task<IActionResult> GetPlayerByUserId(string userId)
-        //{
-        //    ApiResponse<PlayerDto> response = await _dbPlayer.GetByUserId(userId);
-        //    return ReturnFormatedResponse(response);
-        //}
-
-        //[HttpGet("GetPlayerByPlayerId")]
-        //[Authorize]
-        //public async Task<IActionResult> GetPlayerByPlayerId(string playerId)
-        //{
-        //    ApiResponse<PlayerDto> response = await _dbPlayer.GetByPlayerId(playerId);
-        //    return ReturnFormatedResponse(response);
-        //}
-
         [HttpPost("CreatePlayer")]
         [Authorize]
         public async Task<IActionResult> CreatePlayer([FromBody] PlayerCreateDto createDto)
