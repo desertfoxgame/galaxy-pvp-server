@@ -50,10 +50,7 @@ builder.Services.AddScoped<IGameConfigRepository, GameConfigRepository>();
 builder.Services.AddScoped<IFriendRepository, FriendRepository>();
 builder.Services.AddScoped<IMatchResultRepository, MatchResultRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
-//builder.Services.AddScoped<IUserStore<GalaxyUser>, CustomUserStore>();
 builder.Services.AddScoped<UserInfoToken>(c => new UserInfoToken() { Id = "" });
-
-//builder.Services.AddIdentity<GalaxyUser, IdentityRole>().AddEntityFrameworkStores<GalaxyPvPContext>();
 builder.Services.AddIdentity<GalaxyUser, IdentityRole>(options => 
     {
         options.Password.RequireDigit = false;

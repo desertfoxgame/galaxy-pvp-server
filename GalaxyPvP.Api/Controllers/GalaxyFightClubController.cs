@@ -34,18 +34,18 @@ namespace GalaxyPvP.Api.Controllers
             _migrationDataRepo = migrationDataRepo;
         }
 
-        [HttpGet("loginWithWallet")]
-        public async Task<IActionResult> LoginWithWallet([FromBody] LoginRequestDTO request)
-        {
-            string adminApiKey = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            if (adminApiKey == "a0c98b44-f0a3-40c0-9ea4-f75095c8fa14")  //GalaxyExtensions.AdminApiKey) 
-            {
-                var user = await _userRepo.LoginWithWallet(request);
-                return ReturnFormatedResponse(user);
-            }
-            else
-                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "UnAuthorized"));
-        }
+        //[HttpGet("loginWithWallet")]
+        //public async Task<IActionResult> LoginWithWallet([FromBody] LoginRequestDTO request)
+        //{
+        //    string adminApiKey = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        //    if (adminApiKey == GalaxyExtensions.AdminApiKey) 
+        //    {
+        //        var user = await _userRepo.LoginWithWallet(request);
+        //        return ReturnFormatedResponse(user);
+        //    }
+        //    else
+        //        return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "UnAuthorized"));
+        //}
 
         [HttpPost("registerWithEmail")]
         public async Task<IActionResult> RegisterWithEmail([FromBody] RegisterRequestDTO model)
@@ -64,7 +64,7 @@ namespace GalaxyPvP.Api.Controllers
         public async Task<IActionResult> RegisterWithWallet([FromBody] RegisterRequestDTO model)
         {
             string adminApiKey = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            if (adminApiKey == "a0c98b44-f0a3-40c0-9ea4-f75095c8fa14")  //GalaxyExtensions.AdminApiKey) 
+            if (adminApiKey == GalaxyExtensions.AdminApiKey) 
             {
                 var user = await _userRepo.RegisterWithWallet(model);
                 return ReturnFormatedResponse(user);
@@ -101,13 +101,13 @@ namespace GalaxyPvP.Api.Controllers
 
         }
 
-        [HttpPost("verification")]
+        [HttpPost("verifyEmail")]
         public async Task<IActionResult> Verification(string verifycode)
         {
             string adminApiKey = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             if (adminApiKey == GalaxyExtensions.AdminApiKey) 
             {
-                var user = await _userRepo.Verificantion(verifycode);
+                var user = await _userRepo.EmailConfirm(verifycode);
                 return ReturnFormatedResponse(user);
             }
             else
@@ -140,13 +140,26 @@ namespace GalaxyPvP.Api.Controllers
                 return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "UnAuthorized"));
         }
 
-        [HttpGet("getUserInfo")]
-        public async Task<IActionResult> GetUserInfo(string email)
+        [HttpGet("getUserInfoByEmail")]
+        public async Task<IActionResult> GetUserInfoByEmail(string email)
         {
             string adminApiKey = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             if (adminApiKey == GalaxyExtensions.AdminApiKey)
             {
                 var user = await _userRepo.GetByEmail(email);
+                return ReturnFormatedResponse(user);
+            }
+            else
+                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "UnAuthorized"));
+        }
+
+        [HttpGet("getUserInfoByWallet")]
+        public async Task<IActionResult> GetUserInfoByWallet(string wallet)
+        {
+            string adminApiKey = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (adminApiKey == GalaxyExtensions.AdminApiKey)
+            {
+                var user = await _userRepo.GetByWallet(wallet);
                 return ReturnFormatedResponse(user);
             }
             else
