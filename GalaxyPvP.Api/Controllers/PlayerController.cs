@@ -192,7 +192,26 @@ namespace GalaxyPvP.Api.Controllers
             ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
             if (userAuthorize.Success)
             {
-                ApiResponse<PlayerDto> response = await _dbPlayer.UpdatePlayerTutorial(userId);
+                ApiResponse<string> response = await _dbPlayer.UpdatePlayerTutorial(userId);
+                return ReturnFormatedResponse(response);
+            }
+            else
+            {
+                return ReturnFormatedResponse(userAuthorize);
+            }
+        }
+
+        [HttpPut("confirmTermsOfService")]
+        [Authorize]
+        public async Task<IActionResult> ConfirmTermsOfService()
+        {
+            string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            ApiResponse<UserDTO> userAuthorize = await _userRepo.AuthorizeUser(userId, jwtToken);
+            if (userAuthorize.Success)
+            {
+                ApiResponse<string> response = await _dbPlayer.ConfirmTermsOfService(userId);
                 return ReturnFormatedResponse(response);
             }
             else
@@ -218,7 +237,6 @@ namespace GalaxyPvP.Api.Controllers
             {
                 return ReturnFormatedResponse(userAuthorize);
             }
-            
         }
     }
 }

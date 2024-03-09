@@ -295,26 +295,46 @@ namespace GalaxyPvP.Data
                 return ApiResponse<PlayerDto>.ReturnFailed(404, ex.Message);
             }
         }
-        public async Task<ApiResponse<PlayerDto>> UpdatePlayerTutorial(string userId)
+
+        public async Task<ApiResponse<string>> ConfirmTermsOfService(string userId)
+        {
+            try
+            {
+                var player = Context.Set<Player>().FirstOrDefault(x => x.UserId == userId);
+                if (player == null)
+                    return ApiResponse<string>.ReturnFailed(404, "Player not exist!");
+                else
+                {
+                    player.ConfirmTermsOfService = true;
+                    await Context.SaveChangesAsync();
+                    return ApiResponse<string>.ReturnResultWith200("Success!");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<string>.ReturnFailed(404, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<string>> UpdatePlayerTutorial(string userId)
         {
             try
             {
                 var player = Context.Set<Player>().FirstOrDefault(x => x.UserId == userId);
                 if (player == null)
                 {
-                    return ApiResponse<PlayerDto>.ReturnFailed(404, "Player not exist!");
+                    return ApiResponse<string>.ReturnFailed(404, "Player not exist!");
                 }
                 else
                 {
                     player.Tutorial = 1;
                     await Context.SaveChangesAsync();
-
-                    return ApiResponse<PlayerDto>.ReturnResultWith200(_mapper.Map<PlayerDto>(player));
+                    return ApiResponse<string>.ReturnResultWith200("Success!");
                 }
             }
             catch (Exception ex)
             {
-                return ApiResponse<PlayerDto>.ReturnFailed(404, ex.Message);
+                return ApiResponse<string>.ReturnFailed(404, ex.Message);
             }
         }
 
@@ -427,6 +447,5 @@ namespace GalaxyPvP.Data
             }
         }
 
-        
     }
 }
