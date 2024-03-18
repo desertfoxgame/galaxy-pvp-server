@@ -24,6 +24,7 @@ namespace GalaxyPvP.Data
         public short isAdmin {  get; set; }
         public short Developer {  get; set; }
         public string Verification { get; set; }
+        public string ConfirmTermsOfService { get; set; }
         public string[] PlayerItems {  get; set; }
     }
 }

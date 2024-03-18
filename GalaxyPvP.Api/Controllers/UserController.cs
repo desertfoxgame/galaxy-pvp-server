@@ -90,6 +90,7 @@ namespace GalaxyPvP.Api.Controllers
                 string nickname = profile.DisplayName ?? string.Empty;
                 string walletaddress = readonlyData.TryGetValue("publicaddress", out UserDataRecord? wallet) ? wallet.Value : string.Empty;
                 string verification = readonlyData.TryGetValue("verification", out UserDataRecord? vefiry) ? vefiry.Value : "Pending";
+                string confirmTermsOfService = readonlyData.TryGetValue("ConfirmTermsOfService", out UserDataRecord? confirm) ? vefiry.Value : "false";
 
                 string currentWinStreaks = userData.TryGetValue("CurrentWinStreaks", out UserDataRecord? CurrentWinStreaks) ? CurrentWinStreaks.Value : "0";
                 string mvp = userData.TryGetValue("MVP", out UserDataRecord? MVP) ? MVP.Value : "0";
@@ -134,6 +135,7 @@ namespace GalaxyPvP.Api.Controllers
                     isAdmin = short.Parse(isAdmin),
                     Developer = short.Parse(developer),
                     Verification = verification,
+                    ConfirmTermsOfService = confirmTermsOfService,
                 };
 
                 ApiResponse<MigrateUserResponseDTO> response = await _migrationDataRepo.MigrationUser(migrationRequestDTO);

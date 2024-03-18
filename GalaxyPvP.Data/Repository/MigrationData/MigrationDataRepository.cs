@@ -72,8 +72,9 @@ namespace GalaxyPvP.Data
 
                 // Create Pvp player using playfab data
                 Player player = _mapper.Map<Player>(request);
-                var newUser = _userRepo.FindBy(x => x.Email == request.Email).FirstOrDefault();
-                newUser.EmailConfirmed = request.Verification == "Pending" ? false : true; // Email confirm with verification from playfab
+                var newUser = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(u => u.Email == request.Email);
+                if (newUser != null)
+                    newUser.EmailConfirmed = request.Verification == "Pending" ? false : true; // Email confirm with verification from playfab
                 player.Id = request.PlayfabID;
                 player.UserId = newUser.Id;
 
