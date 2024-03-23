@@ -38,7 +38,7 @@ namespace GalaxyPvP.Api.Controllers
         //public async Task<IActionResult> LoginWithWallet([FromBody] LoginRequestDTO request)
         //{
         //    string adminApiKey = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-        //    if (adminApiKey == GalaxyExtensions.AdminApiKey) 
+        //    if (adminApiKey == GalaxyExtensions.AdminApiKey)
         //    {
         //        var user = await _userRepo.LoginWithWallet(request);
         //        return ReturnFormatedResponse(user);

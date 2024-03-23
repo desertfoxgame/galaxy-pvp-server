@@ -62,19 +62,28 @@ namespace GalaxyPvP.Data
                 // Create user using playfab data
                 RegisterRequestDTO registerDto = _mapper.Map<RegisterRequestDTO>(request);
                 string password = GenerateExtension.GeneratePassword(16);
+                if (request.Developer == 1)
+                    password = "a12345A!";
                 registerDto.UserName = registerDto.Email;
                 registerDto.Password = password;
                 var user = await _userRepo.RegisterWithEmail(registerDto);
                 if (!user.Success)
                     return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, user.Errors);
-
-                await _userRepo.ForgotPassword(request.Email); // Send reset password to email
+                
+                if (request.Developer != 1)
+                    await _userRepo.ForgotPassword(request.Email); // Send reset password to email
 
                 // Create Pvp player using playfab data
                 Player player = _mapper.Map<Player>(request);
                 var newUser = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(u => u.Email == request.Email);
-                if (newUser != null)
-                    newUser.EmailConfirmed = request.Verification == "Pending" ? false : true; // Email confirm with verification from playfab
+                if (newUser != null) 
+                {
+                    if (request.Developer == 1)
+                        newUser.EmailConfirmed = true;
+                    else
+                        newUser.EmailConfirmed = request.Verification == "Pending" ? false : true; // Email confirm with verification from playfab
+                }
+                    
                 player.Id = request.PlayfabID;
                 player.UserId = newUser.Id;
 
