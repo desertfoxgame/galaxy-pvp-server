@@ -105,7 +105,8 @@ namespace GalaxyPvP.Data.Repository.User
 
             var user = Context.GalaxyUsers.FirstOrDefault(u => u.WalletAddress == request.WalletAddress);
             if (user == null)
-                return ApiResponse<LoginResponseDTO>.ReturnFailed(404, "Wallet address is InCorrect.");
+                return ApiResponse<LoginResponseDTO>.ReturnUserNotFound();
+
             var roles = await _userManager.GetRolesAsync(user);
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(secretKey);

@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using GalaxyPvP.Api.Helpers;
 using GalaxyPvP.Data;
 using GalaxyPvP.Data.Dto;
 using GalaxyPvP.Data.Dto.MigrationDB;
@@ -34,18 +35,91 @@ namespace GalaxyPvP.Api.Controllers
             _migrationDataRepo = migrationDataRepo;
         }
 
-        //[HttpGet("loginWithWallet")]
-        //public async Task<IActionResult> LoginWithWallet([FromBody] LoginRequestDTO request)
-        //{
-        //    string adminApiKey = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-        //    if (adminApiKey == GalaxyExtensions.AdminApiKey)
-        //    {
-        //        var user = await _userRepo.LoginWithWallet(request);
-        //        return ReturnFormatedResponse(user);
-        //    }
-        //    else
-        //        return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "UnAuthorized"));
-        //}
+        [HttpGet("loginWithWallet")]
+        public async Task<IActionResult> LoginWithWallet([FromBody] LoginRequestDTO dto)
+        {
+            string adminApiKey = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (adminApiKey == GalaxyExtensions.AdminApiKey)
+            {
+                ApiResponse<LoginResponseDTO> loginResponse = await _userRepo.LoginWithWallet(dto);
+
+                if (loginResponse.StatusCode == 400)
+                {
+                    var loginPlayfab = await PlayfabHelper.LoginWithWallet(dto.WalletAddress);
+                    if (loginPlayfab.Success)
+                    {
+                        var playfabData = await PlayfabHelper.GetPlayfabData(loginPlayfab.PlayfabId);
+                        if (playfabData.Success)
+                        {
+                            ApiResponse<MigrateUserResponseDTO> migrateData = await _migrationDataRepo.MigrationUser(playfabData.Data);
+                            if (migrateData.Success)
+                                return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith201(""));
+                            else
+                                return ReturnFormatedResponse(ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, migrateData.Errors));
+                        }
+                        else
+                        {
+                            loginResponse = ApiResponse<LoginResponseDTO>.ReturnFailed(404, playfabData.ErrorMessage);
+                            return ReturnFormatedResponse(loginResponse);
+                        }
+                    }
+                    else
+                    {
+                        loginResponse = ApiResponse<LoginResponseDTO>.ReturnFailed(404, loginPlayfab.ErrorMessage);
+                        return ReturnFormatedResponse(loginResponse);
+                    }
+                }
+                else
+                    return ReturnFormatedResponse(loginResponse);
+
+            }
+            else
+                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "UnAuthorized"));
+
+        }
+
+        [HttpGet("loginWithEmail")]
+        public async Task<IActionResult> LoginWithEmail([FromBody] LoginRequestDTO dto)
+        {
+            string adminApiKey = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (adminApiKey == GalaxyExtensions.AdminApiKey)
+            {
+                ApiResponse<LoginResponseDTO> loginResponse = await _userRepo.Login(dto);
+
+                if (loginResponse.StatusCode == 400)
+                {
+                    var loginPlayfab = await PlayfabHelper.LoginWithWallet(dto.Email);
+                    if (loginPlayfab.Success)
+                    {
+                        var playfabData = await PlayfabHelper.GetPlayfabData(loginPlayfab.PlayfabId);
+                        if (playfabData.Success)
+                        {
+                            ApiResponse<MigrateUserResponseDTO> migrateData = await _migrationDataRepo.MigrationUser(playfabData.Data);
+                            if (migrateData.Success)
+                                return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith201(""));
+                            else
+                                return ReturnFormatedResponse(ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, migrateData.Errors));
+                        }
+                        else
+                        {
+                            loginResponse = ApiResponse<LoginResponseDTO>.ReturnFailed(404, playfabData.ErrorMessage);
+                            return ReturnFormatedResponse(loginResponse);
+                        }
+                    }
+                    else
+                    {
+                        loginResponse = ApiResponse<LoginResponseDTO>.ReturnFailed(404, loginPlayfab.ErrorMessage);
+                        return ReturnFormatedResponse(loginResponse);
+                    }
+                }
+                else
+                    return ReturnFormatedResponse(loginResponse);
+
+            }
+            else
+                return ReturnFormatedResponse(ApiResponse<string>.ReturnFailed(401, "UnAuthorized"));
+
+        }
 
         [HttpPost("registerWithEmail")]
         public async Task<IActionResult> RegisterWithEmail([FromBody] RegisterRequestDTO model)
