@@ -130,6 +130,82 @@ namespace GalaxyPvP.Data
             }
         }
 
+        public async Task<ApiResponse<MigrateUserResponseDTO>> MigrationUser(MigrateUserRequestDTO request, string password)
+        {
+            try
+            {
+                MigrateUserResponseDTO response = new();
+                _mapper.Map(request, response);
+                response.PlayerItemsCantCreate = [];
+
+                // Create user using playfab data
+                RegisterRequestDTO registerDto = _mapper.Map<RegisterRequestDTO>(request);
+                registerDto.UserName = registerDto.Email;
+                registerDto.Password = password;
+                var user = await _userRepo.RegisterWithEmail(registerDto);
+                if (!user.Success)
+                    return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, user.Errors);
+
+                //if (request.Developer != 1)
+                //    await _userRepo.ForgotPassword(request.Email); // Send reset password to email
+
+                // Create Pvp player using playfab data
+                Player player = _mapper.Map<Player>(request);
+                var newUser = await Context.Set<GalaxyUser>().FirstOrDefaultAsync(u => u.Email == request.Email);
+                if (newUser != null)
+                {
+                    if (request.Developer == 1)
+                        newUser.EmailConfirmed = true;
+                    else
+                        newUser.EmailConfirmed = request.Verification == "Pending" ? false : true; // Email confirm with verification from playfab
+                }
+
+                player.Id = request.PlayfabID;
+                player.UserId = newUser.Id;
+
+                // Create Player Item from playfab inventory
+                foreach (string name in request.PlayerItems)
+                {
+                    int dataId = await GetItemDataId(name);
+                    if (dataId != 0)
+                    {
+                        PlayerItemCreateDto itemCreateDto = new()
+                        {
+                            DataId = dataId
+                        };
+
+                        if (await Context.Set<PlayerItem>().FirstOrDefaultAsync(p => p.PlayerId == player.Id && p.DataId == itemCreateDto.DataId) != null)
+                        {
+                            response.PlayerItemsCantCreate.Add(name);
+                        }
+                        else
+                        {
+                            PlayerItem item = new();
+                            _mapper.Map(itemCreateDto, item);
+                            item.PlayerId = player.Id;
+                            item.CreatedAt = DateTime.Now;
+                            item.UpdatedAt = DateTime.Now;
+                            Context.Set<PlayerItem>().Add(item);
+                        }
+                    }
+                    else
+                        response.PlayerItemsCantCreate.Add(name);
+                }
+                await Context.SaveChangesAsync();
+                // Create player
+                ApiResponse<PlayerDto> migrateDataCreate = await _playerRepo.MigrateDataCreate(newUser.Id, player);
+
+                if (migrateDataCreate.Success)
+                    return ApiResponse<MigrateUserResponseDTO>.ReturnResultWith200(response);
+                else
+                    return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, migrateDataCreate.Errors);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<MigrateUserResponseDTO>.ReturnFailed(404, ex.Message);
+            }
+        }
+
         async Task<int> GetItemDataId(string name)
         {
             var itemData = await Context.Set<ItemDataMigration>().FirstOrDefaultAsync(x => x.Name == name);

@@ -192,7 +192,7 @@ namespace GalaxyPvP.Data.Repository.User
 
             var newUser = await _userManager.FindByEmailAsync(request.Email);
 
-            await SendVerifyCode(request.Email, newUser.Id);
+            //await SendVerifyCode(request.Email, newUser.Id);
 
             if (!_roleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
                 await _roleManager.CreateAsync(new IdentityRole("admin"));

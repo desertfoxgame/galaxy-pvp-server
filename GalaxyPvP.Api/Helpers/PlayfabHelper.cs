@@ -4,8 +4,10 @@ using GalaxyPvP.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using PlayFab;
 using PlayFab.AdminModels;
+using PlayFab.ClientModels;
 using PlayFab.ServerModels;
 using UserDataRecord = PlayFab.ServerModels.UserDataRecord;
+using GetPlayerCombinedInfoRequest = PlayFab.ServerModels.GetPlayerCombinedInfoRequest;
 
 namespace GalaxyPvP.Api.Helpers
 {
@@ -24,17 +26,18 @@ namespace GalaxyPvP.Api.Helpers
                 return LoginPlayfabResponse.ReturnSuccess(loginPlayfab.Result.PlayFabId);
         }
 
-        public static async Task<LoginPlayfabResponse> LoginWithEmail(string email)
+        public static async Task<LoginPlayfabResponse> LoginWithEmail(string email, string password)
         {
-            LookupUserAccountInfoRequest userInfoRequest = new()
+            LoginWithEmailAddressRequest request = new()
             {
                 Email = email,
+                Password = password,
             };
-            var userInfoResp = await PlayFabAdminAPI.GetUserAccountInfoAsync(userInfoRequest);
-            if (userInfoResp.Error != null)
-                return LoginPlayfabResponse.ReturnError(userInfoResp.Error.ErrorMessage);
+            var loginResp = await PlayFabClientAPI.LoginWithEmailAddressAsync(request);
+            if (loginResp.Error != null)
+                return LoginPlayfabResponse.ReturnError(loginResp.Error.ErrorMessage);
             else
-                return LoginPlayfabResponse.ReturnSuccess(userInfoResp.Result.UserInfo.PlayFabId);
+                return LoginPlayfabResponse.ReturnSuccess(loginResp.Result.PlayFabId);
         }
 
         public static async Task<PlayfabDataResponse> GetPlayfabData(string playfabId)

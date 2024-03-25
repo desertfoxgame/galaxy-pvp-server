@@ -88,13 +88,13 @@ namespace GalaxyPvP.Api.Controllers
 
                 if (loginResponse.StatusCode == 400)
                 {
-                    var loginPlayfab = await PlayfabHelper.LoginWithWallet(dto.Email);
+                    var loginPlayfab = await PlayfabHelper.LoginWithEmail(dto.Email, dto.Password);
                     if (loginPlayfab.Success)
                     {
                         var playfabData = await PlayfabHelper.GetPlayfabData(loginPlayfab.PlayfabId);
                         if (playfabData.Success)
                         {
-                            ApiResponse<MigrateUserResponseDTO> migrateData = await _migrationDataRepo.MigrationUser(playfabData.Data);
+                            ApiResponse<MigrateUserResponseDTO> migrateData = await _migrationDataRepo.MigrationUser(playfabData.Data, dto.Password);
                             if (migrateData.Success)
                                 return ReturnFormatedResponse(ApiResponse<string>.ReturnResultWith201(""));
                             else
